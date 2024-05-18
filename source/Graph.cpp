@@ -1,17 +1,38 @@
 #include "../include/Graph.hpp"
+#include <sstream>
 using namespace std;
+
 Graph::Graph(std::ifstream &instance)
 {
-    /*
-    Recebe o arquivo aberto
-    coloca numero de nós igual a 0
-    Itera pelas linhas, em cada linha:
-        verifica se o primeiro nó está na lista duplamente encadeada
-            se não estiver cria o nó
-        verifica se o segundoo nó está na lista duplamente encadeada
-            se não estiver cria o nó
-        cria a aresta da linha
-    */
+    _number_of_edges = 0;
+    _number_of_nodes = 0;
+
+    _first = NULL;
+    _last = NULL;
+
+    string line;
+
+    while (getline(instance, line))
+    {
+        istringstream iss(line);
+
+        size_t node_1, node_2;
+        float node_1_weight, node_2_weight, edge_weight = 0.0;
+
+        if (_weighted_nodes && _weighted_edges)
+            iss >> node_1 >> node_1_weight >> node_2 >> node_2_weight >> edge_weight;
+        else if (_weighted_nodes && !_weighted_edges)
+            iss >> node_1 >> node_1_weight >> node_2 >> node_2_weight;
+        else if (!_weighted_nodes && _weighted_edges)
+            iss >> node_1 >> node_2 >> edge_weight;
+        else
+            iss >> node_1 >> node_2;
+
+        add_node(node_1, node_1_weight);
+        add_node(node_2, node_2_weight);
+
+        add_edge(node_1, node_2, edge_weight);
+    }
 }
 
 Graph::Graph()
@@ -24,14 +45,60 @@ Graph::~Graph()
 
 void Graph::remove_node(size_t node_position)
 {
+    if (_first == NULL)
+    {
+        cout << "Error: Graph is empty" << endl;
+        return;
+    }
+
+    Node *aux = _first;
+
+    while (aux != NULL && aux->_id != node_position)
+        aux = aux->_next_node;
+
+    if (aux == NULL)
+    {
+        cout << "Error: Node not found" << endl;
+        return;
+    }
+
+    // retirar o nó da(s) aresta(s) do grafo
+    // atualizar a lista encadeada
+    // liberar memória
 }
 
 void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
 {
+    Node *aux_node_1, *aux_node_2 = NULL;
+
+    for (Node *aux = _first; aux != NULL; aux = aux->_next_node)
+    {
+
+        if (aux->_id == node_position_1)
+            aux_node_1 = aux;
+
+        if (aux->_id == node_position_2)
+            aux_node_2 = aux;
+
+        if (aux_node_1 != NULL && aux_node_2 != NULL)
+            break;
+    }
+
+    if (aux_node_1 == NULL || aux_node_2 == NULL)
+    {
+        cout << "Error: At least one of the nodes was not found" << endl;
+        return;
+    }
+
+    // remover a aresta entre os nós
 }
 
 void Graph::add_node(size_t node_id, float weight)
 {
+    for (Node *aux = _first; aux != NULL; aux = aux->_next_node)
+        if (aux->_id == node_id)
+            return;
+
     Node *aux = new Node;
     aux->_number_of_edges = 0;
     aux->_id = node_id;
@@ -103,11 +170,12 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
 
 void Graph::print_graph()
 {
-    for (Node *node = _first; node != NULL; node = node->_next_node){
+    for (Node *node = _first; node != NULL; node = node->_next_node)
+    {
         cout << node->_id;
         for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
             cout << " -> " << edge->_target_id;
-    }  
+    }
     cout << endl;
 }
 
