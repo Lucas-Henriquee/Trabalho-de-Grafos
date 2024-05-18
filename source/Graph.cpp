@@ -14,6 +14,9 @@ Graph::Graph(std::ifstream &instance)
 
     while (getline(instance, line))
     {
+        if (line.empty())
+            continue;
+
         istringstream iss(line);
 
         size_t node_1, node_2;
@@ -21,9 +24,9 @@ Graph::Graph(std::ifstream &instance)
 
         if (_weighted_nodes && _weighted_edges)
             iss >> node_1 >> node_1_weight >> node_2 >> node_2_weight >> edge_weight;
-        else if (_weighted_nodes && !_weighted_edges)
+        else if (_weighted_nodes)
             iss >> node_1 >> node_1_weight >> node_2 >> node_2_weight;
-        else if (!_weighted_nodes && _weighted_edges)
+        else if (_weighted_edges)
             iss >> node_1 >> node_2 >> edge_weight;
         else
             iss >> node_1 >> node_2;
