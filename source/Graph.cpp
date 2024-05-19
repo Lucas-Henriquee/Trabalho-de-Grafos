@@ -2,8 +2,12 @@
 #include <sstream>
 using namespace std;
 
-Graph::Graph(std::ifstream &instance)
+Graph::Graph(std::ifstream &instance, bool directed, bool weight_edges, bool weight_nodes)
 {
+    _directed = directed;
+    _weighted_edges = weight_edges;
+    _weighted_nodes = weight_nodes;
+
     _number_of_edges = 0;
     _number_of_nodes = 0;
 
@@ -44,13 +48,28 @@ Graph::Graph()
 
 Graph::~Graph()
 {
+    Node *aux_node_1 = _first;
+
+    while (aux_node_1 != NULL)
+    {
+        Edge *aux_edge_1 = aux_node_1->_first_edge;
+        while (aux_edge_1 != NULL)
+        {
+            Edge *aux_edge_2 = aux_edge_1->_next_edge;
+            delete aux_edge_1;
+            aux_edge_1 = aux_edge_2;
+        }
+        Node *aux_node_2 = aux_node_1->_next_node;
+        delete aux_node_1;
+        aux_node_1 = aux_node_2;
+    }
 }
 
 void Graph::remove_node(size_t node_position)
 {
     if (_first == NULL)
     {
-        cout << "Error: Graph is empty" << endl;
+        cout << "Erro: O Grafo está vazio." << endl;
         return;
     }
 
@@ -61,7 +80,7 @@ void Graph::remove_node(size_t node_position)
 
     if (aux == NULL)
     {
-        cout << "Error: Node not found" << endl;
+        cout << "Erro: O Nó não foi encontrado." << endl;
         return;
     }
 
@@ -89,7 +108,7 @@ void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
 
     if (aux_node_1 == NULL || aux_node_2 == NULL)
     {
-        cout << "Error: At least one of the nodes was not found" << endl;
+        cout << "Erro: Ao menos um dos Nós não foi encontrado." << endl;
         return;
     }
 

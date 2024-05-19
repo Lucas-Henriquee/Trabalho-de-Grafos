@@ -3,7 +3,7 @@
 #include <chrono>
 using namespace std;
 
-void menu();
+void menu(string file);
 void transitive_direct(size_t vertex);
 void transitive_indirect(size_t vertex);
 void dijkstra_shortest_path(size_t vertex_1, size_t vertex_2);
@@ -34,29 +34,31 @@ int main(int argc, char *argv[])
         if (file.is_open())
         {
             bool directed = (string(argv[3]) == "1");
-            bool weighted_edges = (string(argv[4]) == "1");
-            bool weighted_nodes = (string(argv[5]) == "1");
+            bool weight_edges = (string(argv[4]) == "1");
+            bool weight_nodes = (string(argv[5]) == "1");
 
-            Graph *a = new Graph(file);
+            Graph *a = new Graph(file, directed, weight_edges, weight_nodes);
             a->print_graph();
         }
         else
-            cout << "Error opening file" << endl;
-
-        menu();
+            cout << "Erro ao abri o arquivo" << endl;
 
         file.close();
+        
+        string file_exit = argv[2];
+
+        menu(file_exit);
+
     }
 
     return 0;
 }
 
-void menu()
+void menu(string file)
 {
 
     int i = -1;
-    size_t vertex_1, vertex_2;
-    size_t size;
+    size_t size, vertex_1, vertex_2;
 
     do
     {
@@ -76,11 +78,13 @@ void menu()
 
         cin >> i;
 
+        system("clear||cls");
+
         switch (i)
         {
         case 1:
         {
-            system("clear||cls");
+            
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
             transitive_direct(vertex_1);
@@ -88,7 +92,6 @@ void menu()
         }
         case 2:
         {
-            system("clear||cls");
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
             transitive_indirect(vertex_1);
@@ -96,7 +99,6 @@ void menu()
         }
         case 3:
         {
-            system("clear||cls");
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
             dijkstra_shortest_path(vertex_1, vertex_2);
@@ -104,7 +106,6 @@ void menu()
         }
         case 4:
         {
-            system("clear||cls");
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
             floyd_shortest_path(vertex_1, vertex_2);
@@ -112,7 +113,6 @@ void menu()
         }
         case 5:
         {
-            system("clear||cls");
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
             size_t *vertices = new size_t[size];
@@ -125,7 +125,6 @@ void menu()
         }
         case 6:
         {
-            system("clear||cls");
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
             size_t *vertices = new size_t[size];
@@ -140,7 +139,6 @@ void menu()
         }
         case 7:
         {
-            system("clear||cls");
             cout << "Digite o ID do vértice: ";
             cin >> vertex_1;
             deep_walking(vertex_1);
@@ -148,13 +146,11 @@ void menu()
         }
         case 8:
         {
-            system("clear||cls");
             properties_graph();
             break;
         }
         case 9:
         {
-            system("clear||cls");
             articulation_vertices();
             break;
         }
