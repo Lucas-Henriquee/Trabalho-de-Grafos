@@ -191,21 +191,21 @@ void menu(string file_exit)
 void transitive_direct(size_t vertex)
 {
     // Implementação
-    output_buffer << "Fecho Transitivo Direto para o vértice " << vertex << ": ...\n";
+    output_buffer << "  Fecho Transitivo Direto para o vértice " << vertex << ": ...\n";
     cout << output_buffer.str();
 }
 
 void transitive_indirect(size_t vertex)
 {
     // Implementação
-    output_buffer << "Fecho Transitivo Indireto para o vértice " << vertex << ": ...\n";
+    output_buffer << "  Fecho Transitivo Indireto para o vértice " << vertex << ": ...\n";
     cout << output_buffer.str();
 }
 
 void dijkstra_shortest_path(size_t vertex_1, size_t vertex_2)
 {
     // Implementação
-    output_buffer << "Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
+    output_buffer << "   Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
     cout << output_buffer.str();
 }
 

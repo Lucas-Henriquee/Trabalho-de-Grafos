@@ -108,11 +108,30 @@ void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
 
     if (aux_node_1 == NULL || aux_node_2 == NULL)
     {
-        cout << "Erro: Ao menos um dos Nós não foi encontrado." << endl;
+        cout << "  Erro: Ao menos um dos Nós não foi encontrado." << endl;
         return;
     }
 
-    // remover a aresta entre os nós
+    Edge *aux_edge_1 = aux_node_1->_first_edge;
+    Edge *aux_edge_2 = NULL;
+
+    while (aux_edge_1 != NULL)
+    {
+        if (aux_edge_1->_target_id == node_position_2)
+        {
+
+            if (aux_edge_2 != NULL)
+                aux_edge_2->_next_edge == aux_edge_1->_next_edge;
+            else
+                aux_node_1->_first_edge = aux_edge_1->_next_edge;
+
+            delete aux_edge_1;
+            aux_node_1->_number_of_edges--;
+            break;
+        }
+        aux_edge_2 = aux_edge_1;
+        aux_edge_1 = aux_edge_1->_next_edge;
+    }
 }
 
 void Graph::add_node(size_t node_id, float weight)
