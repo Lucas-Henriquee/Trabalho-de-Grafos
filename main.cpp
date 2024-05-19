@@ -1,9 +1,12 @@
 #include "include/Graph.hpp"
 #include <thread>
 #include <chrono>
+#include <sstream>
+#include <fstream>
+#include <iostream>
 using namespace std;
 
-void menu(string file);
+void menu(string file_exit);
 void transitive_direct(size_t vertex);
 void transitive_indirect(size_t vertex);
 void dijkstra_shortest_path(size_t vertex_1, size_t vertex_2);
@@ -13,7 +16,9 @@ void kruskal_minimum_generating_tree(size_t *vertices, size_t size);
 void deep_walking(size_t vertex);
 void properties_graph();
 void articulation_vertices();
-void save_exit();
+void save_exit(string file);
+
+ostringstream output_buffer;
 
 int main(int argc, char *argv[])
 {
@@ -44,17 +49,16 @@ int main(int argc, char *argv[])
             cout << "Erro ao abri o arquivo" << endl;
 
         file.close();
-        
+
         string file_exit = argv[2];
 
         menu(file_exit);
-
     }
 
     return 0;
 }
 
-void menu(string file)
+void menu(string file_exit)
 {
 
     int i = -1;
@@ -84,7 +88,7 @@ void menu(string file)
         {
         case 1:
         {
-            
+
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
             transitive_direct(vertex_1);
@@ -169,10 +173,14 @@ void menu(string file)
             if (i != 0)
             {
                 cout << "\n\n  Deseja salvar esses dados em um arquivo? (s/n): ";
-                string option;
+                char option;
                 cin >> option;
-                if (option == "s")
-                    save_exit();
+
+                if (option == 's')
+                    save_exit(file_exit);
+
+                output_buffer.str("");
+                output_buffer.clear();
             }
         }
     } while (i != 0);
@@ -182,31 +190,90 @@ void menu(string file)
 
 void transitive_direct(size_t vertex)
 {
+    // Implementação
+    output_buffer << "Fecho Transitivo Direto para o vértice " << vertex << ": ...\n";
+    cout << output_buffer.str();
 }
+
 void transitive_indirect(size_t vertex)
 {
+    // Implementação
+    output_buffer << "Fecho Transitivo Indireto para o vértice " << vertex << ": ...\n";
+    cout << output_buffer.str();
 }
+
 void dijkstra_shortest_path(size_t vertex_1, size_t vertex_2)
 {
+    // Implementação
+    output_buffer << "Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
+    cout << output_buffer.str();
 }
+
 void floyd_shortest_path(size_t vertex_1, size_t vertex_2)
 {
+    // Implementação
+    output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
+    cout << output_buffer.str();
 }
+
 void prim_minimum_generating_tree(size_t *vertices, size_t size)
 {
+    // Implementação
+    output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
+    for (size_t i = 0; i < size; ++i)
+    {
+        output_buffer << vertices[i] << " ";
+    }
+    output_buffer << "\n";
+    cout << output_buffer.str();
 }
+
 void kruskal_minimum_generating_tree(size_t *vertices, size_t size)
 {
+    // Implementação
+    output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
+    for (size_t i = 0; i < size; ++i)
+    {
+        output_buffer << vertices[i] << " ";
+    }
+    output_buffer << "\n";
+    cout << output_buffer.str();
 }
+
 void deep_walking(size_t vertex)
 {
+    // Implementação
+    output_buffer << "  Caminhamento em Profundidade a partir do vértice " << vertex << ": ...\n";
+    cout << output_buffer.str();
 }
+
 void properties_graph()
 {
+    // Implementação
+    output_buffer << "  Propriedades do Grafo: Raio, Diâmetro, Centro, Periferia: ...\n";
+    cout << output_buffer.str();
 }
+
 void articulation_vertices()
 {
+    // Implementação
+    output_buffer << "  Vértices de Articulação do Grafo: ...\n";
+    cout << output_buffer.str();
 }
-void save_exit()
+
+void save_exit(string file_exit)
 {
+    ofstream output_file(file_exit, ios::out | ios::app);
+
+    if (output_file.is_open())
+    {
+        output_file << output_buffer.str();
+        cout << "  Saída salva no arquivo: " << file_exit << endl;
+        this_thread::sleep_for(chrono::seconds(2));
+        output_file.close();
+    }
+    else
+    {
+        cout << "  Erro ao abrir o arquivo para salvar a saída." << endl;
+    }
 }
