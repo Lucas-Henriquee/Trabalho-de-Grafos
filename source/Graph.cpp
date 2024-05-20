@@ -73,14 +73,14 @@ void Graph::remove_node(size_t node_position)
         return;
     }
 
-    Node *aux = _first;
+    Node *aux_node_1 = _first;
 
-    while (aux != NULL && aux->_id != node_position)
-        aux = aux->_next_node;
+    while (aux_node_1 != NULL && aux_node_1->_id != node_position)
+        aux_node_1 = aux_node_1->_next_node;
 
-    if (aux == NULL)
+    if (aux_node_1 == NULL)
     {
-        cout << "  Erro: O Nó não foi encontrado." << endl;
+        cout << "  Erro: O Nó não foi encontrado no grafo." << endl;
         return;
     }
 
@@ -222,6 +222,25 @@ void Graph::print_graph()
 
 void Graph::print_graph(std::ofstream &output_file)
 {
+    if (_first == NULL)
+    {
+        cout << "  Erro: Não será possível imprimir o grafo, pois ele está vazio." << endl;
+        return;
+    }
+
+    output_file << "  \n\t\tImprimindo Grafo " << endl;
+
+    output_file << "  \tDados do Grafo: \n  Número de Nós: " << _number_of_nodes << "  Número de Arestas: " << _number_of_edges << endl;
+
+    for (Node *node = _first; node != NULL; node = node->_next_node)
+    {
+        output_file << node->_id;
+        for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
+            output_file << " -> " << edge->_target_id;
+    }
+    output_file << endl;
+
+    output_file << "\n\n\n\tFuncionalidades solicitadas para a impressão:  " << endl;
 }
 
 int Graph::conected(size_t node_id_1, size_t node_id_2)

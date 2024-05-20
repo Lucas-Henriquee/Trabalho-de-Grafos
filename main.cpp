@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
 
         string file_exit = argv[2];
 
-        if(g != NULL){
+        if (g != NULL)
+        {
             menu(g, file_exit);
             delete g;
         }
@@ -72,7 +73,7 @@ void menu(Graph *g, string file_exit)
     do
     {
         system("clear||cls");
-        
+
         cout << "\n\t  Menu de Operações do Grafo\n\n\n";
         cout << "  1) Fecho Transitivo Direto de um vértice" << endl;
         cout << "  2) Fecho Transitivo Indireto de um Vértice" << endl;
@@ -269,13 +270,24 @@ void articulation_vertices(Graph *g)
 
 void save_exit(Graph *g, string file_exit)
 {
+    ifstream check_file(file_exit);
+    bool file_exists = check_file.good();
+
     ofstream output_file(file_exit, ios::out | ios::app);
 
     if (output_file.is_open())
     {
+
+        if (!file_exists)
+        {
+            g->print_graph(output_file);
+        }
+
         output_file << output_buffer.str();
+
         cout << "  Saída salva no arquivo: " << file_exit << endl;
         this_thread::sleep_for(chrono::seconds(2));
+
         output_file.close();
     }
     else
