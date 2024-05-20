@@ -24,7 +24,7 @@ Graph::Graph(std::ifstream &instance, bool directed, bool weight_edges, bool wei
         istringstream iss(line);
 
         size_t node_1, node_2;
-        float node_1_weight, node_2_weight, edge_weight = 0.0;
+        float node_1_weight = 0.0, node_2_weight = 0.0, edge_weight = 0.0;
 
         if (_weighted_nodes && _weighted_edges)
             iss >> node_1 >> node_1_weight >> node_2 >> node_2_weight >> edge_weight;
@@ -91,7 +91,7 @@ void Graph::remove_node(size_t node_position)
 
 void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
 {
-    Node *aux_node_1, *aux_node_2 = NULL;
+    Node *aux_node_1 = NULL, *aux_node_2 = NULL;
 
     for (Node *aux = _first; aux != NULL; aux = aux->_next_node)
     {
@@ -243,7 +243,7 @@ void Graph::print_graph(std::ofstream &output_file)
 
 int Graph::conected(size_t node_id_1, size_t node_id_2)
 {
-    Node *aux_node_1, *aux_node_2 = NULL;
+    Node *aux_node_1 = NULL, *aux_node_2 = NULL;
     Node *aux_node = _first;
 
     while (aux_node != NULL)
