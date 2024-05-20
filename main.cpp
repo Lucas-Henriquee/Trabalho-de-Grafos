@@ -6,17 +6,17 @@
 #include <iostream>
 using namespace std;
 
-void menu(string file_exit);
-void transitive_direct(size_t vertex);
-void transitive_indirect(size_t vertex);
-void dijkstra_shortest_path(size_t vertex_1, size_t vertex_2);
-void floyd_shortest_path(size_t vertex_1, size_t vertex_2);
-void prim_minimum_generating_tree(size_t *vertices, size_t size);
-void kruskal_minimum_generating_tree(size_t *vertices, size_t size);
-void deep_walking(size_t vertex);
-void properties_graph();
-void articulation_vertices();
-void save_exit(string file);
+void menu(Graph *g, string file_exit);
+void transitive_direct(Graph *g, size_t vertex);
+void transitive_indirect(Graph *g, size_t vertex);
+void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2);
+void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2);
+void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size);
+void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size);
+void deep_walking(Graph *g, size_t vertex);
+void properties_graph(Graph *g);
+void articulation_vertices(Graph *g);
+void save_exit(Graph *g, string file);
 
 ostringstream output_buffer;
 
@@ -36,14 +36,16 @@ int main(int argc, char *argv[])
         string filename = argv[1];
         ifstream file(filename);
 
+        Graph *g = NULL;
+
         if (file.is_open())
         {
             bool directed = (string(argv[3]) == "1");
             bool weight_edges = (string(argv[4]) == "1");
             bool weight_nodes = (string(argv[5]) == "1");
 
-            Graph *a = new Graph(file, directed, weight_edges, weight_nodes);
-            a->print_graph();
+            g = new Graph(file, directed, weight_edges, weight_nodes);
+            g->print_graph();
         }
         else
             cout << "Erro ao abri o arquivo" << endl;
@@ -52,13 +54,16 @@ int main(int argc, char *argv[])
 
         string file_exit = argv[2];
 
-        menu(file_exit);
+        if(g != NULL){
+            menu(g, file_exit);
+            delete g;
+        }
     }
 
     return 0;
 }
 
-void menu(string file_exit)
+void menu(Graph *g, string file_exit)
 {
 
     int i = -1;
@@ -67,6 +72,7 @@ void menu(string file_exit)
     do
     {
         system("clear||cls");
+        
         cout << "\n\t  Menu de Operações do Grafo\n\n\n";
         cout << "  1) Fecho Transitivo Direto de um vértice" << endl;
         cout << "  2) Fecho Transitivo Indireto de um Vértice" << endl;
@@ -91,28 +97,28 @@ void menu(string file_exit)
 
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
-            transitive_direct(vertex_1);
+            transitive_direct(g, vertex_1);
             break;
         }
         case 2:
         {
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
-            transitive_indirect(vertex_1);
+            transitive_indirect(g, vertex_1);
             break;
         }
         case 3:
         {
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
-            dijkstra_shortest_path(vertex_1, vertex_2);
+            dijkstra_shortest_path(g, vertex_1, vertex_2);
             break;
         }
         case 4:
         {
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
-            floyd_shortest_path(vertex_1, vertex_2);
+            floyd_shortest_path(g, vertex_1, vertex_2);
             break;
         }
         case 5:
@@ -123,7 +129,7 @@ void menu(string file_exit)
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t i = 0; i < size; ++i)
                 cin >> vertices[i];
-            prim_minimum_generating_tree(vertices, size);
+            prim_minimum_generating_tree(g, vertices, size);
             delete[] vertices;
             break;
         }
@@ -137,7 +143,7 @@ void menu(string file_exit)
             {
                 cin >> vertices[i];
             }
-            kruskal_minimum_generating_tree(vertices, size);
+            kruskal_minimum_generating_tree(g, vertices, size);
             delete[] vertices;
             break;
         }
@@ -145,17 +151,17 @@ void menu(string file_exit)
         {
             cout << "Digite o ID do vértice: ";
             cin >> vertex_1;
-            deep_walking(vertex_1);
+            deep_walking(g, vertex_1);
             break;
         }
         case 8:
         {
-            properties_graph();
+            properties_graph(g);
             break;
         }
         case 9:
         {
-            articulation_vertices();
+            articulation_vertices(g);
             break;
         }
         case 0:
@@ -177,7 +183,7 @@ void menu(string file_exit)
                 cin >> option;
 
                 if (option == 's')
-                    save_exit(file_exit);
+                    save_exit(g, file_exit);
 
                 output_buffer.str("");
                 output_buffer.clear();
@@ -188,35 +194,35 @@ void menu(string file_exit)
     return;
 }
 
-void transitive_direct(size_t vertex)
+void transitive_direct(Graph *g, size_t vertex)
 {
     // Implementação
     output_buffer << "  Fecho Transitivo Direto para o vértice " << vertex << ": ...\n";
     cout << output_buffer.str();
 }
 
-void transitive_indirect(size_t vertex)
+void transitive_indirect(Graph *g, size_t vertex)
 {
     // Implementação
     output_buffer << "  Fecho Transitivo Indireto para o vértice " << vertex << ": ...\n";
     cout << output_buffer.str();
 }
 
-void dijkstra_shortest_path(size_t vertex_1, size_t vertex_2)
+void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
     // Implementação
     output_buffer << "   Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
     cout << output_buffer.str();
 }
 
-void floyd_shortest_path(size_t vertex_1, size_t vertex_2)
+void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
     // Implementação
     output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
     cout << output_buffer.str();
 }
 
-void prim_minimum_generating_tree(size_t *vertices, size_t size)
+void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
     // Implementação
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
@@ -228,7 +234,7 @@ void prim_minimum_generating_tree(size_t *vertices, size_t size)
     cout << output_buffer.str();
 }
 
-void kruskal_minimum_generating_tree(size_t *vertices, size_t size)
+void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
     // Implementação
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
@@ -240,28 +246,28 @@ void kruskal_minimum_generating_tree(size_t *vertices, size_t size)
     cout << output_buffer.str();
 }
 
-void deep_walking(size_t vertex)
+void deep_walking(Graph *g, size_t vertex)
 {
     // Implementação
     output_buffer << "  Caminhamento em Profundidade a partir do vértice " << vertex << ": ...\n";
     cout << output_buffer.str();
 }
 
-void properties_graph()
+void properties_graph(Graph *g)
 {
     // Implementação
     output_buffer << "  Propriedades do Grafo: Raio, Diâmetro, Centro, Periferia: ...\n";
     cout << output_buffer.str();
 }
 
-void articulation_vertices()
+void articulation_vertices(Graph *g)
 {
     // Implementação
     output_buffer << "  Vértices de Articulação do Grafo: ...\n";
     cout << output_buffer.str();
 }
 
-void save_exit(string file_exit)
+void save_exit(Graph *g, string file_exit)
 {
     ofstream output_file(file_exit, ios::out | ios::app);
 

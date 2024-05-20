@@ -69,7 +69,7 @@ void Graph::remove_node(size_t node_position)
 {
     if (_first == NULL)
     {
-        cout << "Erro: O Grafo está vazio." << endl;
+        cout << "  Erro: O Grafo está vazio." << endl;
         return;
     }
 
@@ -80,7 +80,7 @@ void Graph::remove_node(size_t node_position)
 
     if (aux == NULL)
     {
-        cout << "Erro: O Nó não foi encontrado." << endl;
+        cout << "  Erro: O Nó não foi encontrado." << endl;
         return;
     }
 
