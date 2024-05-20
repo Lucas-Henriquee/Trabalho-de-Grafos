@@ -243,5 +243,24 @@ void Graph::print_graph(std::ofstream &output_file)
 
 int Graph::conected(size_t node_id_1, size_t node_id_2)
 {
+    Node *aux_node_1, *aux_node_2 = NULL;
+    Node *aux_node = _first;
+
+    while (aux_node != NULL)
+    {
+        if (aux_node->_id == node_id_1)
+            aux_node_1 = aux_node;
+        if (aux_node->_id == node_id_2)
+            aux_node_2 = aux_node;
+        aux_node = aux_node->_next_node;
+    }
+
+    if (aux_node_1 == NULL || aux_node_2 == NULL)
+        return 0;
+
+    for (Edge *aux_edge = aux_node_1->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        if (aux_edge->_target_id == node_id_2)
+            return 1;
+
     return 0;
 }
