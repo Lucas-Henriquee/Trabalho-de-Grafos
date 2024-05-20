@@ -150,7 +150,7 @@ void menu(Graph *g, string file_exit)
         }
         case 7:
         {
-            cout << "Digite o ID do vértice: ";
+            cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
             deep_walking(g, vertex_1);
             break;
@@ -290,6 +290,7 @@ void save_exit(Graph *g, string file_exit)
 
         output_file.close();
     }
+
     else
     {
         cout << "  Erro ao abrir o arquivo para salvar a saída." << endl;

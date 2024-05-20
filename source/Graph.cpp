@@ -222,15 +222,12 @@ void Graph::print_graph()
 
 void Graph::print_graph(std::ofstream &output_file)
 {
-    if (_first == NULL)
-    {
-        cout << "  Erro: Não será possível imprimir o grafo, pois ele está vazio." << endl;
-        return;
-    }
-
     output_file << "  \n\t\tImprimindo Grafo " << endl;
 
     output_file << "  \tDados do Grafo: \n  Número de Nós: " << _number_of_nodes << "  Número de Arestas: " << _number_of_edges << endl;
+
+    if (_first == NULL)
+        return;
 
     for (Node *node = _first; node != NULL; node = node->_next_node)
     {
@@ -238,6 +235,7 @@ void Graph::print_graph(std::ofstream &output_file)
         for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
             output_file << " -> " << edge->_target_id;
     }
+
     output_file << endl;
 
     output_file << "\n\n\n\tFuncionalidades solicitadas para a impressão:  " << endl;
