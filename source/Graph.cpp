@@ -67,23 +67,13 @@ Graph::~Graph()
 
 void Graph::remove_node(size_t node_position)
 {
-    if (_first == NULL)
-    {
-        cout << "  Erro: O Grafo está vazio." << endl;
-        return;
-    }
+    Node *aux_node = find_node(node_position);
 
-    Node *aux_node_1 = _first;
-
-    while (aux_node_1 != NULL && aux_node_1->_id != node_position)
-        aux_node_1 = aux_node_1->_next_node;
-
-    if (aux_node_1 == NULL)
+    if (!aux_node)
     {
         cout << "  Erro: O Nó não foi encontrado no grafo." << endl;
         return;
     }
-
     // retirar o nó da(s) aresta(s) do grafo
     // atualizar a lista encadeada
     // liberar memória
@@ -91,22 +81,10 @@ void Graph::remove_node(size_t node_position)
 
 void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
 {
-    Node *aux_node_1 = NULL, *aux_node_2 = NULL;
+    Node *aux_node_1 = find_node(node_position_1);
+    Node *aux_node_2 = find_node(node_position_2);
 
-    for (Node *aux = _first; aux != NULL; aux = aux->_next_node)
-    {
-
-        if (aux->_id == node_position_1)
-            aux_node_1 = aux;
-
-        if (aux->_id == node_position_2)
-            aux_node_2 = aux;
-
-        if (aux_node_1 != NULL && aux_node_2 != NULL)
-            break;
-    }
-
-    if (aux_node_1 == NULL || aux_node_2 == NULL)
+    if (!aux_node_1 || !aux_node_2)
     {
         cout << "  Erro: Ao menos um dos Nós não foi encontrado." << endl;
         return;
@@ -136,9 +114,8 @@ void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
 
 void Graph::add_node(size_t node_id, float weight)
 {
-    for (Node *aux = _first; aux != NULL; aux = aux->_next_node)
-        if (aux->_id == node_id)
-            return;
+    if (find_node(node_id))
+        return;
 
     Node *aux = new Node;
     aux->_number_of_edges = 0;
@@ -160,20 +137,12 @@ void Graph::add_node(size_t node_id, float weight)
 
 void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
 {
-    Node *search_node_1 = NULL;
-    Node *search_node_2 = NULL;
-    Node *aux_node = _first;
-    for (size_t i = 0; i < _number_of_nodes; i++)
-    {
-        if (aux_node->_id == node_id_1)
-            search_node_1 = aux_node;
-        if (aux_node->_id == node_id_2)
-            search_node_2 = aux_node;
-        if (search_node_1 != NULL && search_node_2 != NULL)
-            break;
-    }
-    if (search_node_1 == NULL || search_node_2 == NULL)
+    Node *search_node_1 = find_node(node_id_1);
+    Node *search_node_2 = find_node(node_id_2);
+
+    if (!search_node_1 || !search_node_2)
         return;
+
     Edge *new_edge_1 = new Edge;
     new_edge_1->_target_id = node_id_2;
     new_edge_1->_weight = weight;
@@ -243,19 +212,10 @@ void Graph::print_graph(std::ofstream &output_file)
 
 int Graph::conected(size_t node_id_1, size_t node_id_2)
 {
-    Node *aux_node_1 = NULL, *aux_node_2 = NULL;
-    Node *aux_node = _first;
+    Node *aux_node_1 = find_node(node_id_1);
+    Node *aux_node_2 = find_node(node_id_2);
 
-    while (aux_node != NULL)
-    {
-        if (aux_node->_id == node_id_1)
-            aux_node_1 = aux_node;
-        if (aux_node->_id == node_id_2)
-            aux_node_2 = aux_node;
-        aux_node = aux_node->_next_node;
-    }
-
-    if (aux_node_1 == NULL || aux_node_2 == NULL)
+    if (!aux_node_1 || !aux_node_2)
         return 0;
 
     for (Edge *aux_edge = aux_node_1->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
@@ -263,4 +223,12 @@ int Graph::conected(size_t node_id_1, size_t node_id_2)
             return 1;
 
     return 0;
+}
+
+Node *Graph::find_node(size_t node_id)
+{
+    for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
+        if (aux_node->_id == node_id)
+            return aux_node;
+    return NULL;
 }

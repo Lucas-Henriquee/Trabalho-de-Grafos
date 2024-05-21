@@ -30,6 +30,8 @@ private:
     bool   _weighted_nodes;
     Node  *_first;
     Node  *_last;
+
+    Node* find_node(size_t node_id);
 };
 
 #endif  //GRAPH_HPP
