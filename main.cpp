@@ -197,8 +197,23 @@ void menu(Graph *g, string file_exit)
 
 void transitive_direct(Graph *g, size_t vertex)
 {
-    // Implementação
-    output_buffer << "  Fecho Transitivo Direto para o vértice " << vertex << ": ...\n";
+    // Cria um vetor de nós visitados com o tamanho igual ao número de nós no grafo,
+    // inicializando todos os elementos como NULL.
+    vector<Node *> visited(g->get_num_nodes(), NULL);
+
+    // Chama a função dfs (Busca em Profundidade) para marcar no vetor os nós visitados a partir do vértice vertex.
+    g->dfs(vertex, visited);
+
+    // Escreve no buffer.
+    output_buffer << "  Fecho Transitivo Direto para o vértice " << vertex << ": ";
+
+    // Faz a escrita no buffer dos IDs dos nós visitados.
+    for (size_t v = 0; v < visited.size(); v++)
+        if (visited[v])
+            output_buffer << visited[v]->_id << " ";
+
+    // Conclui a escrita no buffer e exibe no terminal ao usuário.
+    output_buffer << "\n";
     cout << output_buffer.str();
 }
 

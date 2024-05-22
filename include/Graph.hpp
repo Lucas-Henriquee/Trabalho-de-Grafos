@@ -19,8 +19,11 @@ public:
     void add_edge(size_t node_id_1, size_t node_id_2, float weight = 0);
     void print_graph(std::ofstream& output_file);
     void print_graph();
-
     int conected(size_t node_id_1, size_t node_id_2);
+
+    void dfs(size_t vertex, vector<Node *>& visited);
+    size_t get_num_nodes();
+    Node *find_node_index(size_t node_position);
 
 private:
     size_t _number_of_nodes;
@@ -31,7 +34,7 @@ private:
     Node  *_first;
     Node  *_last;
 
-    Node* find_node(size_t node_id);
+    Node* find_node_id(size_t node_id);
 };
 
 #endif  //GRAPH_HPP
