@@ -75,14 +75,19 @@ void Graph::remove_node(size_t node_id)
         cout << "  Erro: O Nó não foi encontrado no grafo." << endl;
         return;
     }
-    size_t conected_nodes = new size_t[aux_node->_number_of_edges];
-    for(Edge *aux_edge = aux_node->_first_edge, int i = 0; aux_edge != NULL; aux_edge = aux_edge->_next_edge, i++){
-        conected_nodes[i] = aux_edge->_target_id;
-    }
-    for (size_t i = 0; i < aux_node->_number_of_edges; i++)
+
+    size_t *conected_nodes = new size_t[aux_node->_number_of_edges];
+
+    int i = 0;
+    for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
     {
-        remove_edge(node_position, conected_nodes[i]);
+        conected_nodes[i] = aux_edge->_target_id;
+        i++;
     }
+
+    for (size_t i = 0; i < aux_node->_number_of_edges; i++)
+        remove_edge(node_id, conected_nodes[i]);
+
     // retirar o nó da(s) aresta(s) do grafo (feito) //
     aux_node->_next_node = aux_node->_previous_node;
     aux_node->_previous_node = aux_node->_next_node;
@@ -277,7 +282,7 @@ void Graph::dfs(size_t vertex, vector<Node *> &visited)
             continue;
 
         // Marca no vetor visited que o nó foi visitado
-         visited[aux_node_1->_id] = aux_node_1;
+        visited[aux_node_1->_id] = aux_node_1;
 
         // Loop responsável por percorrer todas as arestas que saem do nó aux_node_1
         for (Edge *aux_edge = aux_node_1->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
