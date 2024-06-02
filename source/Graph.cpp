@@ -66,9 +66,9 @@ Graph::~Graph()
     }
 }
 
-void Graph::remove_node(size_t node_position)
+void Graph::remove_node(size_t node_id)
 {
-    Node *aux_node = find_node_index(node_position);
+    Node *aux_node = find_node(node_id);
 
     if (!aux_node)
     {
@@ -80,10 +80,10 @@ void Graph::remove_node(size_t node_position)
     // liberar memória
 }
 
-void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
+void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
 {
-    Node *aux_node_1 = find_node_index(node_position_1);
-    Node *aux_node_2 = find_node_index(node_position_2);
+    Node *aux_node_1 = find_node(node_id_1);
+    Node *aux_node_2 = find_node(node_id_2);
 
     if (!aux_node_1 || !aux_node_2)
     {
@@ -96,7 +96,7 @@ void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
 
     while (aux_edge_1 != NULL)
     {
-        if (aux_edge_1->_target_id == node_position_2)
+        if (aux_edge_1->_target_id == node_id_2)
         {
 
             if (aux_edge_2 != NULL)
@@ -115,7 +115,7 @@ void Graph::remove_edge(size_t node_position_1, size_t node_position_2)
 
 void Graph::add_node(size_t node_id, float weight)
 {
-    if (find_node_id(node_id))
+    if (find_node(node_id))
         return;
 
     Node *aux = new Node;
@@ -138,8 +138,8 @@ void Graph::add_node(size_t node_id, float weight)
 
 void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
 {
-    Node *search_node_1 = find_node_id(node_id_1);
-    Node *search_node_2 = find_node_id(node_id_2);
+    Node *search_node_1 = find_node(node_id_1);
+    Node *search_node_2 = find_node(node_id_2);
 
     if (!search_node_1 || !search_node_2)
         return;
@@ -213,8 +213,8 @@ void Graph::print_graph(std::ofstream &output_file)
 
 int Graph::conected(size_t node_id_1, size_t node_id_2)
 {
-    Node *aux_node_1 = find_node_id(node_id_1);
-    Node *aux_node_2 = find_node_id(node_id_2);
+    Node *aux_node_1 = find_node(node_id_1);
+    Node *aux_node_2 = find_node(node_id_2);
 
     if (!aux_node_1 || !aux_node_2)
         return 0;
@@ -226,24 +226,11 @@ int Graph::conected(size_t node_id_1, size_t node_id_2)
     return 0;
 }
 
-Node *Graph::find_node_id(size_t node_id)
+Node *Graph::find_node(size_t node_id)
 {
     for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
         if (aux_node->_id == node_id)
             return aux_node;
-    return NULL;
-}
-
-Node *Graph::find_node_index(size_t node_position)
-{
-    size_t count = 0;
-
-    for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
-    {
-        if (count == node_position)
-            return aux_node;
-        count++;
-    }
     return NULL;
 }
 
@@ -255,7 +242,7 @@ size_t Graph::get_num_nodes()
 void Graph::dfs(size_t vertex, vector<Node *> &visited)
 {
     // Criando um nó inicial e chamando a função para encontrá-lo
-    Node *start_node = find_node_id(vertex);
+    Node *start_node = find_node(vertex);
 
     // Verificando se o nó existe
     if (!start_node)
@@ -285,7 +272,7 @@ void Graph::dfs(size_t vertex, vector<Node *> &visited)
         for (Edge *aux_edge = aux_node_1->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
         {
             // Encontra o próximo nó (destino)
-            Node *aux_node_2 = find_node_id(aux_edge->_target_id);
+            Node *aux_node_2 = find_node(aux_edge->_target_id);
 
             // Verifica se o nó destino existe e se ele ainda não foi visitado colocando-o na pilha
             if (aux_node_2 && !visited[aux_node_2->_id])
