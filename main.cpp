@@ -228,7 +228,7 @@ void transitive_indirect(Graph *g, size_t vertex)
     output_buffer << "  Fecho Transitivo Indireto para o vértice " << vertex << ": ";
 
     // Faz a escrita no buffer dos IDs dos nós visitados.
-    for (size_t v = 0; v < visited.size(); v++)
+    for (size_t v = visited.size() - 1; v >= 0; v++)
         if (visited[v])
             output_buffer << visited[v]->_id << " ";
 
