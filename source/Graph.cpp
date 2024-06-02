@@ -75,9 +75,20 @@ void Graph::remove_node(size_t node_id)
         cout << "  Erro: O Nó não foi encontrado no grafo." << endl;
         return;
     }
-    // retirar o nó da(s) aresta(s) do grafo
-    // atualizar a lista encadeada
-    // liberar memória
+    size_t conected_nodes = new size_t[aux_node->_number_of_edges];
+    for(Edge *aux_edge = aux_node->_first_edge, int i = 0; aux_edge != NULL; aux_edge = aux_edge->_next_edge, i++){
+        conected_nodes[i] = aux_edge->_target_id;
+    }
+    for (size_t i = 0; i < aux_node->_number_of_edges; i++)
+    {
+        remove_edge(node_position, conected_nodes[i]);
+    }
+    // retirar o nó da(s) aresta(s) do grafo (feito) //
+    aux_node->_next_node = aux_node->_previous_node;
+    aux_node->_previous_node = aux_node->_next_node;
+    // atualizar a lista encadeada (feito) //
+    delete aux_node;
+    // liberar memória (feito) //
 }
 
 void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
