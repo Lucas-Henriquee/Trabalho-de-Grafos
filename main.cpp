@@ -141,9 +141,7 @@ void menu(Graph *g, string file_exit)
             size_t *vertices = new size_t[size];
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t i = 0; i < size; ++i)
-            {
                 cin >> vertices[i];
-            }
             kruskal_minimum_generating_tree(g, vertices, size);
             delete[] vertices;
             break;
@@ -202,7 +200,7 @@ void transitive_direct(Graph *g, size_t vertex)
     vector<Node *> visited(g->get_num_nodes(), NULL);
 
     // Chama a função dfs (Busca em Profundidade) para marcar no vetor os nós visitados a partir do vértice vertex.
-    g->dfs(vertex, visited);
+    g->dfs(vertex, visited, true);
 
     // Escreve no buffer.
     output_buffer << "  Fecho Transitivo Direto para o vértice " << vertex << ": ";
@@ -219,8 +217,23 @@ void transitive_direct(Graph *g, size_t vertex)
 
 void transitive_indirect(Graph *g, size_t vertex)
 {
-    // Implementação
-    output_buffer << "  Fecho Transitivo Indireto para o vértice " << vertex << ": ...\n";
+    // Cria um vetor de nós visitados com o tamanho igual ao número de nós no grafo,
+    // inicializando todos os elementos como NULL.
+    vector<Node *> visited(g->get_num_nodes(), NULL);
+
+    // Chama a função dfs (Busca em Profundidade) para marcar no vetor os nós visitados a partir do vértice vertex.
+    g->dfs(vertex, visited, false);
+
+    // Escreve no buffer.
+    output_buffer << "  Fecho Transitivo Indireto para o vértice " << vertex << ": ";
+
+    // Faz a escrita no buffer dos IDs dos nós visitados.
+    for (size_t v = 0; v < visited.size(); v++)
+        if (visited[v])
+            output_buffer << visited[v]->_id << " ";
+
+    // Conclui a escrita no buffer e exibe no terminal ao usuário.
+    output_buffer << "\n";
     cout << output_buffer.str();
 }
 
@@ -294,9 +307,7 @@ void save_exit(Graph *g, string file_exit)
     {
 
         if (!file_exists)
-        {
             g->print_graph(output_file);
-        }
 
         output_file << output_buffer.str();
 
@@ -307,7 +318,5 @@ void save_exit(Graph *g, string file_exit)
     }
 
     else
-    {
         cout << "  Erro ao abrir o arquivo para salvar a saída." << endl;
-    }
 }

@@ -9,7 +9,7 @@ class Graph
 public:
     /*Assinatura dos métodos básicos para o funcionamento da classe*/
 
-    Graph(std::ifstream& instance, bool directed, bool weight_edges, bool weight_nodes);
+    Graph(std::ifstream &instance, bool directed, bool weight_edges, bool weight_nodes);
     Graph();
     ~Graph();
 
@@ -17,23 +17,23 @@ public:
     void remove_edge(size_t node_id_1, size_t node_id_2);
     void add_node(size_t node_id, float weight = 0);
     void add_edge(size_t node_id_1, size_t node_id_2, float weight = 0);
-    void print_graph(std::ofstream& output_file);
+    void print_graph(std::ofstream &output_file);
     void print_graph();
     int conected(size_t node_id_1, size_t node_id_2);
 
-    void dfs(size_t vertex, vector<Node *>& visited);
+    void dfs(size_t vertex, vector<Node *> &visited, bool direct);
     size_t get_num_nodes();
 
 private:
     size_t _number_of_nodes;
     size_t _number_of_edges;
-    bool   _directed;
-    bool   _weighted_edges;
-    bool   _weighted_nodes;
-    Node  *_first;
-    Node  *_last;
+    bool _directed;
+    bool _weighted_edges;
+    bool _weighted_nodes;
+    Node *_first;
+    Node *_last;
 
-    Node* find_node(size_t node_id);
+    Node *find_node(size_t node_id);
 };
 
-#endif  //GRAPH_HPP
+#endif // GRAPH_HPP

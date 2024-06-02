@@ -255,44 +255,71 @@ size_t Graph::get_num_nodes()
     return _number_of_nodes;
 }
 
-void Graph::dfs(size_t vertex, vector<Node *> &visited)
+void Graph::dfs(size_t vertex, vector<Node *> &visited, bool direct)
 {
-    // Criando um nó inicial e chamando a função para encontrá-lo
+    // Criando um nó inicial e chamando a função para encontrá-lo.
     Node *start_node = find_node(vertex);
 
-    // Verificando se o nó existe
+    // Verificando se o nó existe.
     if (!start_node)
         return;
 
-    // Inicializando uma pilha de ponteiros de nós
+    // Inicializando uma pilha de ponteiros de nós.
     stack<Node *> stack_nodes;
 
-    // Coloca o nó encontrado na pilha
+    // Coloca o nó encontrado na pilha.
     stack_nodes.push(start_node);
 
-    // O loop continua até que a pilha esteja vazia
+    // O loop continua até que a pilha esteja vazia.
     while (!stack_nodes.empty())
     {
-        // Em cada iteração, o nó no topo da pilha é removido
+        // Em cada iteração, o nó no topo da pilha é removido.
         Node *aux_node_1 = stack_nodes.top();
         stack_nodes.pop();
 
-        // Verifica se o nó já foi visitado evitando que seja adicionado novamente à pilha
+        // Verifica se o nó já foi visitado evitando que seja adicionado novamente à pilha.
         if (visited[aux_node_1->_id])
             continue;
 
-        // Marca no vetor visited que o nó foi visitado
+        // Marca no vetor visited que o nó foi visitado.
         visited[aux_node_1->_id] = aux_node_1;
 
-        // Loop responsável por percorrer todas as arestas que saem do nó aux_node_1
-        for (Edge *aux_edge = aux_node_1->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        // Verifica se é um fecho transitivo direto.
+        if (direct)
         {
-            // Encontra o próximo nó (destino)
-            Node *aux_node_2 = find_node(aux_edge->_target_id);
+            // Loop responsável por percorrer todas as arestas que saem do nó aux_node_1.
+            for (Edge *aux_edge_1 = aux_node_1->_first_edge; aux_edge_1 != NULL; aux_edge_1 = aux_edge_1->_next_edge)
+            {
+                // Encontra o próximo nó (destino).
+                Node *aux_node_2 = find_node(aux_edge_1->_target_id);
 
-            // Verifica se o nó destino existe e se ele ainda não foi visitado colocando-o na pilha
-            if (aux_node_2 && !visited[aux_node_2->_id])
-                stack_nodes.push(aux_node_2);
+                // Verifica se o nó destino existe e se ele ainda não foi visitado colocando-o na pilha.
+                if (aux_node_2 && !visited[aux_node_2->_id])
+                    stack_nodes.push(aux_node_2);
+            }
+        }
+
+        // Caso não seja parte para o grafo reverso.
+        else
+        {
+            // Loop para as arestas de entrada do nó aux_node_1.
+            for (Node *aux_node_3 = _first; aux_node_3 != NULL; aux_node_3 = aux_node_3->_next_node)
+            {
+                // Percorre todas as arestas do nó atual que chegam ao nó aux_node_1.
+                for (Edge *aux_edge_2 = aux_node_3->_first_edge; aux_edge_2 != NULL; aux_edge_2 = aux_edge_2->_next_edge)
+                {
+                    // Verifica se o destino da aresta é o nó atual (aux_node_1).
+                    if (aux_edge_2->_target_id == aux_node_1->_id)
+                    {
+                        // Encontra o próximo nó (origem da aresta).
+                        Node *aux_node_2 = find_node(aux_node_3->_id);
+
+                        // Verifica se o nó origem existe e se ele ainda não foi visitado colocando-o na pilha.
+                        if (aux_node_2 && !visited[aux_node_2->_id])
+                            stack_nodes.push(aux_node_2);
+                    }
+                }
+            }
         }
     }
 }
