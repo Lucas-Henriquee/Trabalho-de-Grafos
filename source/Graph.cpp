@@ -17,6 +17,9 @@ Graph::Graph(std::ifstream &instance, bool directed, bool weight_edges, bool wei
 
     string line;
 
+    // Pulando a primeira linha.
+    getline(instance, line);
+
     while (getline(instance, line))
     {
         if (line.empty())
@@ -76,6 +79,13 @@ void Graph::remove_node(size_t node_id)
         return;
     }
 
+    for (size_t i = 0; i < _number_of_nodes; ++i)
+        if (i != node_id && !(conected(node_id, i) || conected(i, node_id)))
+        {
+            cout << "  Erro: A remoção do nó " << node_id << " deixaria o grafo desconexo." << endl;
+            return;
+        }
+
     size_t *conected_nodes = new size_t[aux_node->_number_of_edges];
 
     int i = 0;
@@ -93,6 +103,7 @@ void Graph::remove_node(size_t node_id)
     aux_node->_previous_node = aux_node->_next_node;
     // atualizar a lista encadeada (feito) //
     delete aux_node;
+    delete[] conected_nodes;
     // liberar memória (feito) //
 }
 
@@ -107,6 +118,12 @@ void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
         return;
     }
 
+    if (!conected(node_id_1, node_id_2) && !conected(node_id_2, node_id_1))
+    {
+        cout << "  Erro: A remoção da aresta (" << node_id_1 << ", " << node_id_2 << ") deixaria o grafo desconexo." << endl;
+        return;
+    }
+
     Edge *aux_edge_1 = aux_node_1->_first_edge;
     Edge *aux_edge_2 = NULL;
 
@@ -116,7 +133,7 @@ void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
         {
 
             if (aux_edge_2 != NULL)
-                aux_edge_2->_next_edge == aux_edge_1->_next_edge;
+                aux_edge_2->_next_edge = aux_edge_1->_next_edge;
             else
                 aux_node_1->_first_edge = aux_edge_1->_next_edge;
 
@@ -255,7 +272,12 @@ size_t Graph::get_num_nodes()
     return _number_of_nodes;
 }
 
-void Graph::dfs(size_t vertex, vector<Node *> &visited, bool direct)
+Node *Graph::get_first_node()
+{
+    return _first;
+}
+
+void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)
 {
     // Criando um nó inicial e chamando a função para encontrá-lo.
     Node *start_node = find_node(vertex);
@@ -322,4 +344,8 @@ void Graph::dfs(size_t vertex, vector<Node *> &visited, bool direct)
             }
         }
     }
+}
+
+void Graph::dfs_articulation()
+{
 }
