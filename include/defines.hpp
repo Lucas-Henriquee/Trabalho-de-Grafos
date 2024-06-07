@@ -8,5 +8,8 @@
 #include <iostream> /* implementações básicas da linguagem */
 #include <utility> /* implementações de alguns containers e operações de swap */
 #include <vector> /* implementação do container vector e suas operações */
+#include <thread>
+#include <chrono>
+#include <sstream>
 
 #endif  //DEFINES_HPP

@@ -3,13 +3,14 @@
 
 #include "Node.hpp"
 #include "defines.hpp"
+using namespace std;
 
 class Graph
 {
 public:
     /*Assinatura dos métodos básicos para o funcionamento da classe*/
 
-    Graph(std::ifstream &instance, bool directed, bool weight_edges, bool weight_nodes);
+    Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_nodes);
     Graph();
     ~Graph();
 
@@ -17,7 +18,7 @@ public:
     void remove_edge(size_t node_id_1, size_t node_id_2);
     void add_node(size_t node_id, float weight = 0);
     void add_edge(size_t node_id_1, size_t node_id_2, float weight = 0);
-    void print_graph(std::ofstream &output_file);
+    void print_graph(ofstream &output_file);
     void print_graph();
     int conected(size_t node_id_1, size_t node_id_2);
 

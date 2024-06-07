@@ -1,9 +1,5 @@
 #include "include/Graph.hpp"
-#include <thread>
-#include <chrono>
-#include <sstream>
-#include <fstream>
-#include <iostream>
+
 using namespace std;
 
 void menu(Graph *g, string file_exit);
@@ -46,6 +42,7 @@ int main(int argc, char *argv[])
 
             g = new Graph(file, directed, weight_edges, weight_nodes);
             g->print_graph();
+            this_thread::sleep_for(chrono::seconds(2));
         }
         else
             cout << "Erro ao abri o arquivo" << endl;
@@ -105,7 +102,7 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
-            transitive_indirect(g, vertex_1);
+            //transitive_indirect(g, vertex_1);
             break;
         }
         case 3:
@@ -155,7 +152,7 @@ void menu(Graph *g, string file_exit)
         }
         case 8:
         {
-            properties_graph(g);
+            //properties_graph(g);
             break;
         }
         case 9:
@@ -174,19 +171,18 @@ void menu(Graph *g, string file_exit)
             cout << "\n  Opção inválida! Tente novamente." << endl;
             this_thread::sleep_for(chrono::seconds(2));
         }
-
-            if (i != 0)
-            {
-                cout << "\n\n  Deseja salvar esses dados em um arquivo? (s/n): ";
-                char option;
-                cin >> option;
-
-                if (option == 's')
-                    save_exit(g, file_exit);
-
-                output_buffer.str("");
-                output_buffer.clear();
-            }
+        }
+        cout << output_buffer.str();
+        this_thread::sleep_for(chrono::seconds(2));
+        if (i != 0)
+        {
+            cout << "\n\n  Deseja salvar esses dados em um arquivo? (s/n): ";
+            char option;
+            cin >> option;
+            if (option == 's')
+                save_exit(g, file_exit);
+            output_buffer.str("");
+            output_buffer.clear();
         }
     } while (i != 0);
 
@@ -212,7 +208,6 @@ void transitive_direct(Graph *g, size_t vertex)
 
     // Conclui a escrita no buffer e exibe no terminal ao usuário.
     output_buffer << "\n";
-    cout << output_buffer.str();
 }
 
 void transitive_indirect(Graph *g, size_t vertex)
@@ -234,7 +229,6 @@ void transitive_indirect(Graph *g, size_t vertex)
 
     // Conclui a escrita no buffer e exibe no terminal ao usuário.
     output_buffer << "\n";
-    cout << output_buffer.str();
 }
 
 void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
@@ -272,7 +266,6 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 
 void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
-    // Implementação
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
     {

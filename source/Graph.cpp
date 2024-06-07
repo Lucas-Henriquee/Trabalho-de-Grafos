@@ -3,7 +3,7 @@
 #include <stack>
 using namespace std;
 
-Graph::Graph(std::ifstream &instance, bool directed, bool weight_edges, bool weight_nodes)
+Graph::Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_nodes)
 {
     _directed = directed;
     _weighted_edges = weight_edges;
@@ -41,7 +41,6 @@ Graph::Graph(std::ifstream &instance, bool directed, bool weight_edges, bool wei
 
         add_node(node_1, node_1_weight);
         add_node(node_2, node_2_weight);
-
         add_edge(node_1, node_2, edge_weight);
     }
 }
@@ -148,7 +147,7 @@ void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
 
 void Graph::add_node(size_t node_id, float weight)
 {
-    if (find_node(node_id))
+    if (find_node(node_id) != NULL)
         return;
 
     Node *aux = new Node;
@@ -176,16 +175,15 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
 
     if (!search_node_1 || !search_node_2)
         return;
-
     Edge *new_edge_1 = new Edge;
     new_edge_1->_target_id = node_id_2;
     new_edge_1->_weight = weight;
     new_edge_1->_next_edge = NULL;
-    search_node_1->_number_of_edges = +1;
+    search_node_1->_number_of_edges = search_node_1->_number_of_edges + 1;
     if (search_node_1->_first_edge != NULL)
     {
         Edge *aux_edge = search_node_1->_first_edge;
-        for (; aux_edge->_next_edge != NULL; aux_edge->_next_edge)
+        for (; aux_edge->_next_edge != NULL;aux_edge = aux_edge->_next_edge)
         {
         }
         aux_edge->_next_edge = new_edge_1;
@@ -198,11 +196,11 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
         new_edge_2->_target_id = node_id_1;
         new_edge_2->_weight = weight;
         new_edge_2->_next_edge = NULL;
-        search_node_2->_number_of_edges = +1;
+        search_node_2->_number_of_edges = search_node_2->_number_of_edges + 1;
         if (search_node_2->_first_edge != NULL)
         {
             Edge *aux_edge = search_node_2->_first_edge;
-            for (; aux_edge->_next_edge != NULL; aux_edge->_next_edge)
+            for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge)
             {
             }
             aux_edge->_next_edge = new_edge_2;
@@ -210,6 +208,7 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
         else
             search_node_2->_first_edge = new_edge_2;
     }
+    _number_of_edges = _number_of_edges + 1;
 }
 
 void Graph::print_graph()
@@ -219,11 +218,12 @@ void Graph::print_graph()
         cout << node->_id;
         for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
             cout << " -> " << edge->_target_id;
+        cout << endl;
     }
     cout << endl;
 }
 
-void Graph::print_graph(std::ofstream &output_file)
+void Graph::print_graph(ofstream &output_file)
 {
     output_file << "  \n\t\tImprimindo Grafo " << endl;
 
@@ -237,6 +237,7 @@ void Graph::print_graph(std::ofstream &output_file)
         output_file << node->_id;
         for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
             output_file << " -> " << edge->_target_id;
+        output_file << endl;
     }
 
     output_file << endl;
