@@ -109,14 +109,14 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
-            //dijkstra_shortest_path(g, vertex_1, vertex_2);
+            // dijkstra_shortest_path(g, vertex_1, vertex_2);
             break;
         }
         case 4:
         {
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
-            //floyd_shortest_path(g, vertex_1, vertex_2);
+            // floyd_shortest_path(g, vertex_1, vertex_2);
             break;
         }
         case 5:
@@ -127,7 +127,7 @@ void menu(Graph *g, string file_exit)
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t i = 0; i < size; ++i)
                 cin >> vertices[i];
-            //prim_minimum_generating_tree(g, vertices, size);
+            // prim_minimum_generating_tree(g, vertices, size);
             delete[] vertices;
             break;
         }
@@ -139,7 +139,7 @@ void menu(Graph *g, string file_exit)
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t i = 0; i < size; ++i)
                 cin >> vertices[i];
-            //kruskal_minimum_generating_tree(g, vertices, size);
+            // kruskal_minimum_generating_tree(g, vertices, size);
             delete[] vertices;
             break;
         }
@@ -147,7 +147,7 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
-            //deep_walking(g, vertex_1);
+            // deep_walking(g, vertex_1);
             break;
         }
         case 8:
@@ -157,7 +157,7 @@ void menu(Graph *g, string file_exit)
         }
         case 9:
         {
-            //articulation_vertices(g);
+            // articulation_vertices(g);
             break;
         }
         case 0:
@@ -202,7 +202,7 @@ void transitive_direct(Graph *g, size_t vertex)
     output_buffer << "  Fecho Transitivo Direto para o vértice " << vertex << ": ";
 
     // Faz a escrita no buffer dos IDs dos nós visitados.
-    for (size_t v = 0; v < visited.size(); v++)
+    for (int v = 0; v < visited.size(); v++)
         if (visited[v])
             output_buffer << visited[v]->_id << " ";
 
@@ -223,7 +223,7 @@ void transitive_indirect(Graph *g, size_t vertex)
     output_buffer << "  Fecho Transitivo Indireto para o vértice " << vertex << ": ";
 
     // Faz a escrita no buffer dos IDs dos nós visitados.
-    for (size_t v = visited.size() - 1; v >= 0; v--)
+    for (int v = visited.size() - 1; v >= 0; v--)
         if (visited[v])
             output_buffer << visited[v]->_id << " ";
 
@@ -328,7 +328,8 @@ void properties_graph(Graph *g)
     {
         for (size_t j = 0; j < n; j++)
             if (i != j)
-                eccentricities[i] = max(eccentricities[i], dist[i][j]);
+                if (dist[i][j] < numeric_limits<float>::infinity())
+                    eccentricities[i] = max(eccentricities[i], dist[i][j]);
 
         // Atualiza o raio e o diâmetro do grafo.
         radius = min(radius, eccentricities[i]);
