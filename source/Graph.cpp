@@ -1,6 +1,6 @@
 #include "../include/Graph.hpp"
-#include <sstream>
-#include <stack>
+#include "../include/defines.hpp"
+
 using namespace std;
 
 Graph::Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_nodes)
@@ -183,7 +183,7 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
     if (search_node_1->_first_edge != NULL)
     {
         Edge *aux_edge = search_node_1->_first_edge;
-        for (; aux_edge->_next_edge != NULL;aux_edge = aux_edge->_next_edge)
+        for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge)
         {
         }
         aux_edge->_next_edge = new_edge_1;
