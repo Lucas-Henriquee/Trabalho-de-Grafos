@@ -231,7 +231,8 @@ void Graph::print_graph(ofstream &output_file)
 
     output_file << "  Dados do Grafo:" << endl;
     output_file << "  Número de Nós: " << _number_of_nodes << endl;
-    output_file << "  Número de Arestas: " << _number_of_edges << "\n\n\n";
+    output_file << "  Número de Arestas: " << _number_of_edges << endl;
+    output_file << "  Tipo do Grafo: " << (_directed ? "Direcionado" : "Não Direcionado") << "\n\n\n";
 
     if (_first == NULL)
         return;
@@ -325,9 +326,20 @@ void Graph::dfs(Graph *g, size_t vertex, vector<pair<size_t, size_t>> &return_ed
             if (aux_node != NULL)
                 for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
                 {
-                    // Se a aresta ainda não está no vetor de arestas de retorno, adiciona.
-                    if (find(return_edges.begin(), return_edges.end(), make_pair(aux_edge->_target_id, v)) == return_edges.end() && find(return_edges.begin(), return_edges.end(), make_pair(v, aux_edge->_target_id)) == return_edges.end())
-                        return_edges.push_back(make_pair(v, aux_edge->_target_id));
+                    // Se o grafo é direcionado.
+                    if (_directed)
+                    {
+                        // Se o vértice alvo da aresta já foi visitado, adiciona ao vetor de arestas de retorno.
+                        if (visited[aux_edge->_target_id])
+                            return_edges.push_back(make_pair(v, aux_edge->_target_id));
+                    }
+                    // Se o grafo é não direcionado.
+                    else
+                    {
+                        // Se o vértice alvo da aresta já foi visitado e não é o vértice antecessor, adiciona ao vetor de arestas de retorno.
+                        if (visited[aux_edge->_target_id] && (node_stack.empty() || aux_edge->_target_id != node_stack.top()))
+                            return_edges.push_back(make_pair(v, aux_edge->_target_id));
+                    }
 
                     // Se o vértice alvo da aresta ainda não foi visitado, adiciona à pilha.
                     if (!visited[aux_edge->_target_id])
