@@ -47,7 +47,7 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
-            // transitive_indirect(g, vertex_1);
+            transitive_indirect(g, vertex_1);
             break;
         }
         case 3:
@@ -92,7 +92,7 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
-            // deep_walking(g, vertex_1);
+            deep_walking(g, vertex_1);
             break;
         }
         case 8:
@@ -108,7 +108,7 @@ void menu(Graph *g, string file_exit)
         case 0:
         {
             cout << "\n  Encerrando o programa..." << endl;
-            this_thread::sleep_for(chrono::seconds(2));
+            this_thread::sleep_for(chrono::seconds(3));
             break;
         }
         default:
@@ -117,6 +117,8 @@ void menu(Graph *g, string file_exit)
             this_thread::sleep_for(chrono::seconds(2));
         }
         }
+        output_buffer << "\n  -------------------------------------------------------------\n"
+                      << endl;
         cout << output_buffer.str();
         this_thread::sleep_for(chrono::seconds(2));
         if (i != 0)
@@ -147,7 +149,9 @@ void transitive_direct(Graph *g, size_t vertex)
     output_buffer << "  Fecho Transitivo Direto para o vértice " << vertex << ": ";
 
     // Faz a escrita no buffer dos IDs dos nós visitados.
-    for (int v = 0; v < visited.size(); v++)
+    int size = visited.size();
+
+    for (int v = 0; v < size; v++)
         if (visited[v])
             output_buffer << visited[v]->_id << " ";
 
@@ -196,7 +200,7 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
     if (!g || size == 0)
     {
         cout << "Grafo ou subconjunto de vértices inválido." << endl;
-        this_thread::sleep_for(chrono::seconds(2));
+        this_thread::sleep_for(chrono::seconds(3));
 
         return;
     }
@@ -222,94 +226,36 @@ void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 
 void deep_walking(Graph *g, size_t vertex)
 {
-    // Implementação
-    output_buffer << "  Caminhamento em Profundidade a partir do vértice " << vertex << ": ...\n";
-    cout << output_buffer.str();
+    // Verifica se o grafo está vazio.
+    if (g->get_num_nodes() == 0)
+    {
+        cout << "  O Grafo está vazio." << endl;
+        return;
+    }
+
+    // Inicializa o vetor de arestas de retorno e a string da árvore.
+    vector<pair<size_t, size_t>> return_edges;
+    string tree;
+
+    // Chama a função DFS.
+    g->dfs(g, vertex, return_edges, tree);
+
+    // Imprime a árvore de caminhamento em profundidade.
+    output_buffer << "  Caminhamento em profundidade a partir do vértice " << vertex << ": " << tree << endl;
+
+    // Imprime as arestas de retorno.
+    if (return_edges.empty())
+        output_buffer << "\n  Arestas de retorno: Nenhuma" << endl;
+    else
+    {
+        output_buffer << "\n  Arestas de retorno:" << endl;
+        for (auto &edge : return_edges)
+            output_buffer << "  (" << edge.first << ", " << edge.second << ")" << endl;
+    }
 }
 
 void properties_graph(Graph *g)
 {
-    // Pega o número de nós do grafo.
-    size_t n = g->get_num_nodes();
-
-    // Verifica se o grafo está vazio.
-    if (n == 0)
-    {
-        output_buffer << "  O Grafo está vazio. \n";
-        cout << output_buffer.str();
-        this_thread::sleep_for(chrono::seconds(2));
-
-        return;
-    }
-
-    // Inicializa a matriz de distâncias com infinito.
-    vector<vector<float>> dist(n, vector<float>(n, numeric_limits<float>::infinity()));
-
-    // Inicializa a matriz de distâncias com os pesos das arestas.
-    for (Node *aux_node = g->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
-    {
-        // Define a distância de um nó para ele mesmo como 0.
-        dist[aux_node->_id][aux_node->_id] = 0;
-
-        // Preenche a matriz de distâncias com os pesos das arestas.
-        for (Edge *edge = aux_node->_first_edge; edge != NULL; edge = edge->_next_edge)
-            dist[aux_node->_id][edge->_target_id] = edge->_weight;
-    }
-
-    // Algoritmo de Floyd-Warshall para encontrar as distâncias mínimas entre todos os pares de nós.
-    for (size_t k = 0; k < n; k++)
-        for (size_t i = 0; i < n; i++)
-            for (size_t j = 0; j < n; j++)
-                if (dist[i][k] < numeric_limits<float>::infinity() && dist[k][j] < numeric_limits<float>::infinity())
-                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
-
-    // Calcula o raio, diâmetro, centro e periferia.
-    float radius = numeric_limits<float>::infinity();
-    float diameter = 0;
-    vector<float> eccentricities(n, 0);
-
-    // Calcula as excentricidades de cada nó.
-    for (size_t i = 0; i < n; i++)
-    {
-        for (size_t j = 0; j < n; j++)
-            if (i != j)
-                if (dist[i][j] < numeric_limits<float>::infinity())
-                    eccentricities[i] = max(eccentricities[i], dist[i][j]);
-
-        // Atualiza o raio e o diâmetro do grafo.
-        radius = min(radius, eccentricities[i]);
-        diameter = max(diameter, eccentricities[i]);
-    }
-
-    // Encontra os nós no centro e na periferia do grafo.
-    vector<size_t> center;
-    vector<size_t> periphery;
-
-    for (size_t i = 0; i < n; i++)
-    {
-        if (eccentricities[i] == radius)
-            center.push_back(i);
-
-        if (eccentricities[i] == diameter)
-            periphery.push_back(i);
-    }
-
-    // Conclui a escrita no buffer e exibe no terminal ao usuário.
-    output_buffer << "  Propriedades do Grafo:\n";
-    output_buffer << "  Raio do grafo: " << radius << "\n";
-    output_buffer << "  Diâmetro do grafo: " << diameter << "\n";
-
-    output_buffer << "  Centro do grafo: ";
-    for (size_t v : center)
-        output_buffer << v << " ";
-
-    output_buffer << "\n  Periferia do grafo: ";
-    for (size_t v : periphery)
-        output_buffer << v << " ";
-
-    output_buffer << "\n";
-
-    cout << output_buffer.str();
 }
 
 void articulation_vertices(Graph *g)
@@ -336,7 +282,7 @@ void save_exit(Graph *g, string file_exit)
         output_file << output_buffer.str();
 
         cout << "  Saída salva no arquivo: " << file_exit << endl;
-        this_thread::sleep_for(chrono::seconds(2));
+        this_thread::sleep_for(chrono::seconds(3));
 
         output_file.close();
     }

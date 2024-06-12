@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
             g = new Graph(file, directed, weight_edges, weight_nodes);
             g->print_graph();
-            this_thread::sleep_for(chrono::seconds(2));
+            this_thread::sleep_for(chrono::seconds(3));
         }
         else
             cout << "Erro ao abri o arquivo" << endl;

@@ -213,9 +213,11 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
 
 void Graph::print_graph()
 {
+    cout << "\n\n";
+
     for (Node *node = _first; node != NULL; node = node->_next_node)
     {
-        cout << node->_id;
+        cout << "\t\t\t" << node->_id;
         for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
             cout << " -> " << edge->_target_id;
         cout << endl;
@@ -225,24 +227,29 @@ void Graph::print_graph()
 
 void Graph::print_graph(ofstream &output_file)
 {
-    output_file << "  \n\t\tImprimindo Grafo " << endl;
+    output_file << "\n\t\t\t\tImprimindo Grafo\n\n\n";
 
-    output_file << "  \tDados do Grafo: \n  Número de Nós: " << _number_of_nodes << "  Número de Arestas: " << _number_of_edges << endl;
+    output_file << "  Dados do Grafo:" << endl;
+    output_file << "  Número de Nós: " << _number_of_nodes << endl;
+    output_file << "  Número de Arestas: " << _number_of_edges << "\n\n\n";
 
     if (_first == NULL)
         return;
 
     for (Node *node = _first; node != NULL; node = node->_next_node)
     {
-        output_file << node->_id;
+        output_file << "\t\t\t" << node->_id;
         for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
             output_file << " -> " << edge->_target_id;
         output_file << endl;
     }
 
-    output_file << endl;
+    output_file << "\n\n";
 
-    output_file << "\n\n\n\tFuncionalidades solicitadas para a impressão:  " << endl;
+    output_file << "  Funcionalidades solicitadas para a impressão:\n";
+
+    output_file << "\n  -------------------------------------------------------------\n"
+                << endl;
 }
 
 int Graph::conected(size_t node_id_1, size_t node_id_2)
@@ -276,6 +283,61 @@ size_t Graph::get_num_nodes()
 Node *Graph::get_first_node()
 {
     return _first;
+}
+
+void Graph::dfs(Graph *g, size_t vertex, vector<pair<size_t, size_t>> &return_edges, string &tree)
+{
+    // Inicializa a pilha de nós e adiciona o vértice inicial.
+    stack<size_t> node_stack;
+    node_stack.push(vertex);
+
+    // Inicializa o vetor de vértices visitados.
+    vector<bool> visited(g->get_num_nodes(), false);
+
+    // Inicia a árvore com um parêntese aberto.
+    tree += "(";
+
+    // Enquanto a pilha não estiver vazia.
+    while (!node_stack.empty())
+    {
+        // Pega o vértice do topo da pilha.
+        size_t v = node_stack.top();
+        node_stack.pop();
+
+        // Se o vértice ainda não foi visitado.
+        if (!visited[v])
+        {
+            // Marca o vértice como visitado.
+            visited[v] = true;
+
+            // Adiciona o vértice à árvore.
+            // Se a árvore não estiver vazia, adiciona uma seta.
+            string current_vertex = to_string(v);
+            if (tree != "(")
+                tree += " -> ";
+            tree += current_vertex;
+
+            // Encontra o nó correspondente ao vértice.
+            Node *aux_node = g->find_node(v);
+
+            // Se o nó existe.
+            // Para cada aresta do nó.
+            if (aux_node != NULL)
+                for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+                {
+                    // Se a aresta ainda não está no vetor de arestas de retorno, adiciona.
+                    if (find(return_edges.begin(), return_edges.end(), make_pair(aux_edge->_target_id, v)) == return_edges.end() && find(return_edges.begin(), return_edges.end(), make_pair(v, aux_edge->_target_id)) == return_edges.end())
+                        return_edges.push_back(make_pair(v, aux_edge->_target_id));
+
+                    // Se o vértice alvo da aresta ainda não foi visitado, adiciona à pilha.
+                    if (!visited[aux_edge->_target_id])
+                        node_stack.push(aux_edge->_target_id);
+                }
+        }
+    }
+
+    // Fecha o parêntese da árvore.
+    tree += ")";
 }
 
 void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)

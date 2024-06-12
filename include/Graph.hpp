@@ -23,6 +23,7 @@ public:
     void print_graph();
     int conected(size_t node_id_1, size_t node_id_2);
 
+    void dfs(Graph *g, size_t vertex,  vector<pair<size_t, size_t>> &return_edges, string &tree);
     void dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct);
     void dfs_articulation();
 
