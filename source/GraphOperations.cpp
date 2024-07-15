@@ -54,7 +54,7 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
-            // dijkstra_shortest_path(g, vertex_1, vertex_2);
+            dijkstra_shortest_path(g, vertex_1, vertex_2);
             break;
         }
         case 4:
@@ -182,7 +182,24 @@ void transitive_indirect(Graph *g, size_t vertex)
 
 void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
-    // Implementação
+    vector<size_t> distance(g->get_num_nodes());
+    vector<int> parents(g->get_num_nodes(), -1);
+    vector<size_t> node_at_index(g->get_num_nodes());
+    g->dijkstra(vertex_1, distance, parents);
+
+    vector<size_t> path(g->get_num_nodes());
+    for (int v = vertex_2; v != vertex_1; v = parents[v]){
+        path.push_back(v);
+    }
+        
+    path.push_back(vertex_1);
+
+    reverse(path.begin(), path.end());
+
+    for(size_t i = 0; i<path.size(); i++){
+        output_buffer << path[i] << " ";
+    }
+
     output_buffer << "   Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
     cout << output_buffer.str();
 }

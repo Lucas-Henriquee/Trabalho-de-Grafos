@@ -1,5 +1,7 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
+#include "Graph.hpp"
+#define MAX_F numeric_limits<float>::infinity()
 
 using namespace std;
 
@@ -423,4 +425,36 @@ void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)
 
 void Graph::dfs_articulation()
 {
+}
+void Graph::dijkstra(size_t source, vector<size_t> distance, vector<int> parents)
+{
+    distance.assign(distance.size(), MAX_F);
+    parents.assign(parents.size(), -1);
+    vector<size_t> node_at_index(get_num_nodes(), NULL);
+
+    distance[0] = 0;
+    node_at_index[0] = source;
+
+    for (size_t i = 0;i < _number_of_nodes; i++)
+    {
+        if(i<node_at_index.size()){
+            Node* iteration_node = find_node(node_at_index[i]);
+            for (Edge* iteration_edge = iteration_node->_first_edge; iteration_edge != NULL; iteration_edge = iteration_edge->_next_edge)
+            {
+                size_t position_target = find(node_at_index.begin(), node_at_index.end(), iteration_edge->_target_id) - node_at_index.begin();
+                size_t position_source = find(node_at_index.begin(), node_at_index.end(), iteration_node->_id) - node_at_index.begin();
+                if(position_target > node_at_index.size()){
+                    node_at_index.push_back(iteration_edge->_target_id);
+                    distance.push_back(distance[position_source] + iteration_edge->_weight);
+                    parents.push_back(iteration_node->_id);
+                }
+                else{
+                    if(distance[position_target] > distance[position_source] + iteration_edge->_weight){
+                        distance[position_target] = distance[position_source] + iteration_edge->_weight;
+                        parents[position_target] = node_at_index[position_source];
+                    }
+                }
+            }
+        }
+    }
 }
