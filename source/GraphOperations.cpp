@@ -188,22 +188,17 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
     g->dijkstra(vertex_1, distance, parents, node_at_index);
     
-    vector<size_t> path(g->get_num_nodes());
+    vector<size_t> path;
     for (int v = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin(); v != 0; v = parents[v]){
         path.push_back(v);
     }
-        
-    path.push_back(vertex_1);
-
-    reverse(path.begin(), path.end());
+    path.push_back(0);
 
     output_buffer << "   Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ":\n";
-    size_t i = 0;
-    do{
+    for (size_t i = 0; i < path.size(); i++)
+    {
         output_buffer << node_at_index[path[i]] << " ";
-        i++;
-    } while(path[i] != 0);
-    output_buffer << node_at_index[0];
+    }
 }
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)

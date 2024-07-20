@@ -426,15 +426,17 @@ void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)
 void Graph::dfs_articulation()
 {
 }
-void Graph::dijkstra(size_t source, vector<float> distance, vector<int> parents, vector<size_t> node_at_index)
+void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index)
 {
     int n = _number_of_nodes;
+    int p = 0;
     distance.assign(n, INF_F);
     parents.assign(n, -1);
+    node_at_index.assign(n, -1);
     vector<bool> visited(n, false);
-    node_at_index.assign(n, NULL);
-    distance[0] = 0;
-    node_at_index[0] = source;
+
+    distance[p] = 0;
+    node_at_index[p] = source;
 
     for(int i = 0;i < n; i++){
         int v =-1;
@@ -442,7 +444,7 @@ void Graph::dijkstra(size_t source, vector<float> distance, vector<int> parents,
             if((!visited[j]) && (v == -1 || distance[j] < distance[v]))
                 v = j;
         }
-
+        
         if(distance[v] == INF_F)
             break;
 
@@ -452,7 +454,8 @@ void Graph::dijkstra(size_t source, vector<float> distance, vector<int> parents,
             int target = aux_edge->_target_id;
             float weight = aux_edge->_weight;
             if(find(node_at_index.begin(), node_at_index.end(), target) == node_at_index.end()){
-                 node_at_index.push_back(target);
+                p++;
+                node_at_index[p] = target;
             }
             int position = find(node_at_index.begin(), node_at_index.end(), target) - node_at_index.begin();
             if(distance[v] + weight < distance[position]){
