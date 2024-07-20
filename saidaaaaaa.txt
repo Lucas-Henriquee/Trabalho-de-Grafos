@@ -1,0 +1,25 @@
+
+				Imprimindo Grafo
+
+
+  Dados do Grafo:
+  Número de Nós: 5
+  Número de Arestas: 5
+  Tipo do Grafo: Não Direcionado
+
+
+			1 -> 2 -> 3
+			2 -> 1 -> 3
+			3 -> 1 -> 2 -> 4
+			4 -> 3 -> 5
+			5 -> 4
+
+
+  Funcionalidades solicitadas para a impressão:
+
+  -------------------------------------------------------------
+
+   Caminho Mínimo (Dijkstra) entre 1 e 5:
+0 49 0
+  -------------------------------------------------------------
+

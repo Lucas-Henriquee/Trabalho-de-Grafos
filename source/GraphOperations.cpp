@@ -182,13 +182,14 @@ void transitive_indirect(Graph *g, size_t vertex)
 
 void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
-    vector<size_t> distance(g->get_num_nodes());
+    vector<float> distance(g->get_num_nodes());
     vector<int> parents(g->get_num_nodes(), -1);
     vector<size_t> node_at_index(g->get_num_nodes());
-    g->dijkstra(vertex_1, distance, parents);
 
+    g->dijkstra(vertex_1, distance, parents, node_at_index);
+    
     vector<size_t> path(g->get_num_nodes());
-    for (int v = vertex_2; v != vertex_1; v = parents[v]){
+    for (int v = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin(); v != 0; v = parents[v]){
         path.push_back(v);
     }
         
@@ -196,12 +197,13 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
     reverse(path.begin(), path.end());
 
-    for(size_t i = 0; i<path.size(); i++){
-        output_buffer << path[i] << " ";
-    }
-
-    output_buffer << "   Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
-    cout << output_buffer.str();
+    output_buffer << "   Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ":\n";
+    size_t i = 0;
+    do{
+        output_buffer << node_at_index[path[i]] << " ";
+        i++;
+    } while(path[i] != 0);
+    output_buffer << node_at_index[0];
 }
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
