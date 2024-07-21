@@ -365,6 +365,12 @@ Node *Graph::get_first_node()
     return _first;
 }
 
+bool Graph::get_directed()
+{
+    // Retornando se o grafo é direcionado.
+    return _directed;
+}
+
 void Graph::dfs(Graph *g, size_t vertex, vector<pair<size_t, size_t>> &return_edges, string &tree)
 {
     // Inicializando a pilha de nós.

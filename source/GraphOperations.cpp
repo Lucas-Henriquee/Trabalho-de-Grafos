@@ -37,12 +37,19 @@ void menu(Graph *g, string file_exit)
 
         system("clear||cls");
 
+        // Verificando se o grafo é direcionado antes de realizar a operação de fecho transitivo.
+        if ((i == 1 || i == 2) && g->get_directed() == false)
+        {
+            cout << "\n  ATENÇÃO! O grafo solicitado não é direcionado, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
+            this_thread::sleep_for(chrono::seconds(5));
+            continue;
+        }
+
         // Switch case para as opções do menu
         switch (i)
         {
         case 1:
         {
-
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
             transitive_direct(g, vertex_1);
@@ -113,7 +120,6 @@ void menu(Graph *g, string file_exit)
         case 0:
         {
             cout << "\n  Encerrando o programa..." << endl;
-            this_thread::sleep_for(chrono::seconds(3));
             break;
         }
         default:
@@ -126,7 +132,7 @@ void menu(Graph *g, string file_exit)
         output_buffer << "\n  -------------------------------------------------------------\n"
                       << endl;
         cout << output_buffer.str();
-        this_thread::sleep_for(chrono::seconds(2));
+        this_thread::sleep_for(chrono::seconds(1));
 
         // Salvando a saída no arquivo e limpando o buffer.
         if (i != 0)

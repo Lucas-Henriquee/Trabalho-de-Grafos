@@ -30,6 +30,7 @@ public:
 
     size_t get_num_nodes();
     Node *get_first_node();
+    bool get_directed();
 
 private:
     size_t _number_of_nodes;
