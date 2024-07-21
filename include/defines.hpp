@@ -12,6 +12,6 @@
 #include <chrono>    /* manipulação de tempo (duração, relógios e pontos no tempo) */
 #include <sstream>   /* manipulação de strings em fluxos de entrada e saída */
 #include <stack>     /* implementação do container stack e suas operações */
-#include <limits>    /* implementação dos valores maximos para os tipos primitivos*/
+#include <limits>    /* implementação dos valores maximos para os tipos primitivos */
 
 #endif // DEFINES_HPP

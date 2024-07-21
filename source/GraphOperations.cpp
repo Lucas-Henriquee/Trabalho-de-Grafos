@@ -201,7 +201,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
     // Chamando a função dijkstra.
     g->dijkstra(vertex_1, distance, parents, node_at_index);
-    
+
     // Construíndo o caminho mínimo de vertex_1 para vertex_2.
     for (int v = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin(); v != 0; v = parents[v])
         path.push_back(v);
@@ -215,7 +215,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     for (size_t i = 0; i < path.size(); i++)
     {
         output_buffer << node_at_index[path[i]];
-        if (i != path.size() - 1) 
+        if (i != path.size() - 1)
             output_buffer << " -> ";
     }
 
@@ -225,14 +225,14 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
-    //TODO: Implementação
+    // TODO: Implementação
 
     output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
 }
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
-    //TODO: Implementação 
+    // TODO: Implementação
 
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
@@ -243,7 +243,7 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 
 void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
-    //TODO: Implementação
+    // TODO: Implementação
 
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
@@ -289,12 +289,12 @@ void deep_walking(Graph *g, size_t vertex)
 
 void properties_graph(Graph *g)
 {
-    //TODO: Implementação
+    // TODO: Implementação
 }
 
 void articulation_vertices(Graph *g)
 {
-    //TODO: Implementação
+    // TODO: Implementação
     g->dfs_articulation(); //! PRECISA SER FEITO
 
     output_buffer << "  Vértices de Articulação do Grafo: ...\n";

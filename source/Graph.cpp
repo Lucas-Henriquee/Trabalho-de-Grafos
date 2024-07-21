@@ -97,7 +97,7 @@ void Graph::remove_node(size_t node_id)
         return;
     }
 
-    //! VERIFICAR SE A NECESSIDADE DE COLOCAR ESSE VERIFICA 
+    //! VERIFICAR SE É NECESSÁRIO INCLUIR ESTA VERIFICAÇÃO.
     // Verificando se a remoção do nó deixará o grafo desconexo.
     for (size_t i = 0; i < _number_of_nodes; ++i)
         if (i != node_id && !(conected(node_id, i) || conected(i, node_id)))
@@ -348,7 +348,7 @@ Node *Graph::find_node(size_t node_id)
     for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
         if (aux_node->_id == node_id)
             return aux_node;
-    
+
     // Caso o nó não seja encontrado.
     return NULL;
 }
@@ -500,7 +500,7 @@ void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)
 
 void Graph::dfs_articulation()
 {
-    //TODO: Implementar a função de articulação.
+    // TODO: Implementar a função de articulação.
 }
 
 void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index)
@@ -522,7 +522,7 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
 
     // Inicializando o nó de origem com 0.
     distance[p] = 0;
-    
+
     // Loop para encontrar o menor caminho.
     for (int i = 0; i < n; i++)
     {
@@ -557,7 +557,7 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
                 p++;
                 node_at_index[p] = target;
             }
-            
+
             // Encontrando a posição do nó destino.
             int position = find(node_at_index.begin(), node_at_index.end(), target) - node_at_index.begin();
 
