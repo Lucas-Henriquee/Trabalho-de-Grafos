@@ -17,8 +17,8 @@ public:
 
     void remove_node(size_t node_id);
     void remove_edge(size_t node_id_1, size_t node_id_2);
-    void add_node(size_t node_id, float weight = 0);
-    void add_edge(size_t node_id_1, size_t node_id_2, float weight = 0);
+    void add_node(size_t node_id, float weight);
+    void add_edge(size_t node_id_1, size_t node_id_2, float weight);
     void print_graph(ofstream &output_file);
     void print_graph();
     int conected(size_t node_id_1, size_t node_id_2);
@@ -42,6 +42,7 @@ private:
     Node *_last;
 
     Node *find_node(size_t node_id);
+    void read_graph(ifstream &instance);
 };
 
 #endif // GRAPH_HPP

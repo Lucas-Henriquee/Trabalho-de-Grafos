@@ -21,6 +21,39 @@ Graph::Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_n
     _first = NULL;
     _last = NULL;
 
+    // Chamando a função para ler o grafo.
+    read_graph(instance);
+}
+
+Graph::Graph()
+{
+    // TODO: Implementar o construtor padrão.
+}
+
+Graph::~Graph()
+{
+    // Criando o nó auxiliar para percorrer o grafo.
+    Node *aux_node_1 = _first;
+
+    // Percorrendo todos os nós do grafo.
+    while (aux_node_1 != NULL)
+    {
+        // Realizando processo de remoção das arestas.
+        Edge *aux_edge_1 = aux_node_1->_first_edge;
+        while (aux_edge_1 != NULL)
+        {
+            Edge *aux_edge_2 = aux_edge_1->_next_edge;
+            delete aux_edge_1;
+            aux_edge_1 = aux_edge_2;
+        }
+        Node *aux_node_2 = aux_node_1->_next_node;
+        delete aux_node_1;
+        aux_node_1 = aux_node_2;
+    }
+}
+
+void Graph::read_graph(ifstream &instance)
+{
     // Striung para armazenar a linha do arquivo.
     string line;
 
@@ -51,37 +84,10 @@ Graph::Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_n
         else
             iss >> node_1 >> node_2;
 
-        // Adicionando os nós e as arestas.
+        // Adicionando os nós e as arestas ao grafo.
         add_node(node_1, node_1_weight);
         add_node(node_2, node_2_weight);
         add_edge(node_1, node_2, edge_weight);
-    }
-}
-
-Graph::Graph()
-{
-    // TODO: Implementar o construtor padrão.
-}
-
-Graph::~Graph()
-{
-    // Criando o nó auxiliar para percorrer o grafo.
-    Node *aux_node_1 = _first;
-
-    // Percorrendo todos os nós do grafo.
-    while (aux_node_1 != NULL)
-    {
-        // Realizando processo de remoção das arestas.
-        Edge *aux_edge_1 = aux_node_1->_first_edge;
-        while (aux_edge_1 != NULL)
-        {
-            Edge *aux_edge_2 = aux_edge_1->_next_edge;
-            delete aux_edge_1;
-            aux_edge_1 = aux_edge_2;
-        }
-        Node *aux_node_2 = aux_node_1->_next_node;
-        delete aux_node_1;
-        aux_node_1 = aux_node_2;
     }
 }
 
