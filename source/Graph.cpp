@@ -377,6 +377,12 @@ bool Graph::get_directed()
     return _directed;
 }
 
+bool Graph::get_weighted_nodes()
+{
+    // Retornando se o grafo possui nós ponderados.
+    return _weighted_nodes;
+}
+
 void Graph::dfs(Graph *g, size_t vertex, vector<pair<size_t, size_t>> &return_edges, string &tree)
 {
     // Inicializando a pilha de nós.

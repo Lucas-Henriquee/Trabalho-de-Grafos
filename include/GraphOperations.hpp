@@ -5,6 +5,7 @@
 #include "defines.hpp"
 
 void menu(Graph *g, string file_exit);
+bool validate_graph(Graph *g, int i);
 void transitive_direct(Graph *g, size_t vertex);
 void transitive_indirect(Graph *g, size_t vertex);
 void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2);

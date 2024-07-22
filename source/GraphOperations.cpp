@@ -37,13 +37,9 @@ void menu(Graph *g, string file_exit)
 
         system("clear||cls");
 
-        // Verificando se o grafo é direcionado antes de realizar a operação de fecho transitivo.
-        if ((i == 1 || i == 2) && g->get_directed() == false)
-        {
-            cout << "\n  ATENÇÃO! O grafo solicitado não é direcionado, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
-            this_thread::sleep_for(chrono::seconds(5));
+        // Chamando a função para validar a operação no grafo.
+        if (!validate_graph(g, i))
             continue;
-        }
 
         // Switch case para as opções do menu
         switch (i)
@@ -129,8 +125,7 @@ void menu(Graph *g, string file_exit)
         }
         }
 
-        output_buffer << "\n  -------------------------------------------------------------\n"
-                      << endl;
+        output_buffer << "\n  -------------------------------------------------------------\n\n";
         cout << output_buffer.str();
         this_thread::sleep_for(chrono::seconds(1));
 
@@ -149,6 +144,35 @@ void menu(Graph *g, string file_exit)
     } while (i != 0);
 
     return;
+}
+
+bool validate_graph(Graph *g, int i)
+{
+    // Verificando se o grafo é direcionado antes de realizar a operação de fecho transitivo.
+    if ((i == 1 || i == 2) && !g->get_directed())
+    {
+        cout << "\n  ATENÇÃO! O grafo solicitado não é direcionado, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
+        this_thread::sleep_for(chrono::seconds(5));
+        return false;
+    }
+
+    // Verificando se o grafo possui pesos nos vértices antes de realizar a operação de caminho mínimo.
+    if ((i == 8) && !g->get_weighted_nodes())
+    {
+        cout << "\n  ATENÇÃO! O grafo solicitado não possui pesos nos vértices, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
+        this_thread::sleep_for(chrono::seconds(5));
+        return false;
+    }
+
+    // Verificando se o grafo é não direcionado antes de realizar a operação dos vérticies articulados.
+    if ((i == 9) && g->get_directed())
+    {
+        cout << "\n  ATENÇÃO! O grafo solicitado é direcionado, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
+        this_thread::sleep_for(chrono::seconds(5));
+        return false;
+    }
+
+    return true;
 }
 
 void transitive_direct(Graph *g, size_t vertex)
