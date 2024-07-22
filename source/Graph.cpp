@@ -54,7 +54,7 @@ Graph::~Graph()
 
 void Graph::read_graph(ifstream &instance)
 {
-    // Striung para armazenar a linha do arquivo.
+    // String para armazenar a linha do arquivo.
     string line;
 
     // Pulando a primeira linha.
@@ -152,6 +152,7 @@ void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
         return;
     }
 
+    //! VERIFICAR SE É NECESSÁRIO INCLUIR ESTA VERIFICAÇÃO.
     // Verificando se a remoção da aresta deixará o grafo desconexo.
     if (!conected(node_id_1, node_id_2) && !conected(node_id_2, node_id_1))
     {
@@ -325,8 +326,7 @@ void Graph::print_graph(ofstream &output_file)
 
     output_file << "  Funcionalidades solicitadas para a impressão:\n";
 
-    output_file << "\n  -------------------------------------------------------------\n"
-                << endl;
+    output_file << "\n  -------------------------------------------------------------\n\n";
 }
 
 int Graph::conected(size_t node_id_1, size_t node_id_2)
