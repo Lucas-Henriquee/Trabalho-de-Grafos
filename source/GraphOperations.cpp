@@ -18,7 +18,8 @@ void menu(Graph *g, string file_exit)
     // Loop do menu
     do
     {
-        system("clear||cls");
+        //system("clear||cls");
+        system("clear");
 
         cout << "\n\t  Menu de Operações do Grafo\n\n\n";
         cout << "  1) Fecho Transitivo Direto de um vértice" << endl;
@@ -69,7 +70,7 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
-            // floyd_shortest_path(g, vertex_1, vertex_2);
+            floyd_shortest_path(g, vertex_1, vertex_2);
             break;
         }
         case 5:
@@ -217,6 +218,7 @@ void transitive_indirect(Graph *g, size_t vertex)
 
 void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
+    // TODO: Verificar se os vertices fazem parte do grafo Dijkstra
     // Criando o vetor de distâncias.
     vector<float> distance(g->get_num_nodes());
 
@@ -239,6 +241,8 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     // Adicionando o vértice de origem.
     path.push_back(0);
 
+    reverse(path.begin(), path.end());
+
     // Escrevendo no buffer o caminho mínimo.
     output_buffer << "  Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ";
 
@@ -255,9 +259,32 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
-    // TODO: Implementação
+    // TODO: Verificar se os vertices fazem parte do grafo Dijkstra
+    size_t n = g->get_num_nodes();
+    vector<vector<float>> distance(n, vector<float>(n));
+    vector<vector<int>> parents(n, vector<int>(n));
+    vector<size_t> node_at_index(n);
+    vector<size_t> path;
 
-    output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ...\n";
+    g->floyd(distance, parents, node_at_index);
+
+    size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
+    size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
+
+    for(p_v2; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2]){
+        path.insert(path.begin(), node_at_index[p_v2]);
+    }
+    path.insert(path.begin(), vertex_1);
+    
+    output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ";
+
+    for (size_t i = 0; i < path.size(); i++)
+    {
+        output_buffer << path[i];
+        if (i != path.size() - 1)
+            output_buffer << " -> ";
+    }
+
 }
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)

@@ -588,3 +588,40 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
         }
     }
 }
+
+void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index)
+{
+    size_t n = _number_of_nodes;
+    size_t v = 0;
+
+    distance.assign(n, vector<float>(n, INF_F));
+    parents.assign(n, vector<int>(n, -1));
+
+    for(Node* aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node){
+        node_at_index[v] = aux_node->_id;
+        distance[v][v] = 0;
+        parents[v][v] = v;
+        v++;
+    }
+
+    v = 0;
+
+    for(Node* aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node){
+        for(Edge* aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge){
+            size_t u = find(node_at_index.begin(), node_at_index.end(), aux_edge->_target_id) - node_at_index.begin();
+            distance[v][u] = aux_edge->_weight;
+            parents[v][u] = v;
+        }
+        v++;
+    }
+    for(size_t k = 0; k < n; k++){
+        for(size_t i = 0; i < n; i++){
+            for(size_t j = 0; j < n; j++){
+                if(distance[i][j] > distance[i][k] + distance[k][j]){
+                    distance[i][j] = distance[i][k] + distance[k][j];
+                    parents[i][j] = parents[k][j];
+                }
+            }
+        }
+    }
+}

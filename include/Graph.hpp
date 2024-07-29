@@ -26,6 +26,7 @@ public:
     void dfs(Graph *g, size_t vertex, vector<pair<size_t, size_t>> &return_edges, string &tree);
     void dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct);
     void dfs_articulation();
+    void floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index);
     void dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index);
 
     size_t get_num_nodes();
