@@ -301,7 +301,7 @@ void Graph::print_graph()
 
 void Graph::print_graph(ofstream &output_file)
 {
-    // Armazendo dados do grafo no buffer.
+    // Armazena dados do grafo no buffer.
     output_file << "\n\t\t\t\tImprimindo Grafo\n\n\n";
 
     output_file << "  Dados do Grafo:" << endl;
@@ -309,24 +309,40 @@ void Graph::print_graph(ofstream &output_file)
     output_file << "  Número de Arestas: " << _number_of_edges << endl;
     output_file << "  Tipo do Grafo: " << (_directed ? "Direcionado" : "Não Direcionado") << "\n\n\n";
 
-    // Verificando se o grafo está vazio.
+    // Verifica se o grafo está vazio.
     if (_first == NULL)
+    {
+        output_file << "  O grafo está vazio." << endl;
         return;
+    }
 
-    // Armazando o grafo no buffer.
+    // Itera sobre todos os nós do grafo
     for (Node *node = _first; node != NULL; node = node->_next_node)
     {
-        output_file << "\t\t\t" << node->_id;
+        // Imprime o nó atual
+        output_file << "\t\t  " << node->_id;
+
+        // Verifica se há arestas saindo do nó
+        bool first_edge = true;
         for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
-            output_file << " -> " << edge->_target_id;
+        {
+            // Se não for a primeira aresta, adiciona a conexão
+            if (first_edge)
+            {
+                output_file << " --(" << edge->_weight << ")--> " << edge->_target_id;
+                first_edge = false;
+            }
+            else
+            {
+                output_file << " --(" << edge->_weight << ")--> " << edge->_target_id;
+            }
+        }
+        // Quebra de linha após processar todas as arestas do nó atual
         output_file << endl;
     }
 
     output_file << "\n\n";
-
-    output_file << "  Funcionalidades solicitadas para a impressão:\n";
-
-    output_file << "\n  -------------------------------------------------------------\n\n";
+    output_file << "  -------------------------------------------------------------\n\n";
 }
 
 int Graph::conected(size_t node_id_1, size_t node_id_2)
@@ -383,68 +399,51 @@ bool Graph::get_weighted_nodes()
     return _weighted_nodes;
 }
 
-void Graph::dfs(Graph *g, size_t vertex, vector<pair<size_t, size_t>> &return_edges, string &tree)
+bool Graph::get_weighted_edges()
 {
-    // Inicializando a pilha de nós.
-    stack<size_t> node_stack;
-    node_stack.push(vertex);
+    // Retornando se o grafo possui arestas ponderadas.
+    return _weighted_edges;
+}
 
-    // Inicializando o vetor de vértices visitados.
-    vector<bool> visited(g->get_num_nodes(), false);
+bool Graph::dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list)
+{
+    // Vetor para armazenar os nós visitados.
+    vector<bool> visited(_number_of_nodes, false);
 
-    // Inicializando a árvore.
-    tree += "(";
+    Node *start_node = find_node(vertex);
 
-    // Enquanto a pilha não estiver vazia.
-    while (!node_stack.empty())
+    // Verificando se o nó de início foi encontrado.
+    if (start_node != NULL)
     {
-        // Pegando o vértice do topo da pilha.
-        size_t v = node_stack.top();
-        node_stack.pop();
+        // Chamando a função dfs (Busca em Profundidade).
+        dfs_recursive(start_node, visited, return_edges, adj_list);
+        return true;
+    }
+    return false;
+}
+void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list)
+{
+    // Marcando o nó como visitado.
+    visited[node->_id] = true;
 
-        // Se o vértice ainda não foi visitado.
-        if (!visited[v])
-        {
-            // Marcando o vértice como visitado.
-            visited[v] = true;
+    // Vetor para armazenar os vizinhos do nó.
+    vector<size_t> neighbors;
 
-            // Adicionando o vértice à árvore.
-            string current_vertex = to_string(v);
-            if (tree != "(")
-                tree += " -> ";
-            tree += current_vertex;
+    // Loop para percorrer todas as arestas do nó.
+    for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
+    {
+        // Encontrando o nó destino da aresta.
+        Node *target_node = find_node(edge->_target_id);
 
-            // Encontrando o nó no grafo.
-            Node *aux_node = g->find_node(v);
+        neighbors.push_back(edge->_target_id);
 
-            // Se o nó existe.
-            if (aux_node != NULL)
-                for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
-                {
-                    // Se o grafo é direcionado.
-                    if (_directed)
-                    {
-                        // Se o vértice da aresta já foi visitado.
-                        if (visited[aux_edge->_target_id])
-                            return_edges.push_back(make_pair(v, aux_edge->_target_id));
-                    }
-                    // Se o grafo não for direcionado.
-                    else
-                    {
-                        // Se o vértice da aresta já foi visitado e não é o vértice antecessor.
-                        if (visited[aux_edge->_target_id] && (node_stack.empty() || aux_edge->_target_id != node_stack.top()))
-                            return_edges.push_back(make_pair(v, aux_edge->_target_id));
-                    }
-
-                    // Se o vértice da aresta ainda não foi visitado.
-                    if (!visited[aux_edge->_target_id])
-                        node_stack.push(aux_edge->_target_id);
-                }
-        }
+        if (!visited[target_node->_id])
+            dfs_recursive(target_node, visited, return_edges, adj_list);
+        else
+            return_edges.push_back(make_pair(node->_id, target_node->_id));
     }
 
-    // Fechando a árvore.
-    tree += ")";
+    adj_list[node->_id] = neighbors;
 }
 
 void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)
@@ -547,10 +546,8 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
         // Encontrando o vértice com a menor distância.
         int v = -1;
         for (int j = 0; j < n; j++)
-        {
             if ((!visited[j]) && (v == -1 || distance[j] < distance[v]))
                 v = j;
-        }
 
         // Se não houver vértice com a menor distância.
         if (distance[v] == INF_F)
@@ -597,7 +594,8 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
     distance.assign(n, vector<float>(n, INF_F));
     parents.assign(n, vector<int>(n, -1));
 
-    for(Node* aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node){
+    for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
+    {
         node_at_index[v] = aux_node->_id;
         distance[v][v] = 0;
         parents[v][v] = v;
@@ -606,22 +604,89 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
 
     v = 0;
 
-    for(Node* aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node){
-        for(Edge* aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge){
+    for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
+        for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        {
             size_t u = find(node_at_index.begin(), node_at_index.end(), aux_edge->_target_id) - node_at_index.begin();
             distance[v][u] = aux_edge->_weight;
             parents[v][u] = v;
         }
-        v++;
-    }
-    for(size_t k = 0; k < n; k++){
-        for(size_t i = 0; i < n; i++){
-            for(size_t j = 0; j < n; j++){
-                if(distance[i][j] > distance[i][k] + distance[k][j]){
+    v++;
+
+    for (size_t k = 0; k < n; k++)
+        for (size_t i = 0; i < n; i++)
+            for (size_t j = 0; j < n; j++)
+                if (distance[i][j] > distance[i][k] + distance[k][j])
+                {
                     distance[i][j] = distance[i][k] + distance[k][j];
                     parents[i][j] = parents[k][j];
                 }
-            }
+}
+
+void Graph::floyd(vector<vector<float>> &distance)
+{
+    for (size_t k = 0; k < _number_of_nodes; ++k)
+        for (size_t i = 0; i < _number_of_nodes; ++i)
+            for (size_t j = 0; j < _number_of_nodes; ++j)
+                if (distance[i][k] < INF_F && distance[k][j] < INF_F)
+                    distance[i][j] = min(distance[i][j], distance[i][k] + distance[k][j]);
+}
+
+void Graph::compute_graph_properties(float &radius, float &diameter, vector<size_t> &center, vector<size_t> &periphery)
+{
+    // Inicializando a matriz de distâncias
+    vector<vector<float>> dist(_number_of_nodes, vector<float>(_number_of_nodes, INF_F));
+
+    // Preenchendo a matriz de distâncias com base nas arestas do grafo
+    for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
+    {
+        // Encontrando o nó atual e inicializando a distância dele para ele mesmo
+        size_t id = aux_node->_id;
+        dist[id - 1][id - 1] = 0;
+
+        // Preenchendo a distância do nó atual para os nós adjacentes
+        for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        {
+            // Encontrando o nó adjacente e preenchendo a distância
+            size_t target_id = aux_edge->_target_id;
+            dist[id - 1][target_id - 1] = aux_edge->_weight;
+
+            // Se o grafo não for direcionado, preenchendo a distância do nó adjacente para o nó atual
+            if (!_directed)
+                dist[target_id - 1][id - 1] = aux_edge->_weight;
         }
+    }
+
+    // Aplicando o algoritmo de Floyd-Warshall para encontrar as distâncias mínimas
+    floyd(dist);
+
+    // Inicializando o raio e o diâmetro
+    diameter = 0;
+    vector<float> eccentricity(_number_of_nodes, 0);
+
+    // Encontrando a excentricidade de cada nó e o diâmetro
+    for (size_t i = 0; i < _number_of_nodes; ++i)
+    {
+        // Encontrando a distância máxima do nó i para os outros nós
+        float max_dist = 0;
+        for (size_t j = 0; j < _number_of_nodes; ++j)
+            if (dist[i][j] < INF_F)
+                max_dist = max(max_dist, dist[i][j]);
+
+        // Atualizando a excentricidade e o diâmetro
+        eccentricity[i] = max_dist;
+        diameter = max(diameter, max_dist);
+    }
+
+    // Encontrando o raio
+    radius = *min_element(eccentricity.begin(), eccentricity.end());
+
+    // Encontrando o centro e a periferia
+    for (size_t i = 0; i < _number_of_nodes; ++i)
+    {
+        if (eccentricity[i] == radius)
+            center.push_back(i + 1);
+        if (eccentricity[i] == diameter)
+            periphery.push_back(i + 1);
     }
 }

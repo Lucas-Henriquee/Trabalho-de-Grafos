@@ -13,5 +13,8 @@
 #include <sstream>   /* manipulação de strings em fluxos de entrada e saída */
 #include <stack>     /* implementação do container stack e suas operações */
 #include <limits>    /* implementação dos valores maximos para os tipos primitivos */
+#include <map>       /* implementação do container map e suas operações */
 
-#endif // DEFINES_HPP
+#define INF_F numeric_limits<float>::infinity(); /* infinito para float */
+
+#endif                                           // DEFINES_HPP

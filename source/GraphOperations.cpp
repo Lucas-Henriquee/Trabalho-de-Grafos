@@ -4,6 +4,8 @@
 
 using namespace std;
 
+
+
 ostringstream output_buffer;
 
 void menu(Graph *g, string file_exit)
@@ -18,8 +20,7 @@ void menu(Graph *g, string file_exit)
     // Loop do menu
     do
     {
-        //system("clear||cls");
-        system("clear");
+        system("clear||cls");
 
         cout << "\n\t  Menu de Operações do Grafo\n\n\n";
         cout << "  1) Fecho Transitivo Direto de um vértice" << endl;
@@ -106,7 +107,7 @@ void menu(Graph *g, string file_exit)
         }
         case 8:
         {
-            // properties_graph(g);
+            properties_graph(g);
             break;
         }
         case 9:
@@ -158,7 +159,7 @@ bool validate_graph(Graph *g, int i)
     }
 
     // Verificando se o grafo possui pesos nos vértices antes de realizar a operação de caminho mínimo.
-    if ((i == 8) && !g->get_weighted_nodes())
+    if ((i == 8) && !g->get_weighted_edges())
     {
         cout << "\n  ATENÇÃO! O grafo solicitado não possui pesos nos vértices, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
         this_thread::sleep_for(chrono::seconds(5));
@@ -179,7 +180,7 @@ bool validate_graph(Graph *g, int i)
 void transitive_direct(Graph *g, size_t vertex)
 {
     // Criando o vetor de nós visitados.
-    vector<Node *> visited(g->get_num_nodes(), NULL);
+    vector<Node *> visited(g->get_num_nodes() + 1, NULL);
 
     // Chamando a função dfs (Busca em Profundidade).
     g->dfs_transitive(vertex, visited, true);
@@ -192,7 +193,6 @@ void transitive_direct(Graph *g, size_t vertex)
     for (int v = 0; v < size; v++)
         if (visited[v])
             output_buffer << visited[v]->_id << " ";
-
     // Concluindo a escrita no buffer e exibindo no terminal ao usuário.
     output_buffer << "\n";
 }
@@ -200,7 +200,7 @@ void transitive_direct(Graph *g, size_t vertex)
 void transitive_indirect(Graph *g, size_t vertex)
 {
     // Criando o vetor de nós visitados.
-    vector<Node *> visited(g->get_num_nodes(), NULL);
+    vector<Node *> visited(g->get_num_nodes() + 1, NULL);
 
     // Chamando a função dfs (Busca em Profundidade).
     g->dfs_transitive(vertex, visited, false);
@@ -271,11 +271,12 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
     size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
 
-    for(p_v2; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2]){
+    for (p_v2; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
+    {
         path.insert(path.begin(), node_at_index[p_v2]);
     }
     path.insert(path.begin(), vertex_1);
-    
+
     output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ";
 
     for (size_t i = 0; i < path.size(); i++)
@@ -284,7 +285,6 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         if (i != path.size() - 1)
             output_buffer << " -> ";
     }
-
 }
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
@@ -311,50 +311,80 @@ void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 
 void deep_walking(Graph *g, size_t vertex)
 {
-    // Verificando se o grafo está vazio.
-    if (g->get_num_nodes() == 0)
-    {
-        cout << "  O Grafo está vazio." << endl;
-        return;
-    }
 
-    // Inicializando o vetor de arestas de retorno e a string da árvore.
+    // Vetor para armazenar as arestas de retorno.
     vector<pair<size_t, size_t>> return_edges;
-    string tree;
 
-    // Chamando a função DFS.
-    g->dfs(g, vertex, return_edges, tree);
+    // Mapa para armazenar a lista de adjacência.
+    map<size_t, vector<size_t>> adj_list;
 
-    // Escrevendo a árvore de caminhamento em profundidade no buffer.
-    output_buffer << "  Caminhamento em profundidade a partir do vértice " << vertex << ": " << tree << endl;
-
-    // Verificando se o vetor de arestas de retorno está vazio.
-    if (return_edges.empty())
-        output_buffer << "\n  Arestas de retorno: Nenhuma" << endl;
-
-    // Caso contrário, escrevendo as arestas de retorno no buffer.
-    else
+    // Encontrando o nó de início.
+    if (g->dfs_call(vertex, return_edges, adj_list))
     {
+        // Escrevendo no buffer o caminhamento em profundidade.
+        output_buffer << "  Caminhamento em Profundidade a partir do vértice " << vertex << ":" << endl;
+        output_buffer << "\n  Lista de Adjacência:" << endl;
+
+        for (auto &entry : adj_list)
+        {
+            output_buffer << "  " << entry.first << " -> ";
+
+            for (size_t i = 0; i < entry.second.size(); ++i)
+            {
+                if (i > 0)
+                    output_buffer << " -> ";
+
+                output_buffer << entry.second[i];
+            }
+
+            output_buffer << endl;
+        }
+
+        // Escrevendo as arestas de retorno no buffer.
         output_buffer << "\n  Arestas de retorno:" << endl;
-        for (auto &edge : return_edges)
-            output_buffer << "  (" << edge.first << ", " << edge.second << ")" << endl;
+        for (size_t i = 0; i < return_edges.size(); ++i)
+            output_buffer << "  (" << return_edges[i].first << ", " << return_edges[i].second << ")" << endl;
+        output_buffer << endl;
     }
 
-    // Concluindo a escrita no buffer e exibindo no terminal ao usuário.
-    output_buffer << "\n";
+    // Caso contrário.
+    else
+        output_buffer << "  Nó não encontrado no grafo." << endl;
 }
 
 void properties_graph(Graph *g)
 {
-    // TODO: Implementação
+    // Variáveis para armazenar o raio e o diâmetro.
+    float radius;
+    float diameter;
+
+    // Vetores para armazenar o centro e a periferia.
+    vector<size_t> center;
+    vector<size_t> periphery;
+
+    // Chamando a função que calcula as propriedades do grafo.
+    g->compute_graph_properties(radius, diameter, center, periphery);
+
+    // Escrevendo as propriedades no buffer.
+    output_buffer << "  Propriedades do Grafo:\n\n";
+    output_buffer << "  Raio (Valor): " << radius << endl;
+    output_buffer << "  Diâmetro (Valor): " << diameter << endl;
+
+    // Escrevendo o centro e a periferia no buffer.
+    output_buffer << "  Centro (Nó):  ";
+    for (size_t v : center)
+        output_buffer << v << " ";
+    output_buffer << endl;
+
+    output_buffer << "  Periferia (Nó): ";
+    for (size_t v : periphery)
+        output_buffer << v << " ";
+    output_buffer << endl;
 }
 
 void articulation_vertices(Graph *g)
 {
     // TODO: Implementação
-    g->dfs_articulation(); //! PRECISA SER FEITO
-
-    output_buffer << "  Vértices de Articulação do Grafo: ...\n";
 }
 
 void save_exit(Graph *g, string file_exit)

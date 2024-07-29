@@ -23,16 +23,22 @@ public:
     void print_graph();
     int conected(size_t node_id_1, size_t node_id_2);
 
-    void dfs(Graph *g, size_t vertex, vector<pair<size_t, size_t>> &return_edges, string &tree);
+    void dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list);
+    bool dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list);
+
     void dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct);
     void dfs_articulation();
     void floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index);
+    void floyd(vector<vector<float>> &distance);
     void dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index);
+
+    void compute_graph_properties(float &radius, float &diameter, vector<size_t> &center, vector<size_t> &periphery);
 
     size_t get_num_nodes();
     Node *get_first_node();
     bool get_directed();
     bool get_weighted_nodes();
+    bool get_weighted_edges();
 
 private:
     size_t _number_of_nodes;
