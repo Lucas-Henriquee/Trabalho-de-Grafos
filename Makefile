@@ -12,7 +12,7 @@ MAIN_OBJ := main.o
 DEPS := $(wildcard $(INC_DIR)/*.hpp)
 
 # Compiler flags
-CXXFLAGS := -std=c++11 -Wall -Wextra
+CXXFLAGS := -std=c++11 -Wall -Wextra -g
 
 # Output executable
 TARGET := execGrupoX
