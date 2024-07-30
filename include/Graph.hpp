@@ -36,6 +36,7 @@ public:
 
     size_t get_num_nodes();
     Node *get_first_node();
+    Node *get_next_node(Node* current_node);
     bool get_directed();
     bool get_weighted_nodes();
     bool get_weighted_edges();

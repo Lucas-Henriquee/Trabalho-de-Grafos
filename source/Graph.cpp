@@ -1,6 +1,6 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
-#include "Graph.hpp"
+#include "../include/Graph.hpp"
 
 #define INF_F numeric_limits<float>::infinity()
 
@@ -219,7 +219,7 @@ void Graph::add_node(size_t node_id, float weight)
 }
 
 void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
-{
+{    
     // Procurando se os nós já existem.
     Node *search_node_1 = find_node(node_id_1);
     Node *search_node_2 = find_node(node_id_2);
@@ -385,6 +385,11 @@ Node *Graph::get_first_node()
 {
     // Retornando o primeiro nó.
     return _first;
+}
+
+Node *Graph::get_next_node(Node *current_node)
+{
+    return find_node(current_node->_id + 1);
 }
 
 bool Graph::get_directed()
