@@ -2,6 +2,7 @@
 #include "../include/GraphOperations.hpp"
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
+#include <catch2/catch.hpp> /* implementação do framework de testes Catch2 */
 
 using namespace std;
 

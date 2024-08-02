@@ -57,8 +57,12 @@ void Graph::read_graph(ifstream &instance)
     // String para armazenar a linha do arquivo.
     string line;
 
-    // Pulando a primeira linha.
+    // Lendo primeira linha.
     getline(instance, line);
+    istringstream iss(line);
+    iss >> _number_of_nodes;
+    for (size_t i = 1; i <= _number_of_nodes; i++)
+        add_node(i, 0);    
 
     // Inicializando leitura do arquivo.
     while (getline(instance, line))
@@ -85,8 +89,6 @@ void Graph::read_graph(ifstream &instance)
             iss >> node_1 >> node_2;
 
         // Adicionando os nós e as arestas ao grafo.
-        add_node(node_1, node_1_weight);
-        add_node(node_2, node_2_weight);
         add_edge(node_1, node_2, edge_weight);
     }
 }
@@ -213,9 +215,6 @@ void Graph::add_node(size_t node_id, float weight)
         aux->_previous_node = _last;
         _last = aux;
     }
-
-    // Atualizando o número de nós.
-    _number_of_nodes++;
 }
 
 void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)

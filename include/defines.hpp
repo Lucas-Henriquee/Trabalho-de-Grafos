@@ -14,6 +14,5 @@
 #include <stack>            /* implementação do container stack e suas operações */
 #include <limits>           /* implementação dos valores maximos para os tipos primitivos */
 #include <map>              /* implementação do container map e suas operações */
-#include <catch2/catch.hpp> /* implementação do framework de testes Catch2 */
 
 #endif                      // DEFINES_HPP
