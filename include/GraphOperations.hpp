@@ -16,5 +16,6 @@ void deep_walking(Graph *g, size_t vertex);
 void properties_graph(Graph *g);
 void articulation_vertices(Graph *g);
 void save_exit(Graph *g, string file);
+void sleep_for_seconds(int seconds);
 
 #endif // GRAPH_OPERATIONS_HPP

@@ -19,18 +19,29 @@ TEST_OBJS := $(patsubst $(TEST_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(TEST_SRCS))
 TEST_TARGET := $(BUILD_DIR)/runTests
 
 # Compiler flags
-CXXFLAGS := -std=c++11 -Wall -Wextra -g -I$(INC_DIR) -I/path/to/catch2
+CXXFLAGS := -std=c++17 -Wall -Wextra -g -I$(INC_DIR)
 LDFLAGS := -pthread
 
-# Output executable
+# OS-specific settings
+ifeq ($(OS),Windows_NT)
+    CXXFLAGS += -I/usr/include
+    LDFLAGS += -L/usr/lib -lCatch2WithMain
+else
+    # Linux-specific flags
+    CXXFLAGS += -I/usr/include
+    LDFLAGS += -pthread -L/usr/lib -lCatch2WithMain
+endif
+
+# Output executables
 TARGET := execGrupoX
+TEST_TARGET := runTests
 
 .PHONY: all clean test
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS) $(MAIN_OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJS) $(MAIN_OBJ) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(OBJS) $(MAIN_OBJ) -o $(TARGET) $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPS)
 	@mkdir -p $(BUILD_DIR)
@@ -49,7 +60,7 @@ $(TEST_TARGET): $(TEST_OBJS) $(OBJS)
 	$(CXX) $(CXXFLAGS) $(TEST_OBJS) $(OBJS) -o $(TEST_TARGET) $(LDFLAGS)
 
 test: $(TEST_TARGET)
-	./$(TEST_TARGET)
+	@./$(TEST_TARGET)
 
 clean:
-	@rm -rf $(BUILD_DIR) $(TARGET)
+	@rm -rf $(BUILD_DIR) $(TARGET) $(TEST_TARGET)

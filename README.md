@@ -67,12 +67,12 @@ Para executar o programa, basta executar o seguinte comando:
 
 #### No Linux e iOS:
 ```sh
-./execGrupoX <arquivo_entrada> <arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
+./execGrupoX ./<arquivo_entrada> ./<arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
 ```
 
 #### No Windows:
 ```sh
-execGrupoX <arquivo_entrada> <arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
+.\execGrupoX .\<arquivo_entrada> .\<arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
 ```
 
 #### Parâmetros de Execução

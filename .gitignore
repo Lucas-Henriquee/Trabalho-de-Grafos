@@ -1,6 +1,6 @@
 /.vscode/*
 *.o
 execGrupoX
-/.build/*
+/build/*
+*.txt
 runTests
-saida.txt

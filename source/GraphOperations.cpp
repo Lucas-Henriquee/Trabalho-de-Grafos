@@ -4,8 +4,6 @@
 
 using namespace std;
 
-
-
 ostringstream output_buffer;
 
 void menu(Graph *g, string file_exit)
@@ -123,13 +121,13 @@ void menu(Graph *g, string file_exit)
         default:
         {
             cout << "\n  Opção inválida! Tente novamente." << endl;
-            this_thread::sleep_for(chrono::seconds(2));
+            sleep_for_seconds(2);
         }
         }
 
         output_buffer << "\n  -------------------------------------------------------------\n\n";
         cout << output_buffer.str();
-        this_thread::sleep_for(chrono::seconds(1));
+        sleep_for_seconds(1);
 
         // Salvando a saída no arquivo e limpando o buffer.
         if (i != 0)
@@ -154,7 +152,7 @@ bool validate_graph(Graph *g, int i)
     if ((i == 1 || i == 2) && !g->get_directed())
     {
         cout << "\n  ATENÇÃO! O grafo solicitado não é direcionado, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
-        this_thread::sleep_for(chrono::seconds(5));
+        sleep_for_seconds(5);
         return false;
     }
 
@@ -162,7 +160,7 @@ bool validate_graph(Graph *g, int i)
     if ((i == 8) && !g->get_weighted_edges())
     {
         cout << "\n  ATENÇÃO! O grafo solicitado não possui pesos nos vértices, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
-        this_thread::sleep_for(chrono::seconds(5));
+        sleep_for_seconds(5);
         return false;
     }
 
@@ -170,7 +168,7 @@ bool validate_graph(Graph *g, int i)
     if ((i == 9) && g->get_directed())
     {
         cout << "\n  ATENÇÃO! O grafo solicitado é direcionado, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
-        this_thread::sleep_for(chrono::seconds(5));
+        sleep_for_seconds(5);
         return false;
     }
 
@@ -408,7 +406,7 @@ void save_exit(Graph *g, string file_exit)
         output_file << output_buffer.str();
 
         cout << "  Saída salva no arquivo: " << file_exit << endl;
-        this_thread::sleep_for(chrono::seconds(3));
+        sleep_for_seconds(3);
 
         // Fechando o arquivo.
         output_file.close();
@@ -417,4 +415,13 @@ void save_exit(Graph *g, string file_exit)
     // Caso contrário.
     else
         cout << "  Erro ao abrir o arquivo para salvar a saída." << endl;
+}
+
+void sleep_for_seconds(int seconds)
+{
+#ifdef _WIN32
+    Sleep(seconds * 1000); // Sleep no Windows espera em milissegundos
+#else
+    sleep(seconds); // sleep no Unix espera em segundos
+#endif
 }
