@@ -54,7 +54,7 @@ Este projeto implementa uma biblioteca em C++ para manipulação de grafos simpl
 ## ⚙️ Orientações
 
 ### Compatibilidade
-O programa é compatível com os ambientes Linux, Windows e IOS.
+O programa é compatível com os ambientes Linux, Windows e iOS.
 ### Compilação
 O padrão para compilação a ser utilizado o  será `g++ *.c* -o execGrupoX`.
 
@@ -64,9 +64,17 @@ make
 ```
 ### Execução
 Para executar o programa, basta executar o seguinte comando:
+
+#### No Linux e iOS:
 ```sh
 ./execGrupoX <arquivo_entrada> <arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
 ```
+
+#### No Windows:
+```sh
+execGrupoX <arquivo_entrada> <arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
+```
+
 #### Parâmetros de Execução
 - `<arquivo_entrada>` : Nome do arquivo contendo as informações do grafo a ser processado.
 
@@ -78,8 +86,21 @@ Para executar o programa, basta executar o seguinte comando:
 
 - `<Op_PesoNos>`  : Indica se os vértices possuem peso associado. Use 1 se os vértices são ponderados e 0 se não são ponderados.
 
-#### Exemplo de arquivo 
-Os arquivos de exemplo do grafo estão localizados na pasta [**instances_example**](instances_example) do repositório. Cada arquivo contém um grafo diferente e pode ser utilizado para testar as funcionalidades da biblioteca.
+### Testes
+
+Para garantir a funcionalidade correta da biblioteca, foi incluido testes automatizados usando a biblioteca Catch2. Para executá-los:
+
+- Certifique-se de que a biblioteca Catch2 está instalada no seu sistema.
+
+- Compile e execute os testes com o comando:
+    ```sh
+    make test
+    ```
+
+Os testes validarão as funcionalidades implementadas e garantirão que o código está funcionando conforme esperado.
+
+### Exemplo de Arquivo para Compilar ou Fazer os Testes
+Os arquivos de exemplo estão localizados na pasta [**instances_example**](instances_example) do repositório. Esses arquivos contêm grafos diferentes que podem ser usados para compilar o programa ou executar os testes. Utilize esses arquivos para garantir que todas as funcionalidades da biblioteca estejam funcionando corretamente.
 
 
 ## 👥 Integrantes do Grupo
