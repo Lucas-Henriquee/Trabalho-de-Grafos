@@ -1,6 +1,6 @@
 /.vscode/*
 *.o
-execGrupoX
+execGrupoX*
 /build/*
 *.txt
 runTests
