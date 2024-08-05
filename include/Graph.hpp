@@ -35,11 +35,10 @@ public:
     void compute_graph_properties(float &radius, float &diameter, vector<size_t> &center, vector<size_t> &periphery);
 
     size_t get_num_nodes();
-    Node *get_first_node();
-    Node *get_next_node(Node* current_node);
     bool get_directed();
     bool get_weighted_nodes();
     bool get_weighted_edges();
+    Node *find_node(size_t node_id);
 
 private:
     size_t _number_of_nodes;
@@ -50,7 +49,6 @@ private:
     Node *_first;
     Node *_last;
 
-    Node *find_node(size_t node_id);
     void read_graph(ifstream &instance);
 };
 

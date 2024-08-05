@@ -382,17 +382,6 @@ size_t Graph::get_num_nodes()
     return _number_of_nodes;
 }
 
-Node *Graph::get_first_node()
-{
-    // Retornando o primeiro nó.
-    return _first;
-}
-
-Node *Graph::get_next_node(Node *current_node)
-{
-    return find_node(current_node->_id + 1);
-}
-
 bool Graph::get_directed()
 {
     // Retornando se o grafo é direcionado.
