@@ -62,7 +62,7 @@ void Graph::read_graph(ifstream &instance)
     istringstream iss(line);
     iss >> _number_of_nodes;
     for (size_t i = 1; i <= _number_of_nodes; i++)
-        add_node(i, 0);    
+        add_node(i, 0);
 
     // Inicializando leitura do arquivo.
     while (getline(instance, line))
@@ -218,7 +218,7 @@ void Graph::add_node(size_t node_id, float weight)
 }
 
 void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
-{    
+{
     // Procurando se os nós já existem.
     Node *search_node_1 = find_node(node_id_1);
     Node *search_node_2 = find_node(node_id_2);
@@ -295,7 +295,8 @@ void Graph::print_graph()
             cout << " -> " << edge->_target_id;
         cout << endl;
     }
-    cout << endl;
+
+    cout << "\n\n Inicializando o Grafo...." << endl;
 }
 
 void Graph::print_graph(ofstream &output_file)
@@ -341,6 +342,7 @@ void Graph::print_graph(ofstream &output_file)
     }
 
     output_file << "\n\n";
+    output_file << "  Funcionalidades solicitadas do Grafo:\n";
     output_file << "  -------------------------------------------------------------\n\n";
 }
 
@@ -423,6 +425,7 @@ bool Graph::dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, 
         dfs_recursive(start_node, visited, return_edges, adj_list);
         return true;
     }
+
     return false;
 }
 void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list)
@@ -439,15 +442,38 @@ void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t,
         // Encontrando o nó destino da aresta.
         Node *target_node = find_node(edge->_target_id);
 
+        // Adicionando o nó destino na lista de vizinhos.
         neighbors.push_back(edge->_target_id);
 
-        if (!visited[target_node->_id])
-            dfs_recursive(target_node, visited, return_edges, adj_list);
-        else
-            return_edges.push_back(make_pair(node->_id, target_node->_id));
+        // Verificando se o grafo é não-direcionado e adicionando a aresta em ambas as direções.
+        if (!_directed)
+            if (find(adj_list[target_node->_id].begin(), adj_list[target_node->_id].end(), node->_id) == adj_list[target_node->_id].end())
+                adj_list[target_node->_id].push_back(node->_id);
+
+        // Verificando se o nó destino ainda não foi visitado ou se o grafo é não-direcionado.
+        if (!_directed || !visited[target_node->_id])
+        {
+            // Adicionando aresta de retorno, se ainda não foi adicionada e o grafo é não-direcionado.
+            if (!_directed)
+            {
+                if (find(return_edges.begin(), return_edges.end(), make_pair(node->_id, target_node->_id)) == return_edges.end() && find(return_edges.begin(), return_edges.end(), make_pair(target_node->_id, node->_id)) == return_edges.end())
+                    return_edges.emplace_back(node->_id, target_node->_id);
+            }
+            // Adicionando aresta de retorno, se ainda não foi adicionada e o grafo é direcionado.
+            else
+            {
+                if (find(return_edges.begin(), return_edges.end(), make_pair(node->_id, target_node->_id)) == return_edges.end())
+                    return_edges.emplace_back(node->_id, target_node->_id);
+            }
+
+            // Chamando a função recursivamente para o nó destino.
+            if (!visited[target_node->_id])
+                dfs_recursive(target_node, visited, return_edges, adj_list);
+        }
     }
 
-    adj_list[node->_id] = neighbors;
+    // Adicionando a lista de vizinhos do nó atual.
+    adj_list[node->_id] = move(neighbors);
 }
 
 void Graph::dfs_transitive(size_t vertex, vector<bool> &visited, bool direct)
@@ -493,7 +519,7 @@ void Graph::dfs_transitive(size_t vertex, vector<bool> &visited, bool direct)
                     stack_nodes.push(aux_node_2);
             }
         }
-        
+
         // Caso não seja parte para o grafo reverso.
         else
         {
