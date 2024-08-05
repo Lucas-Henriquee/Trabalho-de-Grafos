@@ -26,7 +26,7 @@ public:
     void dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list);
     bool dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list);
 
-    void dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct);
+    void dfs_transitive(size_t vertex, vector<bool> &visited, bool direct);
     void dfs_articulation();
     void floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index);
     void floyd(vector<vector<float>> &distance);

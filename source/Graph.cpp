@@ -450,7 +450,7 @@ void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t,
     adj_list[node->_id] = neighbors;
 }
 
-void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)
+void Graph::dfs_transitive(size_t vertex, vector<bool> &visited, bool direct)
 {
     // Criando um nó inicial e chamando a função para encontrá-lo.
     Node *start_node = find_node(vertex);
@@ -477,7 +477,7 @@ void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)
             continue;
 
         // Marcando no vetor que o nó foi visitado.
-        visited[aux_node_1->_id] = aux_node_1;
+        visited[aux_node_1->_id] = true;
 
         // Verificando se é um fecho transitivo direto.
         if (direct)
@@ -493,7 +493,7 @@ void Graph::dfs_transitive(size_t vertex, vector<Node *> &visited, bool direct)
                     stack_nodes.push(aux_node_2);
             }
         }
-
+        
         // Caso não seja parte para o grafo reverso.
         else
         {

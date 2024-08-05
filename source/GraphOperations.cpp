@@ -21,7 +21,7 @@ void menu(Graph *g, string file_exit)
         system("clear||cls");
 
         cout << "\n\t  Menu de Operações do Grafo\n\n\n";
-        cout << "  1) Fecho Transitivo Direto de um vértice" << endl;
+        cout << "  1) Fecho Transitivo Direto de um Vértice" << endl;
         cout << "  2) Fecho Transitivo Indireto de um Vértice" << endl;
         cout << "  3) Caminho Mínimo entre Dois Vértices (Dijkstra)" << endl;
         cout << "  4) Caminho Mínimo entre Dois Vértices (Floyd)" << endl;
@@ -178,19 +178,18 @@ bool validate_graph(Graph *g, int i)
 void transitive_direct(Graph *g, size_t vertex)
 {
     // Criando o vetor de nós visitados.
-    vector<Node *> visited(g->get_num_nodes() + 1, NULL);
+    vector<bool> visited(g->get_num_nodes() + 1, false);
 
     // Chamando a função dfs (Busca em Profundidade).
     g->dfs_transitive(vertex, visited, true);
 
-    // Armazendo no buffer os IDs dos nós visitados.
+    // Armazenando no buffer os IDs dos nós visitados.
     output_buffer << "  Fecho Transitivo Direto para o vértice " << vertex << ": ";
 
-    int size = visited.size();
-
-    for (int v = 0; v < size; v++)
+    for (size_t v = 0; v < visited.size(); v++)
         if (visited[v])
-            output_buffer << visited[v]->_id << " ";
+            output_buffer << v << " ";
+
     // Concluindo a escrita no buffer e exibindo no terminal ao usuário.
     output_buffer << "\n";
 }
@@ -198,17 +197,17 @@ void transitive_direct(Graph *g, size_t vertex)
 void transitive_indirect(Graph *g, size_t vertex)
 {
     // Criando o vetor de nós visitados.
-    vector<Node *> visited(g->get_num_nodes() + 1, NULL);
+    vector<bool> visited(g->get_num_nodes() + 1, false);
 
     // Chamando a função dfs (Busca em Profundidade).
     g->dfs_transitive(vertex, visited, false);
 
-    // Armazendo no buffer os IDs dos nós visitados.
+    // Armazenando no buffer os IDs dos nós visitados.
     output_buffer << "  Fecho Transitivo Indireto para o vértice " << vertex << ": ";
 
     for (int v = visited.size() - 1; v >= 0; v--)
         if (visited[v])
-            output_buffer << visited[v]->_id << " ";
+            output_buffer << v << " ";
 
     // Concluindo a escrita no buffer e exibindo no terminal ao usuário.
     output_buffer << "\n";
