@@ -29,14 +29,8 @@ int main(int argc, char *argv[])
             bool weight_nodes = (string(argv[5]) == "1");
 
             g = new Graph(file, directed, weight_edges, weight_nodes);
-            g->print_graph();
-
-        #ifdef _WIN32
-            Sleep(3 * 1000); // Sleep no Windows
-        #else
-            sleep(3); // sleep no Unix
-        #endif
-
+            
+            print_start();
         }
         else
             cout << "Erro ao abri o arquivo" << endl;

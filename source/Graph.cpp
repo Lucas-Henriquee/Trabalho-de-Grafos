@@ -285,18 +285,32 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
 
 void Graph::print_graph()
 {
-    cout << "\n\n";
+    int i = 0;
 
-    // Imprimindo o grafo.
-    for (Node *node = _first; node != NULL; node = node->_next_node)
+    while (i != -1)
     {
-        cout << "\t\t\t" << node->_id;
-        for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
-            cout << " -> " << edge->_target_id;
-        cout << endl;
-    }
+        system("clear||cls");
+        cout << "\n\t\t\t Grafo\n\n\n";
 
-    cout << "\n\n Inicializando o Grafo...." << endl;
+        cout << "  Dados do Grafo:" << endl;
+        cout << "  Número de Nós: " << _number_of_nodes << endl;
+        cout << "  Número de Arestas: " << _number_of_edges << endl;
+        cout << "  Tipo do Grafo: " << (_directed ? "Direcionado" : "Não Direcionado") << "\n\n\n";
+
+        cout << "\n\n";
+
+        // Imprimindo o grafo.
+        for (Node *node = _first; node != NULL; node = node->_next_node)
+        {
+            cout << "\t\t\t" << node->_id;
+            for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
+                cout << " -> " << edge->_target_id;
+            cout << endl;
+        }
+
+        cout << "\n\n  Digite -1 para voltar ao menu: ";
+        cin >> i;
+    }
 }
 
 void Graph::print_graph(ofstream &output_file)
@@ -417,6 +431,7 @@ bool Graph::dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, 
 
     return false;
 }
+
 void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list)
 {
     // Marcando o nó como visitado.
@@ -491,8 +506,9 @@ void Graph::dfs_transitive(size_t vertex, vector<bool> &visited, bool direct)
         if (visited[aux_node_1->_id])
             continue;
 
-        // Marcando no vetor que o nó foi visitado.
-        visited[aux_node_1->_id] = true;
+        // Marcando no vetor que o nó foi visitado, mas sem marcar o nó inicial.
+        if (aux_node_1->_id != vertex)
+            visited[aux_node_1->_id] = true;
 
         // Verificando se é um fecho transitivo direto.
         if (direct)

@@ -12,7 +12,7 @@ void menu(Graph *g, string file_exit)
 {
 
     // Variável para a escolha do menu
-    int i = -1;
+    int i = -2;
 
     // Variáveis para armazenar o tamanho, vértices de origem e destino.
     size_t size, vertex_1, vertex_2;
@@ -23,16 +23,17 @@ void menu(Graph *g, string file_exit)
         system("clear||cls");
 
         cout << "\n\t  Menu de Operações do Grafo\n\n\n";
-        cout << "  1) Fecho Transitivo Direto de um Vértice" << endl;
-        cout << "  2) Fecho Transitivo Indireto de um Vértice" << endl;
-        cout << "  3) Caminho Mínimo entre Dois Vértices (Dijkstra)" << endl;
-        cout << "  4) Caminho Mínimo entre Dois Vértices (Floyd)" << endl;
-        cout << "  5) Árvore Geradora Mínima (Prim)" << endl;
-        cout << "  6) Árvore Geradora Mínima (Kruskal)" << endl;
-        cout << "  7) Caminhamento em Profundidade" << endl;
-        cout << "  8) Propriedades do Grafo" << endl;
-        cout << "  9) Vértices de Articulação" << endl;
-        cout << "  0) Sair do Programa" << endl;
+        cout << "  01) Fecho Transitivo Direto de um Vértice" << endl;
+        cout << "  02) Fecho Transitivo Indireto de um Vértice" << endl;
+        cout << "  03) Caminho Mínimo entre Dois Vértices (Dijkstra)" << endl;
+        cout << "  04) Caminho Mínimo entre Dois Vértices (Floyd)" << endl;
+        cout << "  05) Árvore Geradora Mínima (Prim)" << endl;
+        cout << "  06) Árvore Geradora Mínima (Kruskal)" << endl;
+        cout << "  07) Caminhamento em Profundidade" << endl;
+        cout << "  08) Propriedades do Grafo" << endl;
+        cout << "  09) Vértices de Articulação" << endl;
+        cout << "  10) Mostrar Grafo" << endl;
+        cout << "  -1) Sair do Programa" << endl;
         cout << "\n\n  Escolha uma opção: ";
 
         cin >> i;
@@ -78,24 +79,24 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
-            size_t *vertices = new size_t[size];
+            size_t *sub_vertices = new size_t[size];
             cout << "\n  Digite os IDs dos vértices: ";
-            for (size_t i = 0; i < size; ++i)
-                cin >> vertices[i];
-            // prim_minimum_generating_tree(g, vertices, size);
-            delete[] vertices;
+            for (size_t j = 0; j < size; ++j)
+                cin >> sub_vertices[j];
+            // prim_minimum_generating_tree(g, sub_vertices, size);
+            delete[] sub_vertices;
             break;
         }
         case 6:
         {
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
-            size_t *vertices = new size_t[size];
+            size_t *sub_vertices = new size_t[size];
             cout << "\n  Digite os IDs dos vértices: ";
-            for (size_t i = 0; i < size; ++i)
-                cin >> vertices[i];
-            // kruskal_minimum_generating_tree(g, vertices, size);
-            delete[] vertices;
+            for (size_t j = 0; j < size; ++j)
+                cin >> sub_vertices[j];
+            // kruskal_minimum_generating_tree(g, sub_vertices, size);
+            delete[] sub_vertices;
             break;
         }
         case 7:
@@ -115,7 +116,12 @@ void menu(Graph *g, string file_exit)
             // articulation_vertices(g);
             break;
         }
-        case 0:
+        case 10:
+        {
+            g->print_graph();
+            break;
+        }
+        case -1:
         {
             cout << "\n  Encerrando o programa..." << endl;
             break;
@@ -132,18 +138,19 @@ void menu(Graph *g, string file_exit)
         sleep_for_seconds(1);
 
         // Salvando a saída no arquivo e limpando o buffer.
-        if (i != 0)
+        if ((i >= 1 && i <= 10) && i != 10)
         {
             cout << "\n\n  Deseja salvar esses dados em um arquivo? (s/n): ";
             char option;
             cin >> option;
             if (option == 's')
                 save_exit(g, file_exit);
-            output_buffer.str("");
-            output_buffer.clear();
         }
 
-    } while (i != 0);
+        output_buffer.str("");
+        output_buffer.clear();
+
+    } while (i != -1);
 
     return;
 }
@@ -217,11 +224,12 @@ void transitive_indirect(Graph *g, size_t vertex)
 
 void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
-    if(g->find_node(vertex_1) == NULL || g->find_node(vertex_2) == NULL){
+    if (g->find_node(vertex_1) == NULL || g->find_node(vertex_2) == NULL)
+    {
         cout << "  Um ou mais vértices não fazem parte do grafo." << endl;
         return;
     }
-    
+
     // Criando o vetor de distâncias.
     vector<float> distance(g->get_num_nodes());
 
@@ -239,8 +247,9 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     // Chamando a função dijkstra.
     g->dijkstra(vertex_1, distance, parents, node_at_index);
 
-    if(distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == INF_F){
-        cout << "  Não há conexão entre os vértices "<< vertex_1<<" e "<< vertex_2 << "." << endl;
+    if (distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == INF_F)
+    {
+        cout << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
         return;
     }
 
@@ -429,11 +438,43 @@ void save_exit(Graph *g, string file_exit)
         cout << "  Erro ao abrir o arquivo para salvar a saída." << endl;
 }
 
+void print_start()
+{
+    int progressBarWidth = 50;
+
+    cout << "\n\n\t\tInicializando grafo...\n";
+    cout << "[";
+
+    for (int i = 0; i < progressBarWidth; ++i)
+        cout << " ";
+
+    cout << "]\r[";
+
+    cout.flush();
+
+    for (int i = 0; i < progressBarWidth; ++i)
+    {
+        sleep_for_seconds(-10);
+        cout << "=";
+        cout.flush();
+    }
+
+    cout << "]\n";
+    cout << "\t   Grafo inicializado com sucesso!\n";
+    sleep(2);
+}
+
 void sleep_for_seconds(int seconds)
 {
 #ifdef _WIN32
-    Sleep(seconds * 1000); // Sleep no Windows espera em milissegundos
+    if (seconds < 0)
+        Sleep(-seconds * 10);
+    else
+        Sleep(seconds * 1000);
 #else
-    sleep(seconds); // sleep no Unix espera em segundos
+    if (seconds < 0)
+        usleep(-seconds * 10000);
+    else
+        sleep(seconds);
 #endif
 }
