@@ -337,7 +337,7 @@ void deep_walking(Graph *g, size_t vertex)
     // Mapa para armazenar a lista de adjacência.
     map<size_t, vector<size_t>> adj_list;
 
-    // Encontrando o nó de início.
+    // Inicia a DFS a partir do vértice dado.
     if (g->dfs_call(vertex, return_edges, adj_list))
     {
         // Escrevendo no buffer o caminhamento em profundidade.
@@ -361,16 +361,14 @@ void deep_walking(Graph *g, size_t vertex)
 
         // Escrevendo as arestas de retorno no buffer.
         output_buffer << "\n  Arestas de retorno:" << endl;
-        for (size_t i = 0; i < return_edges.size(); ++i)
-            output_buffer << "  (" << return_edges[i].first << ", " << return_edges[i].second << ")" << endl;
+        for (auto &edge : return_edges)
+            output_buffer << "  (" << edge.first << ", " << edge.second << ")" << endl;
         output_buffer << endl;
     }
 
-    // Caso contrário.
     else
         output_buffer << "  Nó não encontrado no grafo." << endl;
 }
-
 void properties_graph(Graph *g)
 {
     // Variáveis para armazenar o raio e o diâmetro.
@@ -440,8 +438,10 @@ void save_exit(Graph *g, string file_exit)
 
 void print_start()
 {
+    // Barra de progresso
     int progressBarWidth = 50;
 
+    // Imprimindo a barra de progresso
     cout << "\n\n\t\tInicializando grafo...\n";
     cout << "[";
 
@@ -452,6 +452,7 @@ void print_start()
 
     cout.flush();
 
+    // Simulando o carregamento
     for (int i = 0; i < progressBarWidth; ++i)
     {
         sleep_for_seconds(-10);

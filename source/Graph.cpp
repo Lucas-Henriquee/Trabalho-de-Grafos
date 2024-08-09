@@ -76,7 +76,7 @@ void Graph::read_graph(ifstream &instance)
 
         // Variáveis para armazenar os valores da linha.
         size_t node_1, node_2;
-        float node_1_weight = 0.0, node_2_weight = 0.0, edge_weight = 0.0;
+        float node_1_weight = 1.0, node_2_weight = 1.0, edge_weight = 1.0;
 
         // Realizando a leitura dos valores.
         if (_weighted_nodes && _weighted_edges)
@@ -623,12 +623,15 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
 
 void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index)
 {
+    // Inicializando as variáveis.
     size_t n = _number_of_nodes;
     size_t v = 0;
 
+    // Inicializando as matrizes de distância e de pais.
     distance.assign(n, vector<float>(n, INF_F));
     parents.assign(n, vector<int>(n, -1));
 
+    // Inicializando o vetor de mapeamento de nós.
     for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
     {
         node_at_index[v] = aux_node->_id;
@@ -639,6 +642,7 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
 
     v = 0;
 
+    // Preenchendo a matriz de distâncias e de pais.
     for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
         for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
         {
@@ -646,8 +650,10 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
             distance[v][u] = aux_edge->_weight;
             parents[v][u] = v;
         }
+
     v++;
 
+    // Aplicando o algoritmo de Floyd-Warshall para encontrar as distâncias mínimas
     for (size_t k = 0; k < n; k++)
         for (size_t i = 0; i < n; i++)
             for (size_t j = 0; j < n; j++)
@@ -660,6 +666,7 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
 
 void Graph::floyd(vector<vector<float>> &distance)
 {
+    // Inicializando a matriz de distâncias com o algoritmo de Floyd-Warshall
     for (size_t k = 0; k < _number_of_nodes; ++k)
         for (size_t i = 0; i < _number_of_nodes; ++i)
             for (size_t j = 0; j < _number_of_nodes; ++j)
@@ -684,6 +691,7 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
         {
             // Encontrando o nó adjacente e preenchendo a distância
             size_t target_id = aux_edge->_target_id;
+
             dist[id - 1][target_id - 1] = aux_edge->_weight;
 
             // Se o grafo não for direcionado, preenchendo a distância do nó adjacente para o nó atual
@@ -704,13 +712,18 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
     {
         // Encontrando a distância máxima do nó i para os outros nós
         float max_dist = 0;
+
+        // Se a distância for infinita, o nó é desconexo
         for (size_t j = 0; j < _number_of_nodes; ++j)
             if (dist[i][j] < INF_F)
                 max_dist = max(max_dist, dist[i][j]);
 
-        // Atualizando a excentricidade e o diâmetro
-        eccentricity[i] = max_dist;
-        diameter = max(diameter, max_dist);
+        // Se o nó é desconexo, ignoramos na excentricidade
+        if (max_dist > 0)
+        {
+            eccentricity[i] = max_dist;
+            diameter = max(diameter, max_dist);
+        }
     }
 
     // Encontrando o raio
