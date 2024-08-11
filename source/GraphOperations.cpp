@@ -113,7 +113,7 @@ void menu(Graph *g, string file_exit)
         }
         case 9:
         {
-            // articulation_vertices(g);
+            articulation_vertices(g);
             break;
         }
         case 10:
@@ -401,7 +401,45 @@ void properties_graph(Graph *g)
 
 void articulation_vertices(Graph *g)
 {
-    // TODO: Implementação
+    // Verificando se o grafo possui vértices.
+    if(g->get_num_nodes() == 0)
+    {
+        cout << "  Grafo vazio, sem vértices de articulação. " << endl;
+        return;
+    }
+
+    // Vetores para armazenar os vértices visitados, tempo de descoberta, tempo de baixa, pai e vértices de articulação.
+    vector<bool> visited(g->get_num_nodes(), false);
+    vector<int> disc_time(g->get_num_nodes(), -1);
+    vector<int> low_time(g->get_num_nodes(), -1);
+    vector<size_t> parent(g->get_num_nodes(), static_cast<size_t>(-1));
+    vector<bool> art_point(g->get_num_nodes(), false);
+
+    // Variável para armazenar o tempo.
+    int time = 0;
+
+    // Chamando a função de articulação para cada vértice não visitado.
+    for(size_t i = 0; i < g->get_num_nodes(); ++i)
+        if(!visited[i])
+            g->dfs_articulation(i, visited, disc_time, low_time, parent, art_point, time);
+
+    // Escrevendo no buffer os vértices de articulação.
+    output_buffer << "  Vértices de Articulação do Grafo: ";
+    
+    // Verificando se há vértices de articulação.
+    bool found_art_point = false;
+    for(size_t i = 0; i < g->get_num_nodes(); ++i)
+        if(art_point[i])
+        {
+            output_buffer << i + 1 << " ";
+            found_art_point = true;
+        }
+
+    // Caso não haja vértices de articulação.
+    if(!found_art_point)
+        output_buffer << "Nenhum";
+    
+    output_buffer << endl;
 }
 
 void save_exit(Graph *g, string file_exit)

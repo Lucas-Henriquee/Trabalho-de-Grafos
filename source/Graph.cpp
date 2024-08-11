@@ -550,9 +550,53 @@ void Graph::dfs_transitive(size_t vertex, vector<bool> &visited, bool direct)
     }
 }
 
-void Graph::dfs_articulation()
+void Graph::dfs_articulation(size_t i, vector<bool> &visited, vector<int> &disc_time, vector<int> &low_time, vector<size_t> &parent, vector<bool> &art_point, int &time)
 {
-    // TODO: Implementar a função de articulação.
+    // Inicializando o nó como visitado.
+    visited[i] = true;
+
+    // Inicializando o tempo de descoberta e o tempo de baixo.
+    disc_time[i] = low_time[i] = ++time;
+
+    // Inicializando o número de filhos do nó.
+    int children = 0;
+
+    // Encontrando o nó atual.
+    Node *aux_node = find_node(i + 1);
+
+    // Loop para percorrer todas as arestas do nó.
+    for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+    {
+        // Encontrando o nó destino da aresta.
+        size_t v = aux_edge->_target_id - 1; // Ajuste do índice do nó.
+
+        // Verificando se o nó destino ainda não foi visitado.
+        if (!visited[v])
+        {
+            // Incrementando o número de filhos do nó.
+            children++;
+
+            // Atualizando o pai do nó destino.
+            parent[v] = i;
+
+            // Chamando a função recursivamente para o nó destino.
+            dfs_articulation(v, visited, disc_time, low_time, parent, art_point, time);
+
+            // Atualizando o tempo de baixo do nó atual.
+            low_time[i] = min(low_time[i], low_time[v]);
+
+            // Verificando se o nó atual é a raiz da árvore e possui mais de um filho.
+            if (parent[i] == static_cast<size_t>(-1) && children > 1)
+                art_point[i] = true;
+
+            // Verificando se o nó atual não é a raiz da árvore e o tempo de baixo do nó destino é maior ou igual ao tempo de descoberta do nó atual.
+            if (parent[i] != static_cast<size_t>(-1) && low_time[v] >= disc_time[i])
+                art_point[i] = true;
+        }
+        // Verificando se o nó destino já foi visitado e se ele não é o pai do nó atual.
+        else if (v != parent[i])
+            low_time[i] = min(low_time[i], disc_time[v]);
+    }
 }
 
 void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index)
