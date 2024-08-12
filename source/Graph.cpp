@@ -200,6 +200,8 @@ void Graph::add_node(size_t node_id, float weight)
     aux->_number_of_edges = 0;
     aux->_id = node_id;
     aux->_weight = weight;
+    aux->_next_node = NULL;
+    aux->_first_edge = NULL;
 
     // Verificando se o grafo está vazio.
     if (_last == NULL)
@@ -242,8 +244,6 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
         // Adicionando a aresta ao nó.
         Edge *aux_edge = search_node_1->_first_edge;
         for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge)
-        {
-        }
         aux_edge->_next_edge = new_edge_1;
     }
 

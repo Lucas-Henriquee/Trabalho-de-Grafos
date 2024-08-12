@@ -83,7 +83,7 @@ void menu(Graph *g, string file_exit)
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
                 cin >> sub_vertices[j];
-            // prim_minimum_generating_tree(g, sub_vertices, size);
+            prim_minimum_generating_tree(g, sub_vertices, size);
             delete[] sub_vertices;
             break;
         }
