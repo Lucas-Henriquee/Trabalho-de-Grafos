@@ -226,7 +226,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
     if (g->find_node(vertex_1) == NULL || g->find_node(vertex_2) == NULL)
     {
-        cout << "  Um ou mais vértices não fazem parte do grafo." << endl;
+        output_buffer << "  Um ou mais vértices não fazem parte do grafo." << endl;
         return;
     }
 
@@ -242,14 +242,12 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     // Criando o vetor para armazenar o caminho.
     vector<size_t> path;
 
-    // TODO: Verificar se os vertices fazem parte do grafo Dijkstra
-
     // Chamando a função dijkstra.
     g->dijkstra(vertex_1, distance, parents, node_at_index);
 
-    if (distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == INF_F)
+    if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
     {
-        cout << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+        output_buffer << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
         return;
     }
 
@@ -278,7 +276,10 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
-    // TODO: Verificar se os vertices fazem parte do grafo Dijkstra
+    if(g->find_node(vertex_1) == NULL || g->find_node(vertex_2) == NULL){
+        cout << "  Um ou mais vértices não fazem parte do grafo." << endl;
+        return;
+    }
     size_t n = g->get_num_nodes();
     vector<vector<float>> distance(n, vector<float>(n));
     vector<vector<int>> parents(n, vector<int>(n));
@@ -287,10 +288,15 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
     g->floyd(distance, parents, node_at_index);
 
+    if(distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == INF_F){
+        cout << "  Não há conexão entre os vértices "<< vertex_1<<" e "<< vertex_2 << "." << endl;
+        return;
+    }
+    
     size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
     size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
 
-    for (p_v2; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
+    for (; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
     {
         path.insert(path.begin(), node_at_index[p_v2]);
     }
