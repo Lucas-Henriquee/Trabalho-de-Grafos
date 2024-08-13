@@ -782,3 +782,69 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
             periphery.push_back(i + 1);
     }
 }
+
+void Graph::kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *vertices, size_t size, function <size_t(size_t, size_t*)> &find_ds, ostringstream &output_buffer){
+    // Inicializando a função de busca.
+    find_ds = [&] (size_t i, size_t *parent) -> size_t {
+        if (parent[i] == i)
+            return i;
+        return parent[i] = find_ds(parent[i], parent);
+    };
+
+    
+    float vt_agm = 0; 
+
+    // Inicializando o vetor de arestas.
+    for(size_t i = 0; i < size; ++i)
+    {
+        Node *aux_node = find_node(vertices[i]);
+        for(Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        {
+            if((find(vertices, vertices + size, aux_edge->_target_id) != vertices + size) && (find(edges.begin(), edges.end(), make_pair(aux_edge->_weight, make_pair(aux_edge->_target_id, aux_node->_id))) == edges.end()))
+                edges.push_back({aux_edge->_weight, {aux_node->_id, aux_edge->_target_id}});
+        }
+    }
+
+    // Ordenando as arestas.
+    sort(edges.begin(), edges.end());
+
+    // Criando as subárvores.
+    size_t *parent = new size_t[size];
+    size_t *rank = new size_t[size];
+    for (size_t i = 0; i < size; i++)
+    {
+        rank[i] = 0;
+        parent[i] = i;
+    }
+
+    vector<pair<float,pair<size_t, size_t>>>::iterator it; 
+    for (it=edges.begin(); it!=edges.end(); it++) 
+    { 
+        size_t u = it->second.first; 
+        size_t v = it->second.second; 
+  
+        size_t set_u = find_ds(u, parent); 
+        size_t set_v = find_ds(v, parent);
+
+        if (set_u != set_v) 
+        { 
+            // Adicionando a aresta na árvore geradora mínima.
+            output_buffer << u << " - " << v << endl; 
+
+            // Atualizando o valor da árvore geradora mínima.
+            vt_agm += it->first;
+
+            // Unindo as subárvores.
+            if (rank[set_u] < rank[set_v]) 
+                parent[set_u] = set_v; 
+            else if (rank[set_u] > rank[set_v]) 
+                parent[set_v] = set_u; 
+            else
+            { 
+                parent[set_v] = set_u; 
+                rank[set_u]++; 
+            }
+        }
+    }
+    output_buffer << "Valor da árvore geradora mínima: " << vt_agm << ".";
+}

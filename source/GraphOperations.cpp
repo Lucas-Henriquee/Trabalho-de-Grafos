@@ -83,7 +83,7 @@ void menu(Graph *g, string file_exit)
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
                 cin >> sub_vertices[j];
-            prim_minimum_generating_tree(g, sub_vertices, size);
+            // prim_minimum_generating_tree(g, sub_vertices, size);
             delete[] sub_vertices;
             break;
         }
@@ -95,7 +95,7 @@ void menu(Graph *g, string file_exit)
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
                 cin >> sub_vertices[j];
-            // kruskal_minimum_generating_tree(g, sub_vertices, size);
+            kruskal_minimum_generating_tree(g, sub_vertices, size);
             delete[] sub_vertices;
             break;
         }
@@ -326,12 +326,17 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
     // TODO: Implementação
+    vector<pair<float, pair<size_t, size_t>>> edges;
+    function<size_t(size_t, size_t*)> find_ds;
 
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
         output_buffer << vertices[i] << " ";
+    output_buffer << ":" << endl;
 
-    output_buffer << "\n";
+    g->kruskal(edges, vertices, size, find_ds, output_buffer);
+
+    output_buffer << endl;
 }
 
 void deep_walking(Graph *g, size_t vertex)
