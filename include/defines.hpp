@@ -12,6 +12,7 @@
 #include <stack>     /* implementação do container stack e suas operações */
 #include <limits>    /* implementação dos valores maximos para os tipos primitivos */
 #include <map>       /* implementação do container map e suas operações */
+#include <cfloat>    
 
 /* implementação do tempo de espera */
 #ifdef _WIN32

@@ -14,7 +14,7 @@ MAIN_OBJ := $(BUILD_DIR)/main.o
 DEPS := $(wildcard $(INC_DIR)/*.hpp)
 
 # Test files
-TEST_SRCS := $(TEST_DIR)/testGraphOperations.cpp
+TEST_SRCS := $(TEST_DIR)/testDirected.cpp $(TEST_DIR)/testUndirected.cpp $(TEST_DIR)/testGraph.cpp
 TEST_OBJS := $(patsubst $(TEST_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(TEST_SRCS))
 TEST_TARGET := runTests
 
@@ -63,7 +63,7 @@ $(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp $(DEPS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(TEST_TARGET): $(TEST_OBJS) $(OBJS)
-	$(CXX) $(CXXFLAGS) $(TEST_OBJS) $(OBJS) -o $(TEST_TARGET) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(TEST_OBJS) $(OBJS) -o $(TEST_TARGET) $(LDFLAGS) -lCatch2WithMain
 
 test: $(TEST_TARGET)
 	@./$(TEST_TARGET)

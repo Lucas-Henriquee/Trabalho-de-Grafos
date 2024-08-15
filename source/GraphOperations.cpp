@@ -2,8 +2,6 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
-#define INF_F numeric_limits<float>::infinity()
-
 using namespace std;
 
 ostringstream output_buffer;
@@ -288,7 +286,7 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
     g->floyd(distance, parents, node_at_index);
 
-    if(distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == INF_F){
+    if(distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == FLT_MAX){
         cout << "  Não há conexão entre os vértices "<< vertex_1<<" e "<< vertex_2 << "." << endl;
         return;
     }
@@ -336,7 +334,6 @@ void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 
 void deep_walking(Graph *g, size_t vertex)
 {
-
     // Vetor para armazenar as arestas de retorno.
     vector<pair<size_t, size_t>> return_edges;
 
@@ -506,7 +503,7 @@ void print_start()
 
     cout << "]\n";
     cout << "\t   Grafo inicializado com sucesso!\n";
-    sleep(2);
+    sleep_for_seconds(2);
 }
 
 void sleep_for_seconds(int seconds)
