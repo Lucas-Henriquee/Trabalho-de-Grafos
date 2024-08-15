@@ -601,6 +601,7 @@ void Graph::dfs_articulation(size_t i, vector<bool> &visited, vector<int> &disc_
 
 void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index)
 {
+    // TODO: Aceitar aresta negativa.
     // Inicializando as variáveis.
     int n = _number_of_nodes;
     int p = 0;
@@ -783,7 +784,7 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
     }
 }
 
-void Graph::kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *vertices, size_t size, function <size_t(size_t, size_t*)> &find_ds, ostringstream &output_buffer){
+void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vertices, size_t size, function <size_t(size_t, size_t*)> &find_ds, ostringstream &output_buffer){
     // Inicializando a função de busca.
     find_ds = [&] (size_t i, size_t *parent) -> size_t {
         if (parent[i] == i)
@@ -791,6 +792,7 @@ void Graph::kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *ve
         return parent[i] = find_ds(parent[i], parent);
     };
 
+    // TODO: Verificar se o usuário é doente e os vertices existem
     
     float vt_agm = 0; 
 
@@ -823,8 +825,8 @@ void Graph::kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *ve
         size_t u = it->second.first; 
         size_t v = it->second.second; 
   
-        size_t set_u = find_ds(u, parent); 
-        size_t set_v = find_ds(v, parent);
+        size_t set_u = find_ds(find(vertices, vertices + size, u) - vertices, parent); 
+        size_t set_v = find_ds(find(vertices, vertices + size, v) - vertices, parent);
 
         if (set_u != set_v) 
         { 
@@ -847,4 +849,54 @@ void Graph::kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *ve
         }
     }
     output_buffer << "Valor da árvore geradora mínima: " << vt_agm << ".";
+}
+
+void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set){
+    // TODO: Verificar se o usuário é doente e os vertices existem
+    // Inicializando as informções basicas para o algoritimo.
+    for (size_t i = 0; i < size; i++)
+    {
+        key[i] = INF_F;
+        mst_set[i] = false;
+    }
+
+    // Inicializando o vetor de chaves.
+    key[0] = 0;
+
+    // Inicializando o vetor de pais.
+    parent[0] = static_cast<size_t>(-1);
+
+    // Loop para encontrar a árvore geradora mínima.
+    for (size_t i = 0; i < size - 1; i++)
+    {
+        // Encontrando a chave mínima.
+        size_t u;
+        float min = INF_F;
+        for (size_t j = 0; j < mst_set.size(); j++)
+            if(!mst_set[j] && key[j] < min)
+                min = key[j], u = j;
+
+        // Marcando o nó como visitado.
+        mst_set[u] = true;
+
+        // Encontrando o nó atual.
+        Node *aux_node = find_node(vertices[u]);
+
+        // Iterando sobre todas as arestas do nó atual.
+        for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        {
+            // Encontrando o nó destino e o peso da aresta.
+            if(find(vertices, vertices + size, aux_edge->_target_id) == vertices + size)
+                continue;
+            size_t v = find(vertices, vertices + size, aux_edge->_target_id) - vertices;
+            float weight = aux_edge->_weight;
+
+            // Atualizando a chave e o pai do nó se a nova chave for menor.
+            if (!mst_set[v] && weight < key[v])
+            {
+                parent[v] = u;
+                key[v] = weight;
+            }
+        }
+    }
 }

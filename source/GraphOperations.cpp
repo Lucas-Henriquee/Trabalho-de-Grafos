@@ -83,7 +83,7 @@ void menu(Graph *g, string file_exit)
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
                 cin >> sub_vertices[j];
-            // prim_minimum_generating_tree(g, sub_vertices, size);
+            prim_minimum_generating_tree(g, sub_vertices, size);
             delete[] sub_vertices;
             break;
         }
@@ -314,18 +314,28 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
-    // TODO: Implementação
+    vector<size_t> parent(size);
+    vector<float> key(size);
+    vector<bool> mst_set(size);
+
+    g->prim(vertices, size, parent, key, mst_set);
 
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
         output_buffer << vertices[i] << " ";
+    output_buffer << ":" << endl;
 
-    output_buffer << "\n";
+    float vt_agm = 0;
+
+    for (size_t i = 1; i < size; i++){
+        output_buffer << vertices[parent[i]] << " - " << vertices[i] << endl;
+        vt_agm += key[i];
+    }
+    output_buffer << "Valor da árvore geradora mínima: " << vt_agm << ".";
 }
 
 void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
-    // TODO: Implementação
     vector<pair<float, pair<size_t, size_t>>> edges;
     function<size_t(size_t, size_t*)> find_ds;
 

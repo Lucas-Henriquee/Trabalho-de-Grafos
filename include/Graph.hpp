@@ -32,6 +32,7 @@ public:
     void floyd(vector<vector<float>> &distance);
     void dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index);
     void kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *vertices, size_t size, function<size_t(size_t, size_t*)> &find_ds, ostringstream &output_buffer);
+    void prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set);
 
     void compute_graph_properties(float &radius, float &diameter, vector<size_t> &center, vector<size_t> &periphery);
 
