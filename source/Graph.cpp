@@ -865,7 +865,7 @@ void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<f
     // Inicializando as informções basicas para o algoritimo.
     for (size_t i = 0; i < size; i++)
     {
-        key[i] = INF_F;
+        key[i] = FLT_MAX;
         mst_set[i] = false;
     }
 
@@ -880,7 +880,7 @@ void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<f
     {
         // Encontrando a chave mínima.
         size_t u;
-        float min = INF_F;
+        float min = FLT_MAX;
         for (size_t j = 0; j < mst_set.size(); j++)
             if(!mst_set[j] && key[j] < min)
                 min = key[j], u = j;
