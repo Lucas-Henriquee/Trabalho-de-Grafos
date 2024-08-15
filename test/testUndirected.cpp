@@ -1,19 +1,20 @@
-#include <catch2/catch.hpp>
+#include <gtest/gtest.h>
 #include "../include/GraphOperations.hpp"
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
 using namespace std;
 
-struct GraphOperationsTest {
+class GraphOperationsUndirectedTest : public ::testing::Test {
+protected:
     Graph *graph;
 
     // Construtor: Inicializa o grafo
-    GraphOperationsTest() {
+    GraphOperationsUndirectedTest() {
         ifstream file("./instances_example/5nU.dat");
         if (!file.good()) {
             cerr << "Erro ao abrir o arquivo 5nU.dat" << endl;
-            graph = NULL;
+            graph = nullptr;
             return;
         }
 
@@ -21,35 +22,34 @@ struct GraphOperationsTest {
     }
 
     // Destrutor: Deleta o grafo
-    ~GraphOperationsTest() {
-        if (graph != NULL) {
+    ~GraphOperationsUndirectedTest() override {
+        if (graph != nullptr) {
             delete graph;
-            graph = NULL;
+            graph = nullptr;
         }
     }
 };
 
-
-TEST_CASE_METHOD(GraphOperationsTest, "UndirectedDijkstraShortestPath", "[GraphOperations]") {
+TEST_F(GraphOperationsUndirectedTest, UndirectedDijkstraShortestPath) {
     // TODO: Implementar o teste
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "UndirectedFloydShortestPath", "[GraphOperations]") {
+TEST_F(GraphOperationsUndirectedTest, UndirectedFloydShortestPath) {
     // TODO: Implementar o teste
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "UndirectedPrimMinimumGeneratingTree", "[GraphOperations]") {
+TEST_F(GraphOperationsUndirectedTest, UndirectedPrimMinimumGeneratingTree) {
     // TODO: Implementar o teste
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "UndirectedKruskalMinimumGeneratingTree", "[GraphOperations]") {
+TEST_F(GraphOperationsUndirectedTest, UndirectedKruskalMinimumGeneratingTree) {
     // TODO: Implementar o teste
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "UndirectedDeepWalking", "[GraphOperations]") {
+TEST_F(GraphOperationsUndirectedTest, UndirectedDeepWalking) {
     // TODO: Implementar o teste
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "UndirectedPropertiesGraph", "[GraphOperations]") {
+TEST_F(GraphOperationsUndirectedTest, UndirectedPropertiesGraph) {
     // TODO: Implementar o teste
 }

@@ -1,22 +1,20 @@
-#include <catch2/catch.hpp>
+#include <gtest/gtest.h>
 #include "../include/GraphOperations.hpp"
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
 using namespace std;
 
-struct GraphOperationsTest
-{
+class GraphOperationsTest : public ::testing::Test {
+protected:
     Graph *graph;
 
     // Construtor: Inicializa o grafo
-    GraphOperationsTest()
-    {
+    GraphOperationsTest() {
         ifstream file("./instances_example/5nD.dat");
-        if (!file.good())
-        {
+        if (!file.good()) {
             cerr << "Erro ao abrir o arquivo 5nD.dat" << endl;
-            graph = NULL;
+            graph = nullptr;
             return;
         }
 
@@ -24,74 +22,70 @@ struct GraphOperationsTest
     }
 
     // Destrutor: Deleta o grafo
-    ~GraphOperationsTest()
-    {
-        if (graph != NULL)
-        {
+    ~GraphOperationsTest() override {
+        if (graph != nullptr) {
             delete graph;
-            graph = NULL;
+            graph = nullptr;
         }
     }
 };
 
-TEST_CASE_METHOD(GraphOperationsTest, "DirectTransitiveClosure", "[GraphOperations]")
-{
-    REQUIRE(graph != NULL);
+TEST_F(GraphOperationsTest, DirectTransitiveClosure) {
+    ASSERT_NE(graph, nullptr);
 
     vector<bool> visited(graph->get_num_nodes() + 1, false);
     graph->dfs_transitive(1, visited, true);
 
     vector<int> expected = {2, 3, 4, 5};
     vector<int> visited_ids;
-    for (size_t i = 1; i < visited.size(); i++)
-        if (visited[i])
+    for (size_t i = 1; i < visited.size(); i++) {
+        if (visited[i]) {
             visited_ids.push_back(i);
+        }
+    }
 
-    REQUIRE(visited_ids == expected);
+    EXPECT_EQ(visited_ids, expected);
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "IndirectTransitiveClosure", "[GraphOperations]")
-{
-    // TODO: Rever esse teste aqui 
-
-    REQUIRE(graph != NULL); 
+TEST_F(GraphOperationsTest, IndirectTransitiveClosure) {
+    ASSERT_NE(graph, nullptr);
 
     vector<bool> visited(graph->get_num_nodes() + 1, false);
-
-    graph->dfs_transitive(2, visited, false);  
+    graph->dfs_transitive(2, visited, false);
 
     vector<int> expected_visited = {1};
 
     vector<int> actual_visited;
-    for (int v = visited.size() - 1; v >= 0; v--)
-        if (visited[v])
+    for (int v = visited.size() - 1; v >= 0; v--) {
+        if (visited[v]) {
             actual_visited.push_back(v);
+        }
+    }
 
-    REQUIRE(actual_visited == expected_visited);
+    EXPECT_EQ(actual_visited, expected_visited);
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "DijkstraShortestPath", "[GraphOperations]")
-{
+TEST_F(GraphOperationsTest, DijkstraShortestPath) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste DijkstraShortestPath";
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "FloydShortestPath", "[GraphOperations]")
-{
+TEST_F(GraphOperationsTest, FloydShortestPath) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste FloydShortestPath";
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "PrimMinimumGeneratingTree", "[GraphOperations]")
-{
+TEST_F(GraphOperationsTest, PrimMinimumGeneratingTree) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste PrimMinimumGeneratingTree";
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "KruskalMinimumGeneratingTree", "[GraphOperations]")
-{
+TEST_F(GraphOperationsTest, KruskalMinimumGeneratingTree) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste KruskalMinimumGeneratingTree";
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "DeepWalking", "[GraphOperations]")
-{
+TEST_F(GraphOperationsTest, DeepWalking) {
     vector<pair<size_t, size_t>> return_edges;
     vector<pair<size_t, size_t>> expected_edges = {{1, 2}, {2, 3}, {3, 4}, {4, 5}};
 
@@ -100,12 +94,11 @@ TEST_CASE_METHOD(GraphOperationsTest, "DeepWalking", "[GraphOperations]")
 
     graph->dfs_call(1, return_edges, adj_list);
 
-    REQUIRE(return_edges == expected_edges);
-    REQUIRE(adj_list == expected_adj_list);
+    EXPECT_EQ(return_edges, expected_edges);
+    EXPECT_EQ(adj_list, expected_adj_list);
 }
 
-TEST_CASE_METHOD(GraphOperationsTest, "PropertiesGraph", "[GraphOperations]")
-{
+TEST_F(GraphOperationsTest, PropertiesGraph) {
     float radius, diameter;
     float expected_radius = 0.0;
     float expected_diameter = 16.0;
@@ -114,12 +107,12 @@ TEST_CASE_METHOD(GraphOperationsTest, "PropertiesGraph", "[GraphOperations]")
     vector<size_t> expected_center = {5};
 
     vector<size_t> periphery;
-    vector<size_t> expected_periphery = {1};   
+    vector<size_t> expected_periphery = {1};
 
     graph->compute_graph_properties(radius, diameter, center, periphery);
 
-    REQUIRE(radius == expected_radius);
-    REQUIRE(diameter == expected_diameter);
-    REQUIRE(center == expected_center);
-    REQUIRE(periphery == expected_periphery);
+    EXPECT_FLOAT_EQ(radius, expected_radius);
+    EXPECT_FLOAT_EQ(diameter, expected_diameter);
+    EXPECT_EQ(center, expected_center);
+    EXPECT_EQ(periphery, expected_periphery);
 }
