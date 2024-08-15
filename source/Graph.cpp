@@ -2,8 +2,6 @@
 #include "../include/defines.hpp"
 #include "../include/Graph.hpp"
 
-#define INF_F numeric_limits<float>::infinity()
-
 using namespace std;
 
 Graph::Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_nodes)
@@ -27,7 +25,18 @@ Graph::Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_n
 
 Graph::Graph()
 {
-    // TODO: Implementar o construtor padrão.
+    // Inicializa as variáveis.
+    _directed = false;
+    _weighted_edges = false;
+    _weighted_nodes = false;
+
+    // Inicializa o número de arestas e nós.
+    _number_of_edges = 0;
+    _number_of_nodes = 0;
+
+    // Inicializa os ponteiros do primeiro e do último nó.
+    _first = NULL;
+    _last = NULL;
 }
 
 Graph::~Graph()
@@ -269,8 +278,7 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
             // Adicionando a aresta ao nó.
             Edge *aux_edge = search_node_2->_first_edge;
             for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge)
-            {
-            }
+            
             aux_edge->_next_edge = new_edge_2;
         }
 
@@ -607,7 +615,7 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
     int p = 0;
 
     // Inicializando as distâncias e os pais.
-    distance.assign(n, INF_F);
+    distance.assign(n, FLT_MAX);
     parents.assign(n, -1);
 
     // Inicializando os nós visitados.
@@ -630,7 +638,7 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
                 v = j;
 
         // Se não houver vértice com a menor distância.
-        if (distance[v] == INF_F)
+        if (distance[v] == FLT_MAX)
             break;
 
         // Marcando o vértice como visitado.
@@ -673,7 +681,7 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
     size_t v = 0;
 
     // Inicializando as matrizes de distância e de pais.
-    distance.assign(n, vector<float>(n, INF_F));
+    distance.assign(n, vector<float>(n, FLT_MAX));
     parents.assign(n, vector<int>(n, -1));
 
     // Inicializando o vetor de mapeamento de nós.
@@ -689,6 +697,7 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
 
     // Preenchendo a matriz de distâncias e de pais.
     for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
+    {
         for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
         {
             size_t u = find(node_at_index.begin(), node_at_index.end(), aux_edge->_target_id) - node_at_index.begin();
@@ -696,8 +705,8 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
             parents[v][u] = v;
         }
 
-    v++;
-
+        v++;
+    }
     // Aplicando o algoritmo de Floyd-Warshall para encontrar as distâncias mínimas
     for (size_t k = 0; k < n; k++)
         for (size_t i = 0; i < n; i++)
@@ -715,14 +724,14 @@ void Graph::floyd(vector<vector<float>> &distance)
     for (size_t k = 0; k < _number_of_nodes; ++k)
         for (size_t i = 0; i < _number_of_nodes; ++i)
             for (size_t j = 0; j < _number_of_nodes; ++j)
-                if (distance[i][k] < INF_F && distance[k][j] < INF_F)
+                if (distance[i][k] < FLT_MAX && distance[k][j] < FLT_MAX)
                     distance[i][j] = min(distance[i][j], distance[i][k] + distance[k][j]);
 }
 
 void Graph::compute_graph_properties(float &radius, float &diameter, vector<size_t> &center, vector<size_t> &periphery)
 {
     // Inicializando a matriz de distâncias
-    vector<vector<float>> dist(_number_of_nodes, vector<float>(_number_of_nodes, INF_F));
+    vector<vector<float>> dist(_number_of_nodes, vector<float>(_number_of_nodes, FLT_MAX));
 
     // Preenchendo a matriz de distâncias com base nas arestas do grafo
     for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
@@ -760,7 +769,7 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
 
         // Se a distância for infinita, o nó é desconexo
         for (size_t j = 0; j < _number_of_nodes; ++j)
-            if (dist[i][j] < INF_F)
+            if (dist[i][j] < FLT_MAX)
                 max_dist = max(max_dist, dist[i][j]);
 
         // Se o nó é desconexo, ignoramos na excentricidade
