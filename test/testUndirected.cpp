@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAI
 #include <catch2/catch.hpp>
 #include "../include/GraphOperations.hpp"
 #include "../include/Graph.hpp"
