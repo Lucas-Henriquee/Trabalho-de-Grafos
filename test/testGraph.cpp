@@ -1,23 +1,20 @@
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <gtest/gtest.h>
 #include "../include/GraphOperations.hpp"
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
 using namespace std;
 
-struct GraphTest
-{
+class GraphTest : public ::testing::Test {
+protected:
     Graph *graph;
 
     // Construtor: Inicializa o grafo
-    GraphTest()
-    {
+    GraphTest() {
         ifstream file("./instances_example/5nD.dat");
-        if (!file.good())
-        {
+        if (!file.good()) {
             cerr << "Erro ao abrir o arquivo 5nD.dat" << endl;
-            graph = NULL;
+            graph = nullptr;
             return;
         }
 
@@ -25,42 +22,40 @@ struct GraphTest
     }
 
     // Destrutor: Deleta o grafo
-    ~GraphTest()
-    {
-        if (graph != NULL)
-        {
+    ~GraphTest() override {
+        if (graph != nullptr) {
             delete graph;
-            graph = NULL;
+            graph = nullptr;
         }
     }
 };
 
-TEST_CASE_METHOD(GraphTest, "AddNode", "[Graph]")
-{
+TEST_F(GraphTest, AddNode) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste AddNode";
 }
 
-TEST_CASE_METHOD(GraphTest, "AddEdge", "[Graph]")
-{
+TEST_F(GraphTest, AddEdge) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste AddEdge";
 }
 
-TEST_CASE_METHOD(GraphTest, "RemoveNode", "[Graph]")
-{
+TEST_F(GraphTest, RemoveNode) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste RemoveNode";
 }
 
-TEST_CASE_METHOD(GraphTest, "RemoveEdge", "[Graph]")
-{
+TEST_F(GraphTest, RemoveEdge) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste RemoveEdge";
 }
 
-TEST_CASE_METHOD(GraphTest, "GraphConstructor", "[Graph]")
-{
+TEST_F(GraphTest, GraphConstructor) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste GraphConstructor";
 }
 
-TEST_CASE_METHOD(GraphTest, "GraphDestructor", "[Graph]")
-{
+TEST_F(GraphTest, GraphDestructor) {
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste GraphDestructor";
 }
