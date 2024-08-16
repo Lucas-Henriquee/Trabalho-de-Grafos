@@ -5,14 +5,17 @@
 
 using namespace std;
 
-class GraphOperationsUndirectedTest : public ::testing::Test {
+class GraphOperationsUndirectedTest : public ::testing::Test
+{
 protected:
     Graph *graph;
 
     // Construtor: Inicializa o grafo
-    GraphOperationsUndirectedTest() {
+    GraphOperationsUndirectedTest()
+    {
         ifstream file("./instances_example/5nU.dat");
-        if (!file.good()) {
+        if (!file.good())
+        {
             cerr << "Erro ao abrir o arquivo 5nU.dat" << endl;
             graph = nullptr;
             return;
@@ -22,34 +25,148 @@ protected:
     }
 
     // Destrutor: Deleta o grafo
-    ~GraphOperationsUndirectedTest() override {
-        if (graph != nullptr) {
+    ~GraphOperationsUndirectedTest() override
+    {
+        if (graph != nullptr)
+        {
             delete graph;
             graph = nullptr;
         }
     }
 };
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedDijkstraShortestPath) {
-    // TODO: Implementar o teste
+TEST_F(GraphOperationsUndirectedTest, UndirectedDijkstraShortestPath)
+{
+    size_t vertex_1 = 1;
+    size_t vertex_2 = 4;
+
+    vector<float> distance(graph->get_num_nodes(), std::numeric_limits<float>::infinity());
+    vector<int> parents(graph->get_num_nodes(), -1);
+    vector<size_t> node_at_index(graph->get_num_nodes());
+    vector<size_t> path;
+
+    graph->dijkstra(vertex_1, distance, parents, node_at_index);
+
+    if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
+    {
+        FAIL() << "Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << ".";
+        return;
+    }
+
+    for (int v = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin(); v != 0; v = parents[v])
+        path.push_back(v);
+
+    path.push_back(0);
+
+    reverse(path.begin(), path.end());
+
+    vector<size_t> path_nodes;
+    for (size_t i = 0; i < path.size(); i++)
+        path_nodes.push_back(node_at_index[path[i]]);
+
+    vector<size_t> expected_path = {1, 3, 4};
+
+    EXPECT_EQ(path_nodes, expected_path) << "O caminho mais curto calculado não é o esperado.";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedFloydShortestPath) {
-    // TODO: Implementar o teste
+TEST_F(GraphOperationsUndirectedTest, UndirectedFloydShortestPath)
+{
+    size_t vertex_1 = 1;
+    size_t vertex_2 = 4;
+
+    size_t n = graph->get_num_nodes();
+    vector<vector<float>> distance(n, vector<float>(n));
+    vector<vector<int>> parents(n, vector<int>(n));
+    vector<size_t> node_at_index(n);
+    vector<size_t> path;
+
+    graph->floyd(distance, parents, node_at_index);
+
+    if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
+    {
+        FAIL() << "Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << ".";
+        return;
+    }
+
+    size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
+    size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
+
+    for (; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
+        path.insert(path.begin(), node_at_index[p_v2]);
+
+    path.insert(path.begin(), vertex_1);
+
+    vector<size_t> expected_path = {1, 3, 4};
+
+    EXPECT_EQ(path, expected_path) << "O caminho mais curto calculado não é o esperado.";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedPrimMinimumGeneratingTree) {
+TEST_F(GraphOperationsUndirectedTest, UndirectedPrimMinimumGeneratingTree)
+{
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste PrimMinimumGeneratingTree";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedKruskalMinimumGeneratingTree) {
+TEST_F(GraphOperationsUndirectedTest, UndirectedKruskalMinimumGeneratingTree)
+{
     // TODO: Implementar o teste
+    FAIL() << "Implementar o teste KruskalMinimumGeneratingTree";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedDeepWalking) {
-    // TODO: Implementar o teste
+TEST_F(GraphOperationsUndirectedTest, UndirectedDeepWalking)
+{
+    vector<pair<size_t, size_t>> return_edges;
+    vector<pair<size_t, size_t>> expected_edges = {{1, 2}, {2, 3}, {3, 1}, {3, 4}, {4, 5}};
+
+    map<size_t, vector<size_t>> adj_list;
+    map<size_t, vector<size_t>> expected_adj_list = {{1, {2, 3}}, {2, {1, 3}}, {3, {1, 4}}, {4, {3, 5}}, {5, {4}}};
+
+    graph->dfs_call(1, return_edges, adj_list);
+
+    EXPECT_EQ(return_edges, expected_edges) << "As arestas retornadas pelo DFS não correspondem às esperadas.";
+    EXPECT_EQ(adj_list, expected_adj_list) << "A lista de adjacência gerada pelo DFS não corresponde à esperada.";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedPropertiesGraph) {
-    // TODO: Implementar o teste
+TEST_F(GraphOperationsUndirectedTest, UndirectedPropertiesGraph)
+{
+    float radius, diameter;
+    float expected_radius = 11.0;
+    float expected_diameter = 16.0;
+
+    vector<size_t> center;
+    vector<size_t> expected_center = {3};
+
+    vector<size_t> periphery;
+    vector<size_t> expected_periphery = {1, 5};
+
+    graph->compute_graph_properties(radius, diameter, center, periphery);
+
+    EXPECT_FLOAT_EQ(radius, expected_radius) << "O raio calculado do grafo não é o esperado.";
+    EXPECT_FLOAT_EQ(diameter, expected_diameter) << "O diâmetro calculado do grafo não é o esperado.";
+    EXPECT_EQ(center, expected_center) << "O(s) centro(s) calculado(s) do grafo não é(são) o(s) esperado(s).";
+    EXPECT_EQ(periphery, expected_periphery) << "A(s) periferia(s) calculada(s) do grafo não é(são) a(s) esperada(s).";
+}
+
+TEST_F(GraphOperationsUndirectedTest, UndirectedArticulationVertices)
+{
+    vector<bool> visited(graph->get_num_nodes(), false);
+    vector<int> disc_time(graph->get_num_nodes(), -1);
+    vector<int> low_time(graph->get_num_nodes(), -1);
+    vector<size_t> parent(graph->get_num_nodes(), static_cast<size_t>(-1));
+    vector<bool> art_point(graph->get_num_nodes(), false);
+
+    int time = 0;
+
+    for (size_t i = 0; i < graph->get_num_nodes(); ++i)
+        if (!visited[i])
+            graph->dfs_articulation(i, visited, disc_time, low_time, parent, art_point, time);
+
+    vector<size_t> articulation_points;
+    for (size_t i = 0; i < graph->get_num_nodes(); ++i)
+        if (art_point[i])
+            articulation_points.push_back(i + 1);
+
+    vector<size_t> expected_art_points = {3, 4};
+
+    EXPECT_EQ(articulation_points, expected_art_points) << "Os vértices de articulação calculados não são os esperados.";
 }
