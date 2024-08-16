@@ -27,20 +27,18 @@ LDFLAGS := -lgtest -lgtest_main -lpthread
 # OS-specific settings
 ifeq ($(OS),Windows_NT)
     MKDIR_CMD = @if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
-    RM_DIR_CMD = @if exist $(BUILD_DIR) rmdir /S /Q $(BUILD_DIR)
-    RM_TARGET_CMD = @if exist $(TARGET).exe del $(TARGET).exe
-    RM_TEST_CMD = @if exist $(TEST_TARGET).exe del $(TEST_TARGET).exe
+    RM_CMD = @if exist $(BUILD_DIR) rmdir /S /Q $(BUILD_DIR) && if exist $(TARGET).exe del $(TARGET).exe && if exist $(TEST_TARGET).exe del $(TEST_TARGET).exe
+    TEST_CMD = $(CXX) $(CXXFLAGS) $(BUILD_DIR)\test_gtest.cpp -o $(BUILD_DIR)\test_gtest $(LDFLAGS)
 else
     MKDIR_CMD = @mkdir -p $(BUILD_DIR)
-    RM_DIR_CMD = @rm -rf $(BUILD_DIR)
-    RM_TARGET_CMD = @rm -f $(TARGET)
-    RM_TEST_CMD = @rm -f $(TEST_TARGET)
+    RM_CMD = @rm -rf $(BUILD_DIR) $(TARGET) $(TEST_TARGET)
+    TEST_CMD = $(CXX) $(CXXFLAGS) $(BUILD_DIR)/test_gtest.cpp -o $(BUILD_DIR)/test_gtest $(LDFLAGS)
 endif
 
 # Output executables
 TARGET := execGrupoX
 
-.PHONY: all clean test
+.PHONY: all clean test check_gtest
 
 all: $(TARGET)
 
@@ -55,25 +53,43 @@ $(BUILD_DIR)/main.o: main.cpp $(DEPS)
 	$(MKDIR_CMD)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp $(DEPS)
+$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp $(DEPS) check_gtest
 	$(MKDIR_CMD)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(TEST_TARGET): $(TEST_OBJS) $(OBJS)
+$(TEST_TARGET): $(TEST_OBJS) $(OBJS) check_gtest
 	$(CXX) $(CXXFLAGS) $(TEST_OBJS) $(OBJS) $(LDFLAGS) -o $(TEST_TARGET)
 
-# Check for gtest library
+# Check if gtest library is installed
 check_gtest:
-	@echo "Checking for gtest library..."
-	@echo '#include <gtest/gtest.h>' > $(BUILD_DIR)/test_gtest.cpp
-	@echo 'int main(int argc, char **argv) { ::testing::InitGoogleTest(&argc, argv); return 0; }' >> $(BUILD_DIR)/test_gtest.cpp
-	@$(CXX) $(CXXFLAGS) $(BUILD_DIR)/test_gtest.cpp -o $(BUILD_DIR)/test_gtest $(LDFLAGS) > /dev/null 2>&1 || (echo "Error: gtest library is required but not found." && exit 1)
-	@rm -f $(BUILD_DIR)/test_gtest $(BUILD_DIR)/test_gtest.cpp
+ifeq ($(OS),Windows_NT)
+	@echo Checking if gtest is installed...
+	@where gtest.lib >nul 2>&1 && \
+		echo Google Test is installed. Compiling and running tests... || \
+		(echo Google Test is not installed. Please install it manually and rerun make test. && exit 1)
+else
+	@echo Checking for gtest library...
+	@dpkg -l | grep -q libgtest-dev && \
+		echo "Google Test is installed. Compiling and running tests..." || \
+		(echo -n "Google Test is not installed. Would you like to install it now? (y/n): " && \
+		read -r answer && \
+		if [ "$$answer" = "y" ]; then \
+			echo "Installing Google Test..."; \
+			sudo apt-get update && sudo apt-get install -y googletest libgtest-dev; \
+			echo "Google Test installed successfully. Please run 'make test' again."; \
+			exit 1; \
+		else \
+			echo "Google Test is required to run tests. Please install it manually and run 'make test' again."; \
+			exit 1; \
+		fi)
+endif
 
-test: $(TEST_TARGET) check_gtest
+test: $(TEST_TARGET)
+ifeq ($(OS),Windows_NT)
+	@$(BUILD_DIR)\$(TEST_TARGET).exe
+else
 	@./$(TEST_TARGET)
+endif
 
 clean:
-	@$(RM_DIR_CMD)
-	@$(RM_TARGET_CMD)
-	@$(RM_TEST_CMD)
+	@$(RM_CMD)
