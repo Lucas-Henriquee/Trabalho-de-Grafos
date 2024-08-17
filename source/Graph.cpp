@@ -631,6 +631,7 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
 
     // Inicializando os nós visitados.
     vector<bool> visited(n, false);
+    int unvisited_nodes = n;
 
     // Inicializando vetor para mapear a posição do nó.
     node_at_index.assign(n, -1);
@@ -640,7 +641,7 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
     distance[p] = 0;
 
     // Loop para encontrar o menor caminho.
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < unvisited_nodes;)
     {
         // Encontrando o vértice com a menor distância.
         int v = -1;
@@ -654,6 +655,7 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
 
         // Marcando o vértice como visitado.
         visited[v] = true;
+        unvisited_nodes--;
 
         // Encontrando o nó no grafo.
         Node *aux_node = find_node(node_at_index[v]);
@@ -680,6 +682,11 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
             {
                 distance[position] = distance[v] + weight;
                 parents[position] = v;
+                if (visited[position])
+                {
+                    visited[position] = false;
+                    unvisited_nodes++;
+                }
             }
         }
     }

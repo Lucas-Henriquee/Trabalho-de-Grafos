@@ -267,9 +267,8 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         if (i != path.size() - 1)
             output_buffer << " -> ";
     }
-
-    // Concluindo a escrita no buffer e exibindo no terminal ao usuário.
-    output_buffer << "\n";
+    output_buffer << endl;
+    output_buffer << "  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
@@ -329,6 +328,8 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         if (i != path.size() - 1)
             output_buffer << " -> ";
     }
+    output_buffer << endl;
+    output_buffer << "  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
