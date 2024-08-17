@@ -69,7 +69,8 @@ ifeq ($(OS),Windows_NT)
 		(echo Google Test is not installed. Please install it manually and rerun make test. && exit 1)
 else
 	@echo Checking for gtest library...
-	@dpkg -l | grep -q libgtest-dev && \
+	@if [ -f /etc/debian_version ]; then \
+		dpkg -l | grep -q libgtest-dev && \
 		echo "Google Test is installed. Compiling and running tests..." || \
 		(echo -n "Google Test is not installed. Would you like to install it now? (y/n): " && \
 		read -r answer && \
@@ -81,7 +82,81 @@ else
 		else \
 			echo "Google Test is required to run tests. Please install it manually and run 'make test' again."; \
 			exit 1; \
-		fi)
+		fi); \
+	elif [ -f /etc/arch-release ]; then \
+		pacman -Q gtest &>/dev/null && \
+		echo "Google Test is installed. Compiling and running tests..." || \
+		(echo -n "Google Test is not installed. Would you like to install it now? (y/n): " && \
+		read -r answer && \
+		if [ "$$answer" = "y" ]; then \
+			echo "Installing Google Test..."; \
+			sudo pacman -Syu --noconfirm gtest; \
+			echo "Google Test installed successfully. Please run 'make test' again."; \
+			exit 1; \
+		else \
+			echo "Google Test is required to run tests. Please install it manually and run 'make test' again."; \
+			exit 1; \
+		fi); \
+	elif [ -f /etc/fedora-release ]; then \
+		dnf list installed | grep -q gtest && \
+		echo "Google Test is installed. Compiling and running tests..." || \
+		(echo -n "Google Test is not installed. Would you like to install it now? (y/n): " && \
+		read -r answer && \
+		if [ "$$answer" = "y" ]; then \
+			echo "Installing Google Test..."; \
+			sudo dnf install -y gtest-devel; \
+			echo "Google Test installed successfully. Please run 'make test' again."; \
+			exit 1; \
+		else \
+			echo "Google Test is required to run tests. Please install it manually and run 'make test' again."; \
+			exit 1; \
+		fi); \
+	elif [ -f /etc/SuSE-release ]; then \
+		zypper se --installed-only | grep -q gtest && \
+		echo "Google Test is installed. Compiling and running tests..." || \
+		(echo -n "Google Test is not installed. Would you like to install it now? (y/n): " && \
+		read -r answer && \
+		if [ "$$answer" = "y" ]; then \
+			echo "Installing Google Test..."; \
+			sudo zypper install -y gtest; \
+			echo "Google Test installed successfully. Please run 'make test' again."; \
+			exit 1; \
+		else \
+			echo "Google Test is required to run tests. Please install it manually and run 'make test' again."; \
+			exit 1; \
+		fi); \
+	elif [ "$(shell uname)" = "Darwin" ]; then \
+		brew list | grep -q gtest && \
+		echo "Google Test is installed. Compiling and running tests..." || \
+		(echo -n "Google Test is not installed. Would you like to install it now? (y/n): " && \
+		read -r answer && \
+		if [ "$$answer" = "y" ]; then \
+			echo "Installing Google Test..."; \
+			brew install googletest; \
+			echo "Google Test installed successfully. Please run 'make test' again."; \
+			exit 1; \
+		else \
+			echo "Google Test is required to run tests. Please install it manually and run 'make test' again."; \
+			exit 1; \
+		fi); \
+	elif [ "$(uname)" = "FreeBSD" ]; then \
+		pkg info | grep -q gtest && \
+		echo "Google Test is installed. Compiling and running tests..." || \
+		(echo -n "Google Test is not installed. Would you like to install it now? (y/n): " && \
+		read -r answer && \
+		if [ "$$answer" = "y" ]; then \
+			echo "Installing Google Test..."; \
+			sudo pkg install -y gtest; \
+			echo "Google Test installed successfully. Please run 'make test' again."; \
+			exit 1; \
+		else \
+			echo "Google Test is required to run tests. Please install it manually and run 'make test' again."; \
+			exit 1; \
+		fi); \
+	else \
+		echo "Unsupported system. Please install Google Test manually."; \
+		exit 1; \
+	fi
 endif
 
 test: $(TEST_TARGET)
