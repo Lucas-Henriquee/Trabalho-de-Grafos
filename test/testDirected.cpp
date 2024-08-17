@@ -40,13 +40,10 @@ TEST_F(GraphOperationsDirectedTest, DirectTransitiveClosure)
 
     vector<int> expected = {2, 3, 4, 5};
     vector<int> visited_ids;
+
     for (size_t i = 1; i < visited.size(); i++)
-    {
         if (visited[i])
-        {
             visited_ids.push_back(i);
-        }
-    }
 
     EXPECT_EQ(visited_ids, expected) << "O fecho transitivo direto não está correto";
 }
@@ -58,13 +55,10 @@ TEST_F(GraphOperationsDirectedTest, IndirectTransitiveClosure)
 
     vector<int> expected_visited = {1};
     vector<int> actual_visited;
+
     for (int v = visited.size() - 1; v >= 0; v--)
-    {
         if (visited[v])
-        {
             actual_visited.push_back(v);
-        }
-    }
 
     EXPECT_EQ(actual_visited, expected_visited) << "O fecho transitivo indireto não está correto";
 }

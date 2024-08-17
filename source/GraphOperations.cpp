@@ -9,13 +9,13 @@ ostringstream output_buffer;
 void menu(Graph *g, string file_exit)
 {
 
-    // Variável para a escolha do menu
+    // Variável para a escolha do menu.
     int i = -2;
 
     // Variáveis para armazenar o tamanho, vértices de origem e destino.
     size_t size, vertex_1, vertex_2;
 
-    // Loop do menu
+    // Loop do menu.
     do
     {
         system("clear||cls");
@@ -42,38 +42,38 @@ void menu(Graph *g, string file_exit)
         if (!validate_graph(g, i))
             continue;
 
-        // Switch case para as opções do menu
+        // Switch case para as opções do menu.
         switch (i)
         {
-        case 1:
+        case 1: // Fecho Transitivo Direto.
         {
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
             transitive_direct(g, vertex_1);
             break;
         }
-        case 2:
+        case 2: // Fecho Transitivo Indireto.
         {
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
             transitive_indirect(g, vertex_1);
             break;
         }
-        case 3:
+        case 3: // Caminho Mínimo (Dijkstra).
         {
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
             dijkstra_shortest_path(g, vertex_1, vertex_2);
             break;
         }
-        case 4:
+        case 4: // Caminho Mínimo (Floyd).
         {
             cout << "\n  Digite os IDs dos vértices (origem destino): ";
             cin >> vertex_1 >> vertex_2;
             floyd_shortest_path(g, vertex_1, vertex_2);
             break;
         }
-        case 5:
+        case 5: // Árvore Geradora Mínima (Prim).
         {
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
@@ -85,7 +85,7 @@ void menu(Graph *g, string file_exit)
             delete[] sub_vertices;
             break;
         }
-        case 6:
+        case 6: // Árvore Geradora Mínima (Kruskal).
         {
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
@@ -97,34 +97,34 @@ void menu(Graph *g, string file_exit)
             delete[] sub_vertices;
             break;
         }
-        case 7:
+        case 7: // Caminhamento em Profundidade.
         {
             cout << "\n  Digite o ID do vértice: ";
             cin >> vertex_1;
             deep_walking(g, vertex_1);
             break;
         }
-        case 8:
+        case 8: // Propriedades do Grafo.
         {
             properties_graph(g);
             break;
         }
-        case 9:
+        case 9: // Vértices de Articulação.
         {
             articulation_vertices(g);
             break;
         }
-        case 10:
+        case 10: // Mostrar Grafo.
         {
             g->print_graph();
             break;
         }
-        case -1:
+        case -1: // Sair do Programa.
         {
             cout << "\n  Encerrando o programa..." << endl;
             break;
         }
-        default:
+        default: // Opção inválida.
         {
             cout << "\n  Opção inválida! Tente novamente." << endl;
             sleep_for_seconds(2);
@@ -135,7 +135,7 @@ void menu(Graph *g, string file_exit)
         cout << output_buffer.str();
         sleep_for_seconds(1);
 
-        // Salvando a saída no arquivo e limpando o buffer.
+        // Salvando a saída no arquivo.
         if ((i >= 1 && i <= 10) && i != 10)
         {
             cout << "\n\n  Deseja salvar esses dados em um arquivo? (s/n): ";
@@ -145,6 +145,7 @@ void menu(Graph *g, string file_exit)
                 save_exit(g, file_exit);
         }
 
+        // Limpando o buffer.
         output_buffer.str("");
         output_buffer.clear();
 
@@ -163,10 +164,10 @@ bool validate_graph(Graph *g, int i)
         return false;
     }
 
-    // Verificando se o grafo possui pesos nos vértices antes de realizar a operação de caminho mínimo.
+    // Verificando se o grafo possui pesos nas arestas antes de realizar a operação de propriedades do grafo.
     if ((i == 8) && !g->get_weighted_edges())
     {
-        cout << "\n  ATENÇÃO! O grafo solicitado não possui pesos nos vértices, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
+        cout << "\n  ATENÇÃO! O grafo solicitado não possui pesos nas arestas, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
         sleep_for_seconds(5);
         return false;
     }
@@ -222,6 +223,7 @@ void transitive_indirect(Graph *g, size_t vertex)
 
 void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
+    // Verificando se os vértices fazem parte do grafo.
     if (g->find_node(vertex_1) == NULL || g->find_node(vertex_2) == NULL)
     {
         output_buffer << "  Um ou mais vértices não fazem parte do grafo." << endl;
@@ -243,6 +245,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     // Chamando a função dijkstra.
     g->dijkstra(vertex_1, distance, parents, node_at_index);
 
+    // Verificando se há conexão entre os vértices.
     if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
     {
         output_buffer << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
@@ -256,6 +259,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     // Adicionando o vértice de origem.
     path.push_back(0);
 
+    // Invertendo o vetor de caminho.
     reverse(path.begin(), path.end());
 
     // Escrevendo no buffer o caminho mínimo.
@@ -267,8 +271,8 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         if (i != path.size() - 1)
             output_buffer << " -> ";
     }
-    output_buffer << endl;
-    output_buffer << "  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
+
+    output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
@@ -328,8 +332,8 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         if (i != path.size() - 1)
             output_buffer << " -> ";
     }
-    output_buffer << endl;
-    output_buffer << "  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
+
+    output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
@@ -391,6 +395,7 @@ void deep_walking(Graph *g, size_t vertex)
         output_buffer << endl;
     }
 
+    // Caso o vértice não seja encontrado no grafo.
     else
         output_buffer << "  Nó não encontrado no grafo." << endl;
 }
@@ -501,10 +506,10 @@ void save_exit(Graph *g, string file_exit)
 
 void print_start()
 {
-    // Barra de progresso
+    // Barra de progresso.
     int progressBarWidth = 50;
 
-    // Imprimindo a barra de progresso
+    // Imprimindo a barra de progresso.
     cout << "\n\n\t\tInicializando grafo...\n";
     cout << "[";
 
@@ -515,7 +520,7 @@ void print_start()
 
     cout.flush();
 
-    // Simulando o carregamento
+    // Simulando o carregamento.
     for (int i = 0; i < progressBarWidth; ++i)
     {
         sleep_for_seconds(-10);
@@ -530,6 +535,7 @@ void print_start()
 
 void sleep_for_seconds(int seconds)
 {
+    // Função para aguardar um tempo em segundos nos ambientes Windows e Unix.
 #ifdef _WIN32
     if (seconds < 0)
         Sleep(-seconds * 10);

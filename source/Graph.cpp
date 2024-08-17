@@ -1,6 +1,5 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
-#include "../include/Graph.hpp"
 
 using namespace std;
 
@@ -280,6 +279,8 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
 
 void Graph::print_graph()
 {
+    // Implementação da função de impressão do grafo no menu.
+
     int i = 0;
 
     while (i != -1)
@@ -439,6 +440,7 @@ bool Graph::dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, 
     // Vetor para armazenar os nós visitados.
     vector<bool> visited(_number_of_nodes, false);
 
+    // Criando um nó inicial e chamando a função para encontrá-lo.
     Node *start_node = find_node(vertex);
 
     // Verificando se o nó de início foi encontrado.
@@ -449,6 +451,7 @@ bool Graph::dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, 
         return true;
     }
 
+    // Caso o nó de início não tenha sido encontrado.
     return false;
 }
 
@@ -711,6 +714,7 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
         v++;
     }
 
+    // Atualizando a variável de controle.
     v = 0;
 
     // Preenchendo a matriz de distâncias e de pais.
@@ -725,7 +729,7 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
 
         v++;
     }
-    // Aplicando o algoritmo de Floyd-Warshall para encontrar as distâncias mínimas
+    // Aplicando o algoritmo de Floyd-Warshall para encontrar as distâncias mínimas.
     for (size_t k = 0; k < n; k++)
         for (size_t i = 0; i < n; i++)
             for (size_t j = 0; j < n; j++)
@@ -738,7 +742,7 @@ void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents,
 
 void Graph::floyd(vector<vector<float>> &distance)
 {
-    // Inicializando a matriz de distâncias com o algoritmo de Floyd-Warshall
+    // Inicializando a matriz de distâncias com o algoritmo de Floyd-Warshall.
     for (size_t k = 0; k < _number_of_nodes; ++k)
         for (size_t i = 0; i < _number_of_nodes; ++i)
             for (size_t j = 0; j < _number_of_nodes; ++j)
@@ -748,49 +752,50 @@ void Graph::floyd(vector<vector<float>> &distance)
 
 void Graph::compute_graph_properties(float &radius, float &diameter, vector<size_t> &center, vector<size_t> &periphery)
 {
-    // Inicializando a matriz de distâncias
+    // Inicializando a matriz de distâncias.
     vector<vector<float>> dist(_number_of_nodes, vector<float>(_number_of_nodes, FLT_MAX));
 
-    // Preenchendo a matriz de distâncias com base nas arestas do grafo
+    // Preenchendo a matriz de distâncias com base nas arestas do grafo.
     for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
     {
-        // Encontrando o nó atual e inicializando a distância dele para ele mesmo
+        // Encontrando o nó atual e inicializando a distância dele para ele mesmo.
         size_t id = aux_node->_id;
         dist[id - 1][id - 1] = 0;
 
-        // Preenchendo a distância do nó atual para os nós adjacentes
+        // Preenchendo a distância do nó atual para os nós adjacentes.
         for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
         {
-            // Encontrando o nó adjacente e preenchendo a distância
+            // Encontrando o nó adjacente e preenchendo a distância.
             size_t target_id = aux_edge->_target_id;
 
+            // Se o grafo for direcionado, preenchendo a distância do nó atual para o nó adjacente.
             dist[id - 1][target_id - 1] = aux_edge->_weight;
 
-            // Se o grafo não for direcionado, preenchendo a distância do nó adjacente para o nó atual
+            // Se o grafo não for direcionado, preenchendo a distância do nó adjacente para o nó atual.
             if (!_directed)
                 dist[target_id - 1][id - 1] = aux_edge->_weight;
         }
     }
 
-    // Aplicando o algoritmo de Floyd-Warshall para encontrar as distâncias mínimas
+    // Aplicando o algoritmo de Floyd-Warshall para encontrar as distâncias mínimas.
     floyd(dist);
 
-    // Inicializando o raio e o diâmetro
+    // Inicializando o raio e o diâmetro.
     diameter = 0;
     vector<float> eccentricity(_number_of_nodes, 0);
 
-    // Encontrando a excentricidade de cada nó e o diâmetro
+    // Encontrando a excentricidade de cada nó e o diâmetro.
     for (size_t i = 0; i < _number_of_nodes; ++i)
     {
-        // Encontrando a distância máxima do nó i para os outros nós
+        // Encontrando a distância máxima do nó i para os outros nós.
         float max_dist = 0;
 
-        // Se a distância for infinita, o nó é desconexo
+        // Se a distância for infinita, o nó é desconexo.
         for (size_t j = 0; j < _number_of_nodes; ++j)
             if (dist[i][j] < FLT_MAX)
                 max_dist = max(max_dist, dist[i][j]);
 
-        // Se o nó é desconexo, ignoramos na excentricidade
+        // Se o nó é desconexo, ignoramos na excentricidade.
         if (max_dist > 0)
         {
             eccentricity[i] = max_dist;
@@ -798,10 +803,10 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
         }
     }
 
-    // Encontrando o raio
+    // Encontrando o raio.
     radius = *min_element(eccentricity.begin(), eccentricity.end());
 
-    // Encontrando o centro e a periferia
+    // Encontrando o centro e a periferia.
     for (size_t i = 0; i < _number_of_nodes; ++i)
     {
         if (eccentricity[i] == radius)

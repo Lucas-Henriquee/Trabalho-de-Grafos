@@ -43,6 +43,7 @@ TEST_F(GraphTest, TestAddNode)
 {
     graph->add_node(6, 1.0);
     Node *node = graph->find_node(6);
+    
     ASSERT_NE(node, nullptr) << "O nó 6 não foi encontrado após ser adicionado.";
 
     EXPECT_EQ(node->_id, 6) << "ID do nó esperado: 6, obtido: " << node->_id;
@@ -59,6 +60,7 @@ TEST_F(GraphTest, TestAddEdge)
 {
     graph->add_edge(5, 3, 1.0);
     Edge *edge = graph->find_edge(5, 3);
+
     ASSERT_NE(edge, nullptr) << "A aresta entre 5 e 3 não foi encontrada após ser adicionada.";
 
     EXPECT_FLOAT_EQ(edge->_weight, 1.0) << "Peso da aresta esperado: 1.0, obtido: " << edge->_weight;
