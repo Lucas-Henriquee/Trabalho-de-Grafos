@@ -109,19 +109,12 @@ void Graph::remove_node(size_t node_id)
 
     // Verificando se o nó foi encontrado.
     if (!aux_node)
-    {
-        cout << "  Erro: O Nó não foi encontrado no grafo." << endl;
         return;
-    }
 
-    //! VERIFICAR SE É NECESSÁRIO INCLUIR ESTA VERIFICAÇÃO.
     // Verificando se a remoção do nó deixará o grafo desconexo.
     for (size_t i = 0; i < _number_of_nodes; ++i)
         if (i != node_id && !(conected(node_id, i) || conected(i, node_id)))
-        {
-            cout << "  Erro: A remoção do nó " << node_id << " deixaria o grafo desconexo." << endl;
             return;
-        }
 
     // Inicializando o vetor de nós conectados.
     size_t *conected_nodes = new size_t[aux_node->_number_of_edges];
@@ -158,18 +151,11 @@ void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
 
     // Verificando se os nós foram encontrados.
     if (!aux_node_1 || !aux_node_2)
-    {
-        cout << "  Erro: Ao menos um dos Nós não foi encontrado." << endl;
         return;
-    }
 
-    //! VERIFICAR SE É NECESSÁRIO INCLUIR ESTA VERIFICAÇÃO.
     // Verificando se a remoção da aresta deixará o grafo desconexo.
     if (!conected(node_id_1, node_id_2) && !conected(node_id_2, node_id_1))
-    {
-        cout << "  Erro: A remoção da aresta (" << node_id_1 << ", " << node_id_2 << ") deixaria o grafo desconexo." << endl;
         return;
-    }
 
     // Inicializando as arestas auxiliares.
     Edge *aux_edge_1 = aux_node_1->_first_edge;
@@ -252,7 +238,8 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
     {
         // Adicionando a aresta ao nó.
         Edge *aux_edge = search_node_1->_first_edge;
-        for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge);
+        for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge)
+            ;
         aux_edge->_next_edge = new_edge_1;
     }
 
@@ -278,8 +265,8 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
             // Adicionando a aresta ao nó.
             Edge *aux_edge = search_node_2->_first_edge;
             for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge)
-            
-            aux_edge->_next_edge = new_edge_2;
+
+                aux_edge->_next_edge = new_edge_2;
         }
 
         // Caso o nó não possua arestas.
@@ -420,6 +407,31 @@ bool Graph::get_weighted_edges()
 {
     // Retornando se o grafo possui arestas ponderadas.
     return _weighted_edges;
+}
+
+Edge *Graph::find_edge(size_t node_id_1, size_t node_id_2)
+{
+    // Encontrando os nós da aresta a ser encontrada.
+    Node *aux_node_1 = find_node(node_id_1);
+    Node *aux_node_2 = find_node(node_id_2);
+
+    // Verificando se os nós foram encontrados.
+    if (!aux_node_1 || !aux_node_2)
+        return NULL;
+
+    // Verificando se a aresta existe.
+    for (Edge *aux_edge = aux_node_1->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        if (aux_edge->_target_id == node_id_2)
+            return aux_edge;
+
+    // Caso a aresta não exista.
+    return NULL;
+}
+
+size_t Graph::get_num_edges()
+{
+    // Retornando o número de arestas.
+    return _number_of_edges;
 }
 
 bool Graph::dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list)

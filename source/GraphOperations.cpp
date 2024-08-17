@@ -274,34 +274,55 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 {
-    if(g->find_node(vertex_1) == NULL || g->find_node(vertex_2) == NULL){
+    // Verificando se os vértices fazem parte do grafo.
+    if (g->find_node(vertex_1) == NULL || g->find_node(vertex_2) == NULL)
+    {
         cout << "  Um ou mais vértices não fazem parte do grafo." << endl;
         return;
     }
+
+    // Armazenando o número de nós.
     size_t n = g->get_num_nodes();
+
+    // Criando a matriz de distâncias.
     vector<vector<float>> distance(n, vector<float>(n));
+
+    // Criando a matriz de pais.
     vector<vector<int>> parents(n, vector<int>(n));
+
+    // Criando o vetor para mapear a posição do nó.
     vector<size_t> node_at_index(n);
+
+    // Criando o vetor para armazenar o caminho.
     vector<size_t> path;
 
+    // Chamando a função floyd.
     g->floyd(distance, parents, node_at_index);
 
-    if(distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == FLT_MAX){
-        cout << "  Não há conexão entre os vértices "<< vertex_1<<" e "<< vertex_2 << "." << endl;
+    // Verificando se há conexão entre os vértices.
+    if (distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == FLT_MAX)
+    {
+        cout << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
         return;
     }
-    
+
+    // Construíndo o caminho mínimo de vertex_1 para vertex_2.
     size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
     size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
 
+    // Adicionando os vértices ao caminho.
     for (; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
     {
         path.insert(path.begin(), node_at_index[p_v2]);
     }
+
+    // Adicionando o vértice de origem.
     path.insert(path.begin(), vertex_1);
 
+    // Escrevendo no buffer o caminho mínimo.
     output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ";
 
+    // Escrevendo o caminho no buffer.
     for (size_t i = 0; i < path.size(); i++)
     {
         output_buffer << path[i];
@@ -420,7 +441,7 @@ void properties_graph(Graph *g)
 void articulation_vertices(Graph *g)
 {
     // Verificando se o grafo possui vértices.
-    if(g->get_num_nodes() == 0)
+    if (g->get_num_nodes() == 0)
     {
         cout << "  Grafo vazio, sem vértices de articulação. " << endl;
         return;
@@ -437,26 +458,26 @@ void articulation_vertices(Graph *g)
     int time = 0;
 
     // Chamando a função de articulação para cada vértice não visitado.
-    for(size_t i = 0; i < g->get_num_nodes(); ++i)
-        if(!visited[i])
+    for (size_t i = 0; i < g->get_num_nodes(); ++i)
+        if (!visited[i])
             g->dfs_articulation(i, visited, disc_time, low_time, parent, art_point, time);
 
     // Escrevendo no buffer os vértices de articulação.
     output_buffer << "  Vértices de Articulação do Grafo: ";
-    
+
     // Verificando se há vértices de articulação.
     bool found_art_point = false;
-    for(size_t i = 0; i < g->get_num_nodes(); ++i)
-        if(art_point[i])
+    for (size_t i = 0; i < g->get_num_nodes(); ++i)
+        if (art_point[i])
         {
             output_buffer << i + 1 << " ";
             found_art_point = true;
         }
 
     // Caso não haja vértices de articulação.
-    if(!found_art_point)
+    if (!found_art_point)
         output_buffer << "Nenhum";
-    
+
     output_buffer << endl;
 }
 
