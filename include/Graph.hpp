@@ -39,6 +39,9 @@ public:
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
     bool negative_cycle();
     void dfs(Node *node, vector<bool> &visited);
+    void dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size);
+    bool is_connected();
+    bool is_connected(size_t *vertices, size_t size);
 
 private:
     size_t _number_of_nodes;

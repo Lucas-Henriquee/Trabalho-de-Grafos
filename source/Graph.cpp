@@ -857,3 +857,52 @@ void Graph::dfs(Node *node, vector<bool> &visited)
             dfs(target_node, visited);
     }
 }
+
+bool Graph::is_connected()
+{
+    // Inicializando o vetor de visitados.
+    vector<bool> visited(_number_of_nodes, false);
+
+    // Encontrando o primeiro nó do grafo.
+    Node *start_node = _first;
+
+    // Chamando a função de busca em profundidade.
+    dfs(start_node, visited);
+
+    // Verificando se todos os nós foram visitados.
+    return find(visited.begin(), visited.end(), false) == visited.end();
+}
+
+bool Graph::is_connected(size_t * vertices, size_t size)
+{
+    // Inicializando o vetor de visitados.
+    vector<bool> visited(size, false);
+
+    // Encontrando o primeiro nó do grafo.
+    Node *start_node = find_node(vertices[0]);
+
+    // Chamando a função de busca em profundidade.
+    dfs(start_node, visited, vertices, size);
+
+    // Verificando se todos os nós foram visitados.
+    return find(visited.begin(), visited.end(), false) == visited.end();
+}
+
+void Graph::dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size)
+{
+    // Marcando o nó como visitado.
+    visited[find(vertices, vertices + size, node->_id)] = true;
+
+    // Loop para percorrer todas as arestas do nó.
+    for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
+    {
+        // Encontrando o nó destino da aresta.
+        Node *target_node = find_node(edge->_target_id);
+        if(find(vertices, vertices + size, edge->_target_id) == vertices + size)
+            continue;
+
+        // Verificando se o nó destino ainda não foi visitado.
+        if (!visited[edge->_target_id])
+            dfs(target_node, visited);
+    }
+}
