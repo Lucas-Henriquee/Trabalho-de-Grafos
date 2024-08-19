@@ -22,7 +22,7 @@ public:
     int conected(size_t node_id_1, size_t node_id_2);
 
     bool dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list);
-    void dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list);
+    void dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list, int parent_id);
     void dfs_transitive(size_t vertex, vector<bool> &visited, bool direct);
     void dfs_articulation(size_t i, vector<bool> &visited, vector<int> &disc_time, vector<int> &low_time, vector<size_t> &parent, vector<bool> &art_point, int &time);
     void floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index);
@@ -37,7 +37,8 @@ public:
     bool get_weighted_edges();
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
-    bool negative_cycle(size_t vertex);
+    bool negative_cycle();
+    void dfs(Node *node, vector<bool> &visited);
 
 private:
     size_t _number_of_nodes;

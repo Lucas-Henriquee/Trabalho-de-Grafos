@@ -437,27 +437,27 @@ size_t Graph::get_num_edges()
 
 bool Graph::dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list)
 {
-    // Vetor para armazenar os nós visitados.
+    // Inicializando o vetor de visitados.
     vector<bool> visited(_number_of_nodes, false);
 
-    // Criando um nó inicial e chamando a função para encontrá-lo.
+    // Encontrando o nó inicial.
     Node *start_node = find_node(vertex);
 
-    // Verificando se o nó de início foi encontrado.
+    // Verificando se o nó foi encontrado.
     if (start_node != NULL)
     {
-        // Chamando a função dfs (Busca em Profundidade).
-        dfs_recursive(start_node, visited, return_edges, adj_list);
+        // Chamando a função recursiva e retornando verdadeiro.
+        dfs_recursive(start_node, visited, return_edges, adj_list, -1);
         return true;
     }
 
-    // Caso o nó de início não tenha sido encontrado.
+    // Caso o nó não seja encontrado.
     return false;
 }
 
-void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list)
+void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list, int parent_id)
 {
-    // Marcando o nó como visitado.
+    // Marca o nó como visitado.
     visited[node->_id] = true;
 
     // Vetor para armazenar os vizinhos do nó.
@@ -469,37 +469,31 @@ void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t,
         // Encontrando o nó destino da aresta.
         Node *target_node = find_node(edge->_target_id);
 
-        // Adicionando o nó destino na lista de vizinhos.
+        // Adicionando o nó destino ao vetor de vizinhos.
         neighbors.push_back(edge->_target_id);
 
-        // Verificando se o grafo é não-direcionado e adicionando a aresta em ambas as direções.
+        // Verificando se o nó destino ainda não foi visitado e chamando a função recursivamente.
+        if (!visited[edge->_target_id])
+            dfs_recursive(target_node, visited, return_edges, adj_list, node->_id);
+
+        // Verificando se a aresta é de retorno.
+        else if (edge->_target_id != static_cast<size_t>(parent_id)) 
+        {
+            // Verificando se a aresta já foi adicionada.
+            if (find(return_edges.begin(), return_edges.end(), make_pair(edge->_target_id, node->_id)) == return_edges.end())
+                return_edges.emplace_back(node->_id, edge->_target_id);
+        }
+
+        // Verificando se o grafo é não direcionado.
         if (!_directed)
+        {
+            // Verificando se o nó destino ainda não foi visitado.
             if (find(adj_list[target_node->_id].begin(), adj_list[target_node->_id].end(), node->_id) == adj_list[target_node->_id].end())
                 adj_list[target_node->_id].push_back(node->_id);
-
-        // Verificando se o nó destino ainda não foi visitado ou se o grafo é não-direcionado.
-        if (!_directed || !visited[target_node->_id])
-        {
-            // Adicionando aresta de retorno, se ainda não foi adicionada e o grafo é não-direcionado.
-            if (!_directed)
-            {
-                if (find(return_edges.begin(), return_edges.end(), make_pair(node->_id, target_node->_id)) == return_edges.end() && find(return_edges.begin(), return_edges.end(), make_pair(target_node->_id, node->_id)) == return_edges.end())
-                    return_edges.emplace_back(node->_id, target_node->_id);
-            }
-            // Adicionando aresta de retorno, se ainda não foi adicionada e o grafo é direcionado.
-            else
-            {
-                if (find(return_edges.begin(), return_edges.end(), make_pair(node->_id, target_node->_id)) == return_edges.end())
-                    return_edges.emplace_back(node->_id, target_node->_id);
-            }
-
-            // Chamando a função recursivamente para o nó destino.
-            if (!visited[target_node->_id])
-                dfs_recursive(target_node, visited, return_edges, adj_list);
         }
     }
 
-    // Adicionando a lista de vizinhos do nó atual.
+    // Adicionando os vizinhos do nó ao mapa.
     adj_list[node->_id] = move(neighbors);
 }
 
@@ -845,4 +839,21 @@ bool Graph::negative_cycle(size_t vertex){
             return true;
     }
     return false;
+}
+
+void Graph::dfs(Node *node, vector<bool> &visited)
+{
+    // Marcando o nó como visitado.
+    visited[node->_id] = true;
+
+    // Loop para percorrer todas as arestas do nó.
+    for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
+    {
+        // Encontrando o nó destino da aresta.
+        Node *target_node = find_node(edge->_target_id);
+
+        // Verificando se o nó destino ainda não foi visitado.
+        if (!visited[edge->_target_id])
+            dfs(target_node, visited);
+    }
 }
