@@ -840,3 +840,20 @@ bool Graph::negative_cycle(){
     }
     return false;
 }
+
+void Graph::dfs(Node *node, vector<bool> &visited)
+{
+    // Marcando o nó como visitado.
+    visited[node->_id] = true;
+
+    // Loop para percorrer todas as arestas do nó.
+    for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
+    {
+        // Encontrando o nó destino da aresta.
+        Node *target_node = find_node(edge->_target_id);
+
+        // Verificando se o nó destino ainda não foi visitado.
+        if (!visited[edge->_target_id])
+            dfs(target_node, visited);
+    }
+}

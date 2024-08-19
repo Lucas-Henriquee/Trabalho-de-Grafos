@@ -38,6 +38,7 @@ public:
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
     bool negative_cycle();
+    void dfs(Node *node, vector<bool> &visited);
 
 private:
     size_t _number_of_nodes;
