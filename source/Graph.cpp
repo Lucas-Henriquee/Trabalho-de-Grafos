@@ -809,3 +809,34 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
             periphery.push_back(i + 1);
     }
 }
+
+bool Graph::negative_cycle(){
+    vector<pair<float, pair<size_t, size_t>>> edges;
+    for(Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node){
+        for(Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge){
+            edges.push_back({aux_edge->_weight, {aux_node->_id, aux_edge->_target_id}});
+        }
+    }
+
+    vector<float> dist(_number_of_nodes, FLT_MAX);
+    dist[edges[0].second.first - 1] = 0;
+    
+    for (size_t i = 0; i < _number_of_nodes; i++)
+        for (size_t j = 0; j < edges.size(); j++)
+        {
+            size_t u = edges[j].second.first - 1;
+            size_t v = edges[j].second.second - 1;
+            float weight = edges[j].first;
+            if(dist[u] != FLT_MAX && dist[u] + weight < dist[v])
+                dist[v] = dist[u] + weight;
+        }
+    for (size_t i = 0; i < edges.size(); i++)
+    {
+        size_t u = edges[i].second.first - 1;
+        size_t v = edges[i].second.second - 1;
+        float weight = edges[i].first;
+        if (dist[u] != FLT_MAX && dist[u] + weight < dist[v])
+            return true;
+    }
+    return false;
+}
