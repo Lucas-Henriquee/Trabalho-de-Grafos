@@ -816,7 +816,7 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
     }
 }
 
-bool Graph::negative_cycle(){
+bool Graph::negative_cycle(size_t vertex){
     vector<pair<float, pair<size_t, size_t>>> edges;
     for(Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node){
         for(Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge){
@@ -825,7 +825,7 @@ bool Graph::negative_cycle(){
     }
 
     vector<float> dist(_number_of_nodes, FLT_MAX);
-    dist[edges[0].second.first - 1] = 0;
+    dist[vertex - 1] = 0;
     
     for (size_t i = 0; i < _number_of_nodes; i++)
         for (size_t j = 0; j < edges.size(); j++)

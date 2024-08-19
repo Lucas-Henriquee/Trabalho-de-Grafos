@@ -231,7 +231,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     }
 
     // Verificando se há ciclo negativo.
-    if(g->negative_cycle()){
+    if(g->negative_cycle(vertex_1)){
         output_buffer << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
         return;
     }
@@ -290,7 +290,7 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         return;
     }
     // Verificando se há ciclo negativo.
-    if(g->negative_cycle()){
+    if(g->negative_cycle(vertex_1)){
         output_buffer << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
         return;
     }
