@@ -15,7 +15,7 @@
 #include <cfloat>    
 #include <functional>/* implementação de funções lambda */
 
-/* implementação do tempo de espera */
+/* implementação do tempo de espera para os ambientes Windows e Unix*/
 #ifdef _WIN32
 #include <windows.h>
 #else

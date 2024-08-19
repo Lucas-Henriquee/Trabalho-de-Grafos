@@ -9,8 +9,6 @@ using namespace std;
 class Graph
 {
 public:
-    /*Assinatura dos métodos básicos para o funcionamento da classe*/
-
     Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_nodes);
     Graph();
     ~Graph();
@@ -23,9 +21,8 @@ public:
     void print_graph();
     int conected(size_t node_id_1, size_t node_id_2);
 
-    void dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list);
     bool dfs_call(size_t vertex, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list);
-
+    void dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t, size_t>> &return_edges, map<size_t, vector<size_t>> &adj_list, int parent_id);
     void dfs_transitive(size_t vertex, vector<bool> &visited, bool direct);
     void dfs_articulation(size_t i, vector<bool> &visited, vector<int> &disc_time, vector<int> &low_time, vector<size_t> &parent, vector<bool> &art_point, int &time);
     void floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index);
@@ -37,12 +34,17 @@ public:
     void compute_graph_properties(float &radius, float &diameter, vector<size_t> &center, vector<size_t> &periphery);
 
     size_t get_num_nodes();
+    size_t get_num_edges();
     bool get_directed();
     bool get_weighted_nodes();
     bool get_weighted_edges();
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
-    size_t get_num_edges();
+    bool negative_cycle();
+    void dfs(Node *node, vector<bool> &visited);
+    void dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size);
+    bool is_connected();
+    bool is_connected(size_t *vertices, size_t size);
 
 private:
     size_t _number_of_nodes;
