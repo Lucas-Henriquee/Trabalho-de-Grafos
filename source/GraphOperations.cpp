@@ -366,7 +366,7 @@ void deep_walking(Graph *g, size_t vertex)
     // Mapa para armazenar a lista de adjacência.
     map<size_t, vector<size_t>> adj_list;
 
-    // Inicia a DFS a partir do vértice dado.
+    // Chamando a função de busca em profundidade.
     if (g->dfs_call(vertex, return_edges, adj_list))
     {
         // Escrevendo no buffer o caminhamento em profundidade.
@@ -375,16 +375,16 @@ void deep_walking(Graph *g, size_t vertex)
 
         for (auto &entry : adj_list)
         {
+            // Escrevendo a lista de adjacência no buffer.
             output_buffer << "  " << entry.first << " -> ";
-
+            
             for (size_t i = 0; i < entry.second.size(); ++i)
             {
-                if (i > 0)
+                if (i > 0) 
                     output_buffer << " -> ";
 
                 output_buffer << entry.second[i];
             }
-
             output_buffer << endl;
         }
 
@@ -394,11 +394,11 @@ void deep_walking(Graph *g, size_t vertex)
             output_buffer << "  (" << edge.first << ", " << edge.second << ")" << endl;
         output_buffer << endl;
     }
-
-    // Caso o vértice não seja encontrado no grafo.
+    // Caso o nó não seja encontrado no grafo.
     else
         output_buffer << "  Nó não encontrado no grafo." << endl;
 }
+
 void properties_graph(Graph *g)
 {
     // Variáveis para armazenar o raio e o diâmetro.
