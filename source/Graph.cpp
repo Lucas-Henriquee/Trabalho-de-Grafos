@@ -1009,7 +1009,7 @@ bool Graph::is_connected(size_t * vertices, size_t size)
 void Graph::dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size)
 {
     // Marcando o nó como visitado.
-    visited[find(vertices, vertices + size, node->_id)] = true;
+    visited[find(vertices, vertices + size, node->_id) - vertices] = true;
 
     // Loop para percorrer todas as arestas do nó.
     for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)

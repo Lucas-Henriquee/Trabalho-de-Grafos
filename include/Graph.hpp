@@ -40,7 +40,7 @@ public:
     bool get_weighted_edges();
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
-    bool negative_cycle();
+    bool negative_cycle(size_t vertex);
     void dfs(Node *node, vector<bool> &visited);
     void dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size);
     bool is_connected();
