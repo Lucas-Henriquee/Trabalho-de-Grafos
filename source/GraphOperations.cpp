@@ -352,6 +352,18 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
     vector<float> key(size);
     vector<bool> mst_set(size);
 
+    for (size_t i = 0; i < size; i++)
+        if (g->find_node(vertices[i]) == NULL)
+        {
+            output_buffer << "  Um ou mais vértices não fazem parte do grafo." << endl;
+            return;
+        }
+    
+    if(!g->is_connected(vertices, size)){
+        output_buffer << "  O subconjunto de vértices não é conexo." << endl;
+        return;
+    }
+
     g->prim(vertices, size, parent, key, mst_set);
 
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
@@ -372,6 +384,18 @@ void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
     vector<pair<float, pair<size_t, size_t>>> edges;
     function<size_t(size_t, size_t*)> find_ds;
+
+    for (size_t i = 0; i < size; i++)
+        if (g->find_node(vertices[i]) == NULL)
+        {
+            output_buffer << "  Um ou mais vértices não fazem parte do grafo." << endl;
+            return;
+        }
+    
+    if(!g->is_connected(vertices, size)){
+        output_buffer << "  O subconjunto de vértices não é conexo." << endl;
+        return;
+    }
 
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
     for (size_t i = 0; i < size; ++i)

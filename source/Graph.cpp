@@ -618,7 +618,6 @@ void Graph::dfs_articulation(size_t i, vector<bool> &visited, vector<int> &disc_
 
 void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index)
 {
-    // TODO: Aceitar aresta negativa.
     // Inicializando as variáveis.
     int n = _number_of_nodes;
     int p = 0;
@@ -819,7 +818,7 @@ void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vert
         return parent[i] = find_ds(parent[i], parent);
     };
 
-    // TODO: Verificar se o usuário é doente e os vertices existem
+    // TODO: Retornar o valor e as arestas da árvore geradora mínima via chamada da função.
     
     float vt_agm = 0; 
 
@@ -879,7 +878,7 @@ void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vert
 }
 
 void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set){
-    // TODO: Verificar se o usuário é doente e os vertices existem
+    
     // Inicializando as informções basicas para o algoritimo.
     for (size_t i = 0; i < size; i++)
     {
