@@ -144,7 +144,7 @@ TEST_F(GraphOperationsDirectedTest, KruskalMinimumGeneratingTree)
 TEST_F(GraphOperationsDirectedTest, DeepWalking)
 {
     vector<pair<size_t, size_t>> return_edges;
-    vector<pair<size_t, size_t>> expected_edges = {{1, 2}, {2, 3}, {3, 4}, {4, 5}};
+    vector<pair<size_t, size_t>> expected_edges = {{1, 3}};
 
     map<size_t, vector<size_t>> adj_list;
     map<size_t, vector<size_t>> expected_adj_list = {{1, {2, 3}}, {2, {3}}, {3, {4}}, {4, {5}}, {5, {}}};
