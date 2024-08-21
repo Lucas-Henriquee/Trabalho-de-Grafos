@@ -477,7 +477,7 @@ void Graph::dfs_recursive(Node *node, vector<bool> &visited, vector<pair<size_t,
             dfs_recursive(target_node, visited, return_edges, adj_list, node->_id);
 
         // Verificando se a aresta é de retorno.
-        else if (edge->_target_id != static_cast<size_t>(parent_id)) 
+        else if (edge->_target_id != static_cast<size_t>(parent_id))
         {
             // Verificando se a aresta já foi adicionada.
             if (find(return_edges.begin(), return_edges.end(), make_pair(edge->_target_id, node->_id)) == return_edges.end())
@@ -810,71 +810,63 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
     }
 }
 
-bool Graph::negative_cycle(size_t vertex){
+bool Graph::negative_cycle(size_t vertex)
+{
+    // Inicializando o vetor de arestas.
     vector<pair<float, pair<size_t, size_t>>> edges;
-    for(Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node){
-        for(Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge){
-            edges.push_back({aux_edge->_weight, {aux_node->_id, aux_edge->_target_id}});
-        }
-    }
 
+    // Preenchendo o vetor de arestas com base nas arestas do grafo.
+    for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
+        for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+            edges.push_back({aux_edge->_weight, {aux_node->_id, aux_edge->_target_id}});
+
+    // Inicializando o vetor de distâncias.
     vector<float> dist(_number_of_nodes, FLT_MAX);
+
+    // Inicializando a distância do nó inicial como 0.
     dist[vertex - 1] = 0;
-    
+
+    // Aplicando o algoritmo de Bellman-Ford para encontrar ciclos negativos.
     for (size_t i = 0; i < _number_of_nodes; i++)
         for (size_t j = 0; j < edges.size(); j++)
         {
+            // Encontrando os nós da aresta.
             size_t u = edges[j].second.first - 1;
             size_t v = edges[j].second.second - 1;
+
+            // Encontrando o peso da aresta.
             float weight = edges[j].first;
-            if(dist[u] != FLT_MAX && dist[u] + weight < dist[v])
+
+            // Atualizando a distância se a nova distância for menor.
+            if (dist[u] != FLT_MAX && dist[u] + weight < dist[v])
                 dist[v] = dist[u] + weight;
         }
+
+    // Verificando se há ciclo negativo.
     for (size_t i = 0; i < edges.size(); i++)
     {
+        // Encontrando os nós da aresta.
         size_t u = edges[i].second.first - 1;
         size_t v = edges[i].second.second - 1;
+
+        // Encontrando o peso da aresta.
         float weight = edges[i].first;
+
+        // Verificando se a distância pode ser atualizada.
         if (dist[u] != FLT_MAX && dist[u] + weight < dist[v])
             return true;
     }
+
+    // Caso não haja ciclo negativo.
     return false;
 }
 
-void Graph::dfs(Node *node, vector<bool> &visited)
+bool Graph::is_connected(size_t *vertices, size_t size)
 {
-    // Marcando o nó como visitado.
-    visited[node->_id] = true;
+    // Verificando se o grafo está vazio.
+    if (_first == NULL)
+        return false;
 
-    // Loop para percorrer todas as arestas do nó.
-    for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
-    {
-        // Encontrando o nó destino da aresta.
-        Node *target_node = find_node(edge->_target_id);
-
-        // Verificando se o nó destino ainda não foi visitado.
-        if (!visited[edge->_target_id])
-            dfs(target_node, visited);
-    }
-}
-
-bool Graph::is_connected()
-{
-    // Inicializando o vetor de visitados.
-    vector<bool> visited(_number_of_nodes, false);
-
-    // Encontrando o primeiro nó do grafo.
-    Node *start_node = _first;
-
-    // Chamando a função de busca em profundidade.
-    dfs(start_node, visited);
-
-    // Verificando se todos os nós foram visitados.
-    return find(visited.begin(), visited.end(), false) == visited.end();
-}
-
-bool Graph::is_connected(size_t * vertices, size_t size)
-{
     // Inicializando o vetor de visitados.
     vector<bool> visited(size, false);
 
@@ -898,11 +890,45 @@ void Graph::dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size
     {
         // Encontrando o nó destino da aresta.
         Node *target_node = find_node(edge->_target_id);
-        if(find(vertices, vertices + size, edge->_target_id) == vertices + size)
+        if (find(vertices, vertices + size, edge->_target_id) == vertices + size)
             continue;
 
         // Verificando se o nó destino ainda não foi visitado.
         if (!visited[edge->_target_id])
             dfs(target_node, visited);
     }
+}
+
+void Graph::dfs(Node *node, vector<bool> &visited)
+{
+    // Marcando o nó como visitado.
+    visited[node->_id - 1] = true;
+
+    // Loop para percorrer todas as arestas do nó.
+    for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
+    {
+        // Encontrando o nó destino da aresta.
+        Node *target_node = find_node(edge->_target_id);
+
+        // Verificando se o nó destino ainda não foi visitado.
+        if (!visited[target_node->_id - 1])
+            dfs(target_node, visited);
+    }
+}
+
+bool Graph::is_connected_graph()
+{
+    // Verificando se o grafo está vazio.
+    if (_first == NULL)
+        return false;
+
+    // Inicializando o vetor de nós visitados.
+    vector<bool> visited(_number_of_nodes, false);
+
+    // Iniciando a DFS a partir do primeiro nó do grafo.
+    Node *start_node = _first;
+    dfs(start_node, visited);
+
+    // Verificando se todos os nós foram visitados (grafo conexo).
+    return find(visited.begin(), visited.end(), false) == visited.end();
 }

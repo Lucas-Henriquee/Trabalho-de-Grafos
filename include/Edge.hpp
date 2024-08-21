@@ -5,6 +5,7 @@
 
 struct Edge
 {
+    // atributos da aresta
     Edge *_next_edge;
     float _weight;
     size_t _target_id;
