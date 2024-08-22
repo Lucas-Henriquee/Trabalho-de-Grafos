@@ -394,7 +394,9 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 
 void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
+    vector<pair<float, pair<size_t, size_t>>> tree_edges;
     vector<pair<float, pair<size_t, size_t>>> edges;
+    float vt_agm = 0;
     function<size_t(size_t, size_t*)> find_ds;
 
     for (size_t i = 0; i < size; i++)
@@ -409,12 +411,19 @@ void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
         return;
     }
 
+    g->kruskal(edges, vertices, size, find_ds, tree_edges);
+
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
         output_buffer << vertices[i] << " ";
     output_buffer << ":" << endl;
 
-    g->kruskal(edges, vertices, size, find_ds, output_buffer);
+    for (size_t i = 0; i < tree_edges.size(); i++)
+    {
+        output_buffer << tree_edges[i].second.first << " - " << tree_edges[i].second.second << endl;
+        vt_agm += tree_edges[i].first;
+    }
+    output_buffer << "Valor da árvore geradora minima: " << vt_agm << ".";
 
     output_buffer << endl;
 }

@@ -810,17 +810,13 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
     }
 }
 
-void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vertices, size_t size, function <size_t(size_t, size_t*)> &find_ds, ostringstream &output_buffer){
+void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vertices, size_t size, function <size_t(size_t, size_t*)> &find_ds, vector<pair<float,pair<size_t,size_t>>> &tree_edges){
     // Inicializando a função de busca.
     find_ds = [&] (size_t i, size_t *parent) -> size_t {
         if (parent[i] == i)
             return i;
         return parent[i] = find_ds(parent[i], parent);
     };
-
-    // TODO: Retornar o valor e as arestas da árvore geradora mínima via chamada da função.
-    
-    float vt_agm = 0; 
 
     // Inicializando o vetor de arestas.
     for(size_t i = 0; i < size; ++i)
@@ -857,10 +853,7 @@ void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vert
         if (set_u != set_v) 
         { 
             // Adicionando a aresta na árvore geradora mínima.
-            output_buffer << u << " - " << v << endl; 
-
-            // Atualizando o valor da árvore geradora mínima.
-            vt_agm += it->first;
+            tree_edges.push_back({it->first, {u, v}});
 
             // Unindo as subárvores.
             if (rank[set_u] < rank[set_v]) 
@@ -874,7 +867,6 @@ void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vert
             }
         }
     }
-    output_buffer << "Valor da árvore geradora mínima: " << vt_agm << ".";
 }
 
 void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set){
