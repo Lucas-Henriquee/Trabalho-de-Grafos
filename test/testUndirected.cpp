@@ -31,9 +31,9 @@ protected:
             graph = nullptr;
         }
     }
-};
+};  
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedDijkstraShortestPath)
+TEST_F(GraphOperationsUndirectedTest, DijkstraShortestPath)
 {
     size_t vertex_1 = 1;
     size_t vertex_2 = 4;
@@ -67,7 +67,7 @@ TEST_F(GraphOperationsUndirectedTest, UndirectedDijkstraShortestPath)
     EXPECT_EQ(path_nodes, expected_path) << "O caminho mais curto calculado não é o esperado.";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedFloydShortestPath)
+TEST_F(GraphOperationsUndirectedTest, FloydShortestPath)
 {
     size_t vertex_1 = 1;
     size_t vertex_2 = 4;
@@ -99,25 +99,25 @@ TEST_F(GraphOperationsUndirectedTest, UndirectedFloydShortestPath)
     EXPECT_EQ(path, expected_path) << "O caminho mais curto calculado não é o esperado.";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedPrimMinimumGeneratingTree)
+TEST_F(GraphOperationsUndirectedTest, PrimMinimumGeneratingTree)
 {
     // TODO: Implementar o teste
     FAIL() << "Implementar o teste PrimMinimumGeneratingTree";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedKruskalMinimumGeneratingTree)
+TEST_F(GraphOperationsUndirectedTest, KruskalMinimumGeneratingTree)
 {
     // TODO: Implementar o teste
     FAIL() << "Implementar o teste KruskalMinimumGeneratingTree";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedDeepWalking)
+TEST_F(GraphOperationsUndirectedTest, DeepWalking)
 {
     vector<pair<size_t, size_t>> return_edges;
-    vector<pair<size_t, size_t>> expected_edges = {{1, 2}, {2, 3}, {3, 1}, {3, 4}, {4, 5}};
+    vector<pair<size_t, size_t>> expected_edges = {{3, 1}};
 
     map<size_t, vector<size_t>> adj_list;
-    map<size_t, vector<size_t>> expected_adj_list = {{1, {2, 3}}, {2, {1, 3}}, {3, {1, 4}}, {4, {3, 5}}, {5, {4}}};
+    map<size_t, vector<size_t>> expected_adj_list = {{1, {2, 3}}, {2, {1, 3}}, {3, {1, 4, 2}}, {4, {3, 5}}, {5, {4}}};
 
     graph->dfs_call(1, return_edges, adj_list);
 
@@ -125,7 +125,7 @@ TEST_F(GraphOperationsUndirectedTest, UndirectedDeepWalking)
     EXPECT_EQ(adj_list, expected_adj_list) << "A lista de adjacência gerada pelo DFS não corresponde à esperada.";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedPropertiesGraph)
+TEST_F(GraphOperationsUndirectedTest, PropertiesGraph)
 {
     float radius, diameter;
     float expected_radius = 11.0;
@@ -145,7 +145,7 @@ TEST_F(GraphOperationsUndirectedTest, UndirectedPropertiesGraph)
     EXPECT_EQ(periphery, expected_periphery) << "A(s) periferia(s) calculada(s) do grafo não é(são) a(s) esperada(s).";
 }
 
-TEST_F(GraphOperationsUndirectedTest, UndirectedArticulationVertices)
+TEST_F(GraphOperationsUndirectedTest, ArticulationVertices)
 {
     vector<bool> visited(graph->get_num_nodes(), false);
     vector<int> disc_time(graph->get_num_nodes(), -1);

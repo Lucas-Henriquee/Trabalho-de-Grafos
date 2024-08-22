@@ -127,13 +127,13 @@ void menu(Graph *g, string file_exit)
         default: // Opção inválida.
         {
             cout << "\n  Opção inválida! Tente novamente." << endl;
-            sleep_for_seconds(2);
+            sleep_for_seconds(2, false);
         }
         }
 
         output_buffer << "\n  -------------------------------------------------------------\n\n";
         cout << output_buffer.str();
-        sleep_for_seconds(1);
+        sleep_for_seconds(1, false);
 
         // Salvando a saída no arquivo.
         if ((i >= 1 && i <= 10) && i != 10)
@@ -160,23 +160,33 @@ bool validate_graph(Graph *g, int i)
     if ((i == 1 || i == 2) && !g->get_directed())
     {
         cout << "\n  ATENÇÃO! O grafo solicitado não é direcionado, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
-        sleep_for_seconds(5);
+        sleep_for_seconds(5, false);
         return false;
     }
 
-    // Verificando se o grafo possui pesos nas arestas antes de realizar a operação de propriedades do grafo.
-    if ((i == 8) && !g->get_weighted_edges())
+    // Verificando se o grafo possui pesos nas arestas e se ele é conexo antes de realizar a operação de propriedades do grafo.
+    if (i == 8)
     {
-        cout << "\n  ATENÇÃO! O grafo solicitado não possui pesos nas arestas, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
-        sleep_for_seconds(5);
-        return false;
+        if (!g->get_weighted_edges())
+        {
+            cout << "\n  ATENÇÃO! O grafo solicitado não possui pesos nas arestas, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
+            sleep_for_seconds(5, false);
+            return false;
+        }
+
+        if (!g->is_connected_graph())
+        {
+            cout << "\n  ATENÇÃO! O grafo solicitado não é conexo, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
+            sleep_for_seconds(5, false);
+            return false;
+        }
     }
 
     // Verificando se o grafo é não direcionado antes de realizar a operação dos vérticies articulados.
     if ((i == 9) && g->get_directed())
     {
         cout << "\n  ATENÇÃO! O grafo solicitado é direcionado, portanto, a operação não pode ser realizada. Por favor, selecione outra opção no menu." << endl;
-        sleep_for_seconds(5);
+        sleep_for_seconds(5, false);
         return false;
     }
 
@@ -231,7 +241,8 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     }
 
     // Verificando se há ciclo negativo.
-    if(g->negative_cycle(vertex_1)){
+    if (g->negative_cycle(vertex_1))
+    {
         output_buffer << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
         return;
     }
@@ -290,7 +301,8 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         return;
     }
     // Verificando se há ciclo negativo.
-    if(g->negative_cycle(vertex_1)){
+    if (g->negative_cycle(vertex_1))
+    {
         output_buffer << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
         return;
     }
@@ -426,10 +438,10 @@ void deep_walking(Graph *g, size_t vertex)
         {
             // Escrevendo a lista de adjacência no buffer.
             output_buffer << "  " << entry.first << " -> ";
-            
+
             for (size_t i = 0; i < entry.second.size(); ++i)
             {
-                if (i > 0) 
+                if (i > 0)
                     output_buffer << " -> ";
 
                 output_buffer << entry.second[i];
@@ -542,7 +554,7 @@ void save_exit(Graph *g, string file_exit)
         output_file << output_buffer.str();
 
         cout << "  Saída salva no arquivo: " << file_exit << endl;
-        sleep_for_seconds(3);
+        sleep_for_seconds(3, false);
 
         // Fechando o arquivo.
         output_file.close();
@@ -572,27 +584,27 @@ void print_start()
     // Simulando o carregamento.
     for (int i = 0; i < progressBarWidth; ++i)
     {
-        sleep_for_seconds(-10);
+        sleep_for_seconds(10, true);
         cout << "=";
         cout.flush();
     }
 
     cout << "]\n";
     cout << "\t   Grafo inicializado com sucesso!\n";
-    sleep_for_seconds(2);
+    sleep_for_seconds(2, false);
 }
 
-void sleep_for_seconds(int seconds)
+void sleep_for_seconds(int seconds, bool miliseconds)
 {
     // Função para aguardar um tempo em segundos nos ambientes Windows e Unix.
 #ifdef _WIN32
-    if (seconds < 0)
-        Sleep(-seconds * 10);
+    if (miliseconds)
+        Sleep(seconds * 10);
     else
         Sleep(seconds * 1000);
 #else
-    if (seconds < 0)
-        usleep(-seconds * 10000);
+    if (miliseconds)
+        usleep(seconds * 10000);
     else
         sleep(seconds);
 #endif
