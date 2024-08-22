@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include "../include/GraphOperations.hpp"
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
