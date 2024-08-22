@@ -8,7 +8,7 @@
 #include <stack>     /* implementação do container stack e suas operações */
 #include <algorithm> /* implementações de algoritmos de ordenação, soma acumulada, reversão de vetores e máximo e mínimos de containers */
 #include <map>       /* implementação do container map e suas operações */
-#include <cfloat>    
+#include <cfloat>    /* implementação dos valores maximos para os tipos float e double */
 #include <functional>/* implementação de funções lambda */
 
 /* implementação do tempo de espera para os ambientes Windows e Unix*/
