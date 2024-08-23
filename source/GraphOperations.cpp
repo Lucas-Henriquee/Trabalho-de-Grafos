@@ -314,7 +314,7 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
-    // TODO: Implementação
+    
 
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
     for (size_t i = 0; i < size; ++i)

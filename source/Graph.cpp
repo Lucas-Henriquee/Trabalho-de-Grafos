@@ -782,3 +782,68 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
             periphery.push_back(i + 1);
     }
 }
+
+vector<tuple<size_t, size_t, float>> Graph :: primMST(Graph graph, size_t* node_id, size_t node_id_size) 
+{
+    if (node_id_size == 0) return;
+
+    // Inicialização dos vetores
+    vector<tuple<size_t, size_t, float>> prim_results;
+    vector<size_t> minWeight(node_id_size, INF_F); // Peso mínimo de aresta para cada vértice
+    vector<int> parent(node_id_size, -1); // Vértice pai para a árvore
+    vector<bool> inMST(node_id_size, false); // Para marcar vértices incluídos na MST
+
+    // Começar com o primeiro vértice
+    size_t startVertex = node_id[0];
+    minWeight[startVertex] = 0;
+    parent[startVertex] = -1;
+
+    for (size_t i = 0; i < node_id_size - 1; ++i) 
+    {
+        // Encontrar o vértice com o menor peso de aresta que ainda não está na MST
+        size_t min_node = -1;
+        size_t minWeightValue = INF_F;
+        for (size_t j = 0; j < node_id_size; ++j)
+        {
+            if (!inMST[node_id[j]] && minWeight[node_id[j]] < minWeightValue) 
+            {
+                min_node = node_id[j];
+                minWeightValue = minWeight[node_id[j]];
+            }
+        }
+
+        // Adicionar o vértice encontrado à MST
+        inMST[min_node] = true;
+
+        // Atualizar os pesos e pais dos vértices adjacentes
+        Node* aux_node=graph.find_node(min_node);
+        Edge* aux_edge=aux_node->_first_edge;
+            while (aux_edge!=NULL)
+            {
+                size_t aux_edge_target_index=-1;
+                size_t aux_edge_target = aux_edge->_target_id;
+                for (size_t i = 0; i < node_id_size; ++i)
+                {
+                    if(node_id[i]==aux_edge_target)
+                    aux_edge_target_index=i;
+                }
+                
+
+
+                if (aux_edge_target_index!=-1 && !inMST[aux_edge_target_index] && aux_edge->_weight < minWeight[aux_edge_target])
+                {
+                    minWeight[aux_edge_target_index] = aux_edge->_weight;
+                    parent[aux_edge_target_index] = min_node;
+                }
+                aux_edge=aux_edge->_next_edge;
+            }
+    }
+
+    for (size_t i = 0; i < node_id_size; ++i)
+    {
+        prim_results[i]={node_id[i], parent[i], minWeight[i]};
+    }
+    return prim_results;
+}
+
+void Graph::kruskal(){}

@@ -39,6 +39,8 @@ public:
     bool get_weighted_nodes();
     bool get_weighted_edges();
     Node *find_node(size_t node_id);
+    vector<tuple<size_t,size_t,float>>primMST(Graph graph, size_t* vertexID, size_t size);
+    void kruskal();
 
 private:
     size_t _number_of_nodes;
