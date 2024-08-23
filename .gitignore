@@ -2,4 +2,4 @@
 /build/*
 *.txt
 execGrupoX*
-runTests
+runTests*

@@ -72,7 +72,7 @@ Para executar o programa, basta executar o seguinte comando:
 
 #### No Windows:
 ```sh
-.\execGrupoX .\<arquivo_entrada> .\<arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
+.\execGrupoX.exe .\<arquivo_entrada> .\<arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
 ```
 
 #### Parâmetros de Execução
@@ -88,9 +88,9 @@ Para executar o programa, basta executar o seguinte comando:
 
 ### Testes
 
-Para garantir a funcionalidade correta da biblioteca, foi incluido testes automatizados usando a biblioteca Catch2. Para executá-los:
+Para garantir a funcionalidade correta da biblioteca, foi incluido testes automatizados usando a biblioteca GTest. Para executá-los:
 
-- Certifique-se de que a biblioteca Catch2 está instalada no seu sistema.
+- Certifique-se de que a biblioteca Gtest está instalada no seu sistema.
 
 - Compile e execute os testes com o comando:
     ```sh

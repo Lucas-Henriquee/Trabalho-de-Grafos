@@ -8,10 +8,13 @@ Os arquivos de instância são nomeados de acordo com o padrão:
 
 - `D` indica que o grafo é direcionado.
 - `U` indica que o grafo é não direcionado.
+- `_n` indica que o grafo contém arestas negativas.
 
 Por exemplo:
-- `10nD.dat` para um grafo direcionado com 10 nós.
-- `15nU.dat` para um grafo não direcionado com 15 nós.
+- `10nD.dat` para um grafo direcionado com 10 nós e arestas não-negativas.
+- `15nU.dat` para um grafo não direcionado com 15 nós e arestas não-negativas.
+- `10nD_n.dat` para um grafo direcionado com 10 nós e arestas negativas.
+- `15nU_n.dat` para um grafo não direcionado com 15 nós e arestas negativas.
 
 ## Formato do Arquivo 
 
@@ -22,20 +25,20 @@ Cada arquivo de instância segue o formato abaixo:
 
 <p align="center">
 5<br>
-1 - 2 - 10<br>
-2 - 3 - 5<br>
-3 - 4 - 2<br>
-4 - 5 - 7<br>
-5 - 1 - 3
+1 - 2 -  10 <br>
+2 - 3 - -5 <br>
+3 - 4 -  12 <br>
+4 - 5 -  11 <br>
+5 - 1 - -3
 </p>
 
 - **Primeira Linha**: `5`, indicando que o grafo tem 5 nós.
 - **Linhas Subsequentemente**:
   - `1 - 2 - 10`: Uma aresta do nó 1 para o nó 2 com peso 10.
-  - `2 - 3 - 5`: Uma aresta do nó 2 para o nó 3 com peso 5.
-  - `3 - 4 - 2`: Uma aresta do nó 3 para o nó 4 com peso 2.
-  - `4 - 5 - 7`: Uma aresta do nó 4 para o nó 5 com peso 7.
-  - `5 - 1 - 3`: Uma aresta do nó 5 para o nó 1 com peso 3.
+  - `2 - 3 - -5`: Uma aresta do nó 2 para o nó 3 com peso -5.
+  - `3 - 4 - 12`: Uma aresta do nó 3 para o nó 4 com peso 12.
+  - `4 - 5 - 11`: Uma aresta do nó 4 para o nó 5 com peso 11.
+  - `5 - 1 - -3`: Uma aresta do nó 5 para o nó 1 com peso -3.
 
 
 # 🔧 Testes Automatizados 

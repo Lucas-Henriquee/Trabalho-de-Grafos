@@ -6,6 +6,7 @@
 
 struct Node
 {
+    // atributos do nó
     size_t _number_of_edges;
     size_t _id;
     float _weight;

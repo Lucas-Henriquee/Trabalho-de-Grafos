@@ -4,6 +4,7 @@
 #include "Graph.hpp"
 #include "defines.hpp"
 
+// funções de operações do menu
 void menu(Graph *g, string file_exit);
 bool validate_graph(Graph *g, int i);
 void transitive_direct(Graph *g, size_t vertex);
@@ -17,6 +18,6 @@ void properties_graph(Graph *g);
 void articulation_vertices(Graph *g);
 void save_exit(Graph *g, string file);
 void print_start();
-void sleep_for_seconds(int seconds);
+void sleep_for_seconds(int seconds, bool miliseconds);
 
 #endif // GRAPH_OPERATIONS_HPP
