@@ -933,12 +933,12 @@ bool Graph::is_connected_graph()
     return find(visited.begin(), visited.end(), false) == visited.end();
 }
 
-vector<tuple<size_t, size_t, float>> Graph :: primMST(Graph graph, size_t* node_id, size_t node_id_size) 
+vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node_id_size)
 {
     if (node_id_size == 0) return;
 
     // Inicialização dos vetores
-    vector<tuple<size_t, size_t, float>> prim_results;
+    vector<tuple<size_t, size_t, float>> prim_results(node_id_size,{0,0,0}); // Vetor de resultados
     vector<size_t> minWeight(node_id_size, INF_F); // Peso mínimo de aresta para cada vértice
     vector<int> parent(node_id_size, -1); // Vértice pai para a árvore
     vector<bool> inMST(node_id_size, false); // Para marcar vértices incluídos na MST
@@ -966,7 +966,7 @@ vector<tuple<size_t, size_t, float>> Graph :: primMST(Graph graph, size_t* node_
         inMST[min_node] = true;
 
         // Atualizar os pesos e pais dos vértices adjacentes
-        Node* aux_node=graph.find_node(min_node);
+        Node* aux_node=this->find_node(min_node);
         Edge* aux_edge=aux_node->_first_edge;
             while (aux_edge!=NULL)
             {
@@ -989,6 +989,7 @@ vector<tuple<size_t, size_t, float>> Graph :: primMST(Graph graph, size_t* node_
             }
     }
 
+    //Salvar resultados na ordem: {id do vértice, pai, peso mínimo}
     for (size_t i = 0; i < node_id_size; ++i)
     {
         prim_results[i]={node_id[i], parent[i], minWeight[i]};
