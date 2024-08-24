@@ -107,7 +107,7 @@ TEST_F(GraphOperationsDirectedTest, FloydShortestPath)
     vector<size_t> node_at_index(n);
     vector<size_t> path;
 
-    graph->floyd(distance, parents, node_at_index);
+    graph->floyd(vertex_1, distance, parents, node_at_index);
 
     if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
     {

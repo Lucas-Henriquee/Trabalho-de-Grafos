@@ -240,13 +240,6 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         return;
     }
 
-    // Verificando se há ciclo negativo.
-    if (g->negative_cycle(vertex_1))
-    {
-        output_buffer << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
-        return;
-    }
-
     // Criando o vetor de distâncias.
     vector<float> distance(g->get_num_nodes());
 
@@ -254,7 +247,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     vector<int> parents(g->get_num_nodes(), -1);
 
     // Criando o vetor para mapear a posição do nó.
-    vector<size_t> node_at_index(g->get_num_nodes());
+    vector<size_t> node_at_index(g->get_num_nodes(), 0);
 
     // Criando o vetor para armazenar o caminho.
     vector<size_t> path;
@@ -262,35 +255,43 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     // Chamando a função dijkstra.
     g->dijkstra(vertex_1, distance, parents, node_at_index);
 
-    // Verificando se há conexão entre os vértices.
-    if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
+    // Caso o grafo nao tenha ciclos negativos.
+    if (find(node_at_index.begin(), node_at_index.end(), vertex_1) != node_at_index.end())
     {
-        output_buffer << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+        // Verificando se há conexão entre os vértices.
+        if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
+        {
+            output_buffer << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+            return;
+        }
+
+        // Construíndo o caminho mínimo de vertex_1 para vertex_2.
+        for (int v = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin(); v != 0; v = parents[v])
+            path.push_back(v);
+
+        // Adicionando o vértice de origem.
+        path.push_back(0);
+
+        // Invertendo o vetor de caminho.
+        reverse(path.begin(), path.end());
+
+        // Escrevendo no buffer o caminho mínimo.
+        output_buffer << "  Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ";
+
+        for (size_t i = 0; i < path.size(); i++)
+        {
+            output_buffer << node_at_index[path[i]];
+            if (i != path.size() - 1)
+                output_buffer << " -> ";
+        }
+
+        // Escrevendo a distância no buffer.
+        output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
+    }
+
+    // Caso contrário, o grafo possui ciclos negativos.
+    else
         return;
-    }
-
-    // Construíndo o caminho mínimo de vertex_1 para vertex_2.
-    for (int v = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin(); v != 0; v = parents[v])
-        path.push_back(v);
-
-    // Adicionando o vértice de origem.
-    path.push_back(0);
-
-    // Invertendo o vetor de caminho.
-    reverse(path.begin(), path.end());
-
-    // Escrevendo no buffer o caminho mínimo.
-    output_buffer << "  Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ";
-
-    for (size_t i = 0; i < path.size(); i++)
-    {
-        output_buffer << node_at_index[path[i]];
-        if (i != path.size() - 1)
-            output_buffer << " -> ";
-    }
-
-    // Escrevendo a distância no buffer.
-    output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
@@ -301,12 +302,7 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         cout << "  Um ou mais vértices não fazem parte do grafo." << endl;
         return;
     }
-    // Verificando se há ciclo negativo.
-    if (g->negative_cycle(vertex_1))
-    {
-        output_buffer << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
-        return;
-    }
+
     // Armazenando o número de nós.
     size_t n = g->get_num_nodes();
 
@@ -317,47 +313,53 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     vector<vector<int>> parents(n, vector<int>(n));
 
     // Criando o vetor para mapear a posição do nó.
-    vector<size_t> node_at_index(n);
+    vector<size_t> node_at_index(n, 0);
 
     // Criando o vetor para armazenar o caminho.
     vector<size_t> path;
 
     // Chamando a função floyd.
-    g->floyd(distance, parents, node_at_index);
+    g->floyd(vertex_1, distance, parents, node_at_index);
 
-    // Verificando se há conexão entre os vértices.
-    if (distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == FLT_MAX)
+    // Caso o grafo nao tenha ciclos negativos.
+    if (find(node_at_index.begin(), node_at_index.end(), vertex_1) != node_at_index.end())
     {
-        cout << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+        // Verificando se há conexão entre os vértices.
+        if (distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == FLT_MAX)
+        {
+            cout << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+            return;
+        }
+
+        // Construíndo o caminho mínimo de vertex_1 para vertex_2.
+        size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
+        size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
+
+        // Adicionando os vértices ao caminho.
+        for (; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
+            path.insert(path.begin(), node_at_index[p_v2]);
+
+        // Adicionando o vértice de origem.
+        path.insert(path.begin(), vertex_1);
+
+        // Escrevendo no buffer o caminho mínimo.
+        output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ";
+
+        // Escrevendo o caminho no buffer.
+        for (size_t i = 0; i < path.size(); i++)
+        {
+            output_buffer << path[i];
+            if (i != path.size() - 1)
+                output_buffer << " -> ";
+        }
+
+        // Escrevendo a distância no buffer.
+        output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
+    }
+
+    // Caso contrário, o grafo possui ciclos negativos.
+    else
         return;
-    }
-
-    // Construíndo o caminho mínimo de vertex_1 para vertex_2.
-    size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
-    size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
-
-    // Adicionando os vértices ao caminho.
-    for (; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
-    {
-        path.insert(path.begin(), node_at_index[p_v2]);
-    }
-
-    // Adicionando o vértice de origem.
-    path.insert(path.begin(), vertex_1);
-
-    // Escrevendo no buffer o caminho mínimo.
-    output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ";
-
-    // Escrevendo o caminho no buffer.
-    for (size_t i = 0; i < path.size(); i++)
-    {
-        output_buffer << path[i];
-        if (i != path.size() - 1)
-            output_buffer << " -> ";
-    }
-
-    // Escrevendo a distância no buffer.
-    output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)

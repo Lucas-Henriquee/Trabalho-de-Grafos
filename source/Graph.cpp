@@ -618,6 +618,13 @@ void Graph::dfs_articulation(size_t i, vector<bool> &visited, vector<int> &disc_
 
 void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index)
 {
+    // Verificando se há ciclo negativo.
+    if (negative_cycle(source))
+    {
+        cout << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
+        return;
+    }
+
     // Inicializando as variáveis.
     int n = _number_of_nodes;
     int p = 0;
@@ -689,8 +696,15 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
     }
 }
 
-void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index)
+void Graph::floyd(size_t vertex_1, vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index)
 {
+    // Verificando se há ciclo negativo.
+    if (negative_cycle(vertex_1))
+    {
+        cout << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
+        return;
+    }
+
     // Inicializando as variáveis.
     size_t n = _number_of_nodes;
     size_t v = 0;
