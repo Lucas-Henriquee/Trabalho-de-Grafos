@@ -30,7 +30,7 @@ protected:
             graph = nullptr;
         }
     }
-};  
+};
 
 TEST_F(GraphOperationsUndirectedTest, DijkstraShortestPath)
 {
@@ -100,14 +100,56 @@ TEST_F(GraphOperationsUndirectedTest, FloydShortestPath)
 
 TEST_F(GraphOperationsUndirectedTest, PrimMinimumGeneratingTree)
 {
-    // TODO: Implementar o teste
-    FAIL() << "Implementar o teste PrimMinimumGeneratingTree";
+    size_t size = 5;
+    size_t sub_vertices[] = {1, 2, 3, 4, 5};
+
+    vector<size_t> parent(size);
+    vector<float> key(size);
+    vector<bool> mst_set(size);
+
+    graph->prim(sub_vertices, size, parent, key, mst_set);
+
+    vector<float> expected_key = {0.0, 3.0, 2.0, 7.0, 4.0};
+    vector<bool> expected_mst_set = {true, true, true, true, false};
+
+    float vt_agm = 0;
+    float expected_vt_agm = 16.0;
+
+    for (size_t i = 1; i < size; i++)
+        vt_agm += key[i];
+
+    EXPECT_EQ(key, expected_key) << "As chaves calculadas para a árvore geradora mínima não são as esperadas.";
+    EXPECT_EQ(mst_set, expected_mst_set) << "Os vértices da árvore geradora mínima não são os esperados.";
+    EXPECT_FLOAT_EQ(vt_agm, expected_vt_agm) << "O valor total da árvore geradora mínima não é o esperado.";
 }
 
 TEST_F(GraphOperationsUndirectedTest, KruskalMinimumGeneratingTree)
 {
-    // TODO: Implementar o teste
-    FAIL() << "Implementar o teste KruskalMinimumGeneratingTree";
+    vector<pair<float, pair<size_t, size_t>>> tree_edges;
+    vector<pair<float, pair<size_t, size_t>>> edges;
+
+    size_t size = 5;
+    size_t sub_vertices[] = {1, 2, 3, 4, 5};
+
+    float vt_agm = 0;
+    float expected_vt_agm = 16.0;
+
+    function<size_t(size_t, size_t *)> find_ds;
+
+    find_ds = [&](size_t i, size_t *parent) -> size_t
+    {
+        if (parent[i] == i)
+            return i;
+
+        return parent[i] = find_ds(parent[i], parent);
+    };
+
+    graph->kruskal(edges, sub_vertices, size, find_ds, tree_edges);
+
+    for (size_t i = 0; i < tree_edges.size(); i++)
+        vt_agm += tree_edges[i].first;
+
+    EXPECT_FLOAT_EQ(vt_agm, expected_vt_agm) << "O valor total da árvore geradora mínima não é o esperado.";
 }
 
 TEST_F(GraphOperationsUndirectedTest, DeepWalking)

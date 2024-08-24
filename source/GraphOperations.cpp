@@ -289,6 +289,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
             output_buffer << " -> ";
     }
 
+    // Escrevendo a distância no buffer.
     output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
@@ -355,77 +356,103 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
             output_buffer << " -> ";
     }
 
+    // Escrevendo a distância no buffer.
     output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
 void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
+    // Vetores para armazenar o pai, chave e se o nó está na árvore.
     vector<size_t> parent(size);
     vector<float> key(size);
     vector<bool> mst_set(size);
 
+    // Verificando se os vértices fazem parte do grafo.
     for (size_t i = 0; i < size; i++)
         if (g->find_node(vertices[i]) == NULL)
         {
             output_buffer << "  Um ou mais vértices não fazem parte do grafo." << endl;
             return;
         }
-    
-    if(!g->is_connected(vertices, size)){
+
+    // Verificando se o subconjunto de vértices é conexo.
+    if (!g->is_connected(vertices, size))
+    {
         output_buffer << "  O subconjunto de vértices não é conexo." << endl;
         return;
     }
 
+    // Chamando a função prim.
     g->prim(vertices, size, parent, key, mst_set);
 
+    // Escrevendo no buffer.
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
-        output_buffer << vertices[i] << " ";
-    output_buffer << ":" << endl;
+    {
+        if (i != (size - 1))
+            output_buffer << vertices[i] << " ";
+        else
+            output_buffer << vertices[i] << ":\n\n";
+    }
 
+    // Calculando o valor da árvore geradora mínima e escrevendo no buffer.
     float vt_agm = 0;
-
-    for (size_t i = 1; i < size; i++){
-        output_buffer << vertices[parent[i]] << " - " << vertices[i] << endl;
+    for (size_t i = 1; i < size; i++)
+    {
+        output_buffer << "\t\t\t" << vertices[parent[i]] << " - " << vertices[i] << endl;
         vt_agm += key[i];
     }
-    output_buffer << "Valor da árvore geradora mínima: " << vt_agm << ".";
+    output_buffer << "\n  Valor da árvore geradora mínima: " << vt_agm << "\n";
 }
 
 void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
+    // Vetores para armazenar as arestas da árvore e as arestas.
     vector<pair<float, pair<size_t, size_t>>> tree_edges;
     vector<pair<float, pair<size_t, size_t>>> edges;
-    float vt_agm = 0;
-    function<size_t(size_t, size_t*)> find_ds;
 
+    // Variável para armazenar o valor da árvore geradora mínima.
+    float vt_agm = 0;
+
+    // Função para encontrar o conjunto disjunto.
+    function<size_t(size_t, size_t *)> find_ds;
+
+    // Verificando se os vértices fazem parte do grafo.
     for (size_t i = 0; i < size; i++)
         if (g->find_node(vertices[i]) == NULL)
         {
             output_buffer << "  Um ou mais vértices não fazem parte do grafo." << endl;
             return;
         }
-    
-    if(!g->is_connected(vertices, size)){
+
+    // Verificando se o subconjunto de vértices é conexo.
+    if (!g->is_connected(vertices, size))
+    {
         output_buffer << "  O subconjunto de vértices não é conexo." << endl;
         return;
     }
 
+    // Chamando a função kruskal.
     g->kruskal(edges, vertices, size, find_ds, tree_edges);
 
+    // Escrevendo no buffer.
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
-        output_buffer << vertices[i] << " ";
-    output_buffer << ":" << endl;
+    {
+        if (i != (size - 1))
+            output_buffer << vertices[i] << " ";
+        else
+            output_buffer << vertices[i] << ":\n\n";
+    }
 
+    // Calculando o valor da árvore geradora mínima e escrevendo no buffer.
     for (size_t i = 0; i < tree_edges.size(); i++)
     {
-        output_buffer << tree_edges[i].second.first << " - " << tree_edges[i].second.second << endl;
+        output_buffer << "\t\t\t" << tree_edges[i].second.first << " - " << tree_edges[i].second.second << endl;
         vt_agm += tree_edges[i].first;
     }
-    output_buffer << "Valor da árvore geradora minima: " << vt_agm << ".";
 
-    output_buffer << endl;
+    output_buffer << "\n  Valor da árvore geradora minima: " << vt_agm << "\n";
 }
 
 void deep_walking(Graph *g, size_t vertex)
@@ -446,7 +473,7 @@ void deep_walking(Graph *g, size_t vertex)
         for (auto &entry : adj_list)
         {
             // Escrevendo a lista de adjacência no buffer.
-            output_buffer << "  " << entry.first << " -> ";
+            output_buffer << "\t\t\t" << entry.first << " -> ";
 
             for (size_t i = 0; i < entry.second.size(); ++i)
             {
@@ -461,7 +488,7 @@ void deep_walking(Graph *g, size_t vertex)
         // Escrevendo as arestas de retorno no buffer.
         output_buffer << "\n  Arestas de retorno:" << endl;
         for (auto &edge : return_edges)
-            output_buffer << "  (" << edge.first << ", " << edge.second << ")" << endl;
+            output_buffer << "  (" << edge.first << ", " << edge.second << ") ";
         output_buffer << endl;
     }
     // Caso o nó não seja encontrado no grafo.

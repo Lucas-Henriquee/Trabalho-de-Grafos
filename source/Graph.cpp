@@ -810,21 +810,31 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
     }
 }
 
-void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vertices, size_t size, function <size_t(size_t, size_t*)> &find_ds, vector<pair<float,pair<size_t,size_t>>> &tree_edges){
+void Graph::kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *vertices, size_t size, function<size_t(size_t, size_t *)> &find_ds, vector<pair<float, pair<size_t, size_t>>> &tree_edges)
+{
+
     // Inicializando a função de busca.
-    find_ds = [&] (size_t i, size_t *parent) -> size_t {
+    find_ds = [&](size_t i, size_t *parent) -> size_t
+    {
+        // Verificando se o nó é o pai dele mesmo.
         if (parent[i] == i)
             return i;
+
+        // Chamando a função recursivamente.
         return parent[i] = find_ds(parent[i], parent);
     };
 
     // Inicializando o vetor de arestas.
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
+        // Encontrando o nó atual.
         Node *aux_node = find_node(vertices[i]);
-        for(Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+
+        // Iterando sobre todas as arestas do nó atual.
+        for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
         {
-            if((find(vertices, vertices + size, aux_edge->_target_id) != vertices + size) && (find(edges.begin(), edges.end(), make_pair(aux_edge->_weight, make_pair(aux_edge->_target_id, aux_node->_id))) == edges.end()))
+            // Verificando se o nó destino da aresta está no vetor de vértices e se a aresta já foi adicionada.
+            if ((find(vertices, vertices + size, aux_edge->_target_id) != vertices + size) && (find(edges.begin(), edges.end(), make_pair(aux_edge->_weight, make_pair(aux_edge->_target_id, aux_node->_id))) == edges.end()))
                 edges.push_back({aux_edge->_weight, {aux_node->_id, aux_edge->_target_id}});
         }
     }
@@ -837,43 +847,53 @@ void Graph::kruskal(vector<pair<float,pair<size_t,size_t>>> &edges, size_t *vert
     size_t *rank = new size_t[size];
     for (size_t i = 0; i < size; i++)
     {
+        // Inicializando o rank e o pai.
         rank[i] = 0;
         parent[i] = i;
     }
 
-    vector<pair<float,pair<size_t, size_t>>>::iterator it; 
-    for (it=edges.begin(); it!=edges.end(); it++) 
-    { 
-        size_t u = it->second.first; 
-        size_t v = it->second.second; 
-  
-        size_t set_u = find_ds(find(vertices, vertices + size, u) - vertices, parent); 
+    // Iterando sobre todas as arestas.
+    vector<pair<float, pair<size_t, size_t>>>::iterator it;
+    for (it = edges.begin(); it != edges.end(); it++)
+    {
+        // Encontrando os nós da aresta.
+        size_t u = it->second.first;
+        size_t v = it->second.second;
+
+        // Encontrando os conjuntos dos nós.
+        size_t set_u = find_ds(find(vertices, vertices + size, u) - vertices, parent);
         size_t set_v = find_ds(find(vertices, vertices + size, v) - vertices, parent);
 
-        if (set_u != set_v) 
-        { 
+        // Verificando se a aresta forma um ciclo.
+        if (set_u != set_v)
+        {
             // Adicionando a aresta na árvore geradora mínima.
             tree_edges.push_back({it->first, {u, v}});
 
-            // Unindo as subárvores.
-            if (rank[set_u] < rank[set_v]) 
-                parent[set_u] = set_v; 
-            else if (rank[set_u] > rank[set_v]) 
-                parent[set_v] = set_u; 
+            // Verificando se o rank do conjunto u é menor que o rank do conjunto v.
+            if (rank[set_u] < rank[set_v])
+                parent[set_u] = set_v;
+            // Verificando se o rank do conjunto v é menor que o rank do conjunto u.
+            else if (rank[set_u] > rank[set_v])
+                parent[set_v] = set_u;
+            // Caso os ranks sejam iguais.
             else
-            { 
-                parent[set_v] = set_u; 
-                rank[set_u]++; 
+            {
+                // Atualizando o rank e o pai do conjunto.
+                parent[set_v] = set_u;
+                rank[set_u]++;
             }
         }
     }
 }
 
-void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set){
-    
+void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set)
+{
+
     // Inicializando as informções basicas para o algoritimo.
     for (size_t i = 0; i < size; i++)
     {
+        // Inicializando o vetor de chaves e o vetor de visitados.
         key[i] = FLT_MAX;
         mst_set[i] = false;
     }
@@ -891,7 +911,7 @@ void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<f
         size_t u;
         float min = FLT_MAX;
         for (size_t j = 0; j < mst_set.size(); j++)
-            if(!mst_set[j] && key[j] < min)
+            if (!mst_set[j] && key[j] < min)
                 min = key[j], u = j;
 
         // Marcando o nó como visitado.
@@ -904,7 +924,7 @@ void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<f
         for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
         {
             // Encontrando o nó destino e o peso da aresta.
-            if(find(vertices, vertices + size, aux_edge->_target_id) == vertices + size)
+            if (find(vertices, vertices + size, aux_edge->_target_id) == vertices + size)
                 continue;
             size_t v = find(vertices, vertices + size, aux_edge->_target_id) - vertices;
             float weight = aux_edge->_weight;
@@ -912,6 +932,7 @@ void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<f
             // Atualizando a chave e o pai do nó se a nova chave for menor.
             if (!mst_set[v] && weight < key[v])
             {
+                // Atualizando a chave e o pai do nó.
                 parent[v] = u;
                 key[v] = weight;
             }
