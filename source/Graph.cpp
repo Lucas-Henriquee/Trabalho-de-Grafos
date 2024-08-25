@@ -1,5 +1,6 @@
 #include "../include/Graph.hpp"
-#include "../include/defines.hpp"
+#include "../include/defines.hpp" 
+
 
 using namespace std;
 
@@ -989,7 +990,7 @@ vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node
             }
     }
 
-    //Salvar resultados na ordem: {id do vértice, pai, peso mínimo}
+    //Salvar resultados na ordem: {id do vértice, pai, peso da aresta}
     for (size_t i = 0; i < node_id_size; ++i)
     {
         prim_results[i]={node_id[i], parent[i], minWeight[i]};
@@ -997,4 +998,92 @@ vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node
     return prim_results;
 }
 
-void Graph::kruskal(){}
+vector<std::pair<int, int>> Graph :: kruskalMST(int* node_id, int node_id_size) 
+{
+    // Vetor que armazena todas as arestas do grafo com os nós de origem e destino
+    std::vector<std::tuple<int, int, int>> edges;  // (origem, destino, peso)
+
+    // Coleta todas as arestas do grafo
+    for (int i = 0; i < node_id_size; i++) 
+    {
+        int u = node_id[i];  // Nó de origem
+        Node* aux_node = this->_first;
+        
+        // Encontra o nó correspondente ao identificador u
+        while (aux_node && aux_node->_id != u) 
+        {
+            aux_node = aux_node->_next_node;
+        }
+
+        // Se o nó for encontrado, percorre suas arestas
+        if (aux_node) 
+        {
+            Edge* aux_edge = aux_node->_first_edge;
+            while (aux_edge) 
+            {
+                edges.push_back(make_tuple(u, aux_edge->_target_id, aux_edge->_weight));
+                aux_edge = aux_edge->_next_edge;
+            }
+        }
+    }
+
+    // Ordena as arestas pelo peso
+    sort(edges.begin(), edges.end(), [](const tuple<int, int, int>& a, const tuple<int, int, int>& b) 
+    {
+        return get<2>(a) < get<2>(b);
+    });
+
+    // Estruturas para representar conjuntos disjuntos
+    vector<size_t> parent(node_id_size);
+    vector<size_t> rank(node_id_size, 0);
+
+    // Inicializa os subconjuntos
+    for (int v = 0; v < node_id_size; ++v) 
+    {
+        parent[v] = v;
+    }
+
+    // Função inline para encontrar o conjunto de um elemento i (usando compressão de caminho)
+    function<size_t(size_t)> find = [&](size_t i) 
+    {
+        if (parent[i] != i)
+            parent[i] = find(parent[i]);
+        return parent[i];
+    };
+
+    // Função inline para unir dois subconjuntos (usando union by rank)
+    auto Union = [&](int x, int y) {
+        int xroot = find(x);
+        int yroot = find(y);
+
+        if (rank[xroot] < rank[yroot])
+            parent[xroot] = yroot;
+        else if (rank[xroot] > rank[yroot])
+            parent[yroot] = xroot;
+        else {
+            parent[yroot] = xroot;
+            rank[xroot]++;
+        }
+    };
+
+    // Vetor para armazenar o resultado (aresta incluída na MST)
+    vector<std::pair<int, int>> result;
+
+    // Itera sobre as arestas, adicionando-as à MST se não formarem um ciclo
+    for (const auto& edge : edges) 
+    {
+        int u = get<0>(edge);  // Nó de origem
+        int v = get<1>(edge);  // Nó de destino
+
+        int set_u = find(u);
+        int set_v = find(v);
+
+        // Se incluir essa aresta não forma um ciclo, adicione à MST
+        if (set_u != set_v) {
+            result.push_back({u, v});
+            Union(set_u, set_v);
+        }
+    }
+
+    return result;
+}
