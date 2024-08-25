@@ -998,10 +998,10 @@ vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node
     return prim_results;
 }
 
-vector<std::pair<int, int>> Graph :: kruskalMST(int* node_id, int node_id_size) 
+vector<tuple<size_t, size_t, float>> Graph:: kruskalMST(size_t* node_id, size_t node_id_size) 
 {
     // Vetor que armazena todas as arestas do grafo com os nós de origem e destino
-    std::vector<std::tuple<int, int, int>> edges;  // (origem, destino, peso)
+    vector<tuple<size_t, size_t, float>> edges;  // (origem, destino, peso)
 
     // Coleta todas as arestas do grafo
     for (int i = 0; i < node_id_size; i++) 
@@ -1010,8 +1010,7 @@ vector<std::pair<int, int>> Graph :: kruskalMST(int* node_id, int node_id_size)
         Node* aux_node = this->_first;
         
         // Encontra o nó correspondente ao identificador u
-        while (aux_node && aux_node->_id != u) 
-        {
+        while (aux_node && aux_node->_id != u) {
             aux_node = aux_node->_next_node;
         }
 
@@ -1034,8 +1033,8 @@ vector<std::pair<int, int>> Graph :: kruskalMST(int* node_id, int node_id_size)
     });
 
     // Estruturas para representar conjuntos disjuntos
-    vector<size_t> parent(node_id_size);
-    vector<size_t> rank(node_id_size, 0);
+    vector<int> parent(node_id_size);
+    vector<int> rank(node_id_size, 0);
 
     // Inicializa os subconjuntos
     for (int v = 0; v < node_id_size; ++v) 
@@ -1043,18 +1042,19 @@ vector<std::pair<int, int>> Graph :: kruskalMST(int* node_id, int node_id_size)
         parent[v] = v;
     }
 
-    // Função inline para encontrar o conjunto de um elemento i (usando compressão de caminho)
-    function<size_t(size_t)> find = [&](size_t i) 
+    // Função lambda para encontrar o conjunto de um elemento i (usando compressão de caminho)
+    function<size_t(size_t)> find = [&](size_t i) -> size_t 
     {
         if (parent[i] != i)
             parent[i] = find(parent[i]);
         return parent[i];
     };
 
-    // Função inline para unir dois subconjuntos (usando union by rank)
-    auto Union = [&](int x, int y) {
-        int xroot = find(x);
-        int yroot = find(y);
+    // Função lambda para unir dois subconjuntos (usando union by rank)
+    auto Union = [&](size_t x, size_t y) 
+    {
+        size_t xroot = find(x);
+        size_t yroot = find(y);
 
         if (rank[xroot] < rank[yroot])
             parent[xroot] = yroot;
@@ -1066,21 +1066,22 @@ vector<std::pair<int, int>> Graph :: kruskalMST(int* node_id, int node_id_size)
         }
     };
 
-    // Vetor para armazenar o resultado (aresta incluída na MST)
-    vector<std::pair<int, int>> result;
+    // Vetor para armazenar o resultado (arestas incluídas na MST)
+    vector<tuple<size_t, size_t, float>> result;
 
     // Itera sobre as arestas, adicionando-as à MST se não formarem um ciclo
-    for (const auto& edge : edges) 
-    {
-        int u = get<0>(edge);  // Nó de origem
-        int v = get<1>(edge);  // Nó de destino
+    for (const auto& edge : edges) {
+        size_t u = get<0>(edge);  // Nó de origem
+        size_t v = get<1>(edge);  // Nó de destino
+        float weight = get<2>(edge); // Peso da aresta
 
-        int set_u = find(u);
-        int set_v = find(v);
+        size_t set_u = find(u);
+        size_t set_v = find(v);
 
-        // Se incluir essa aresta não forma um ciclo, adicione à MST
-        if (set_u != set_v) {
-            result.push_back({u, v});
+        // Se incluir essa aresta não formar um ciclo, adicione à MST
+        if (set_u != set_v) 
+        {
+            result.push_back(make_tuple(u, v, weight));
             Union(set_u, set_v);
         }
     }

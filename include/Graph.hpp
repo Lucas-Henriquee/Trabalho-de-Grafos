@@ -44,8 +44,8 @@ public:
     bool negative_cycle(size_t vertex);
     bool is_connected(size_t *vertices, size_t size);
     bool is_connected_graph();
-    vector<tuple<size_t,size_t,float>>primMST(size_t* vertexID, size_t size);
-    vector<std::pair<int, int>> kruskalMST(int* vertexID, int size);
+    vector<tuple<size_t,size_t,float>>primMST(size_t* node_id, size_t node_id_size);
+    vector<tuple<size_t,size_t,float>>kruskalMST(size_t* node_id, size_t node_id_size);
 
 private:
     // atributos do grafo

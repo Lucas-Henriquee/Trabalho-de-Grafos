@@ -381,13 +381,21 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 
 void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
-    // TODO: Implementação
+    vector<tuple<size_t,size_t,float>> data_kruskal_tree=g->kruskalMST(vertices,size);
 
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
         output_buffer << vertices[i] << " ";
 
     output_buffer << "\n";
+    for (size_t i = 0; i < size; ++i)
+    {
+        output_buffer << "\n";
+        output_buffer << "Aresta " << get<0>(data_kruskal_tree[i]);
+        output_buffer << " - "<< get<1>(data_kruskal_tree[i]);
+        output_buffer << ", Peso da aresta: " << get<2>(data_kruskal_tree[i]);
+    }
+
 }
 
 void deep_walking(Graph *g, size_t vertex)
