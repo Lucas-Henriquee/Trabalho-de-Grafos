@@ -77,6 +77,12 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
+            if(size == 0)
+            {
+                cout << "  O subconjunto de vértices não pode ser vazio." << endl;
+                sleep_for_seconds(2, false);
+                break;
+            }
             size_t *sub_vertices = new size_t[size];
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
@@ -89,6 +95,12 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
+            if(size == 0)
+            {
+                cout << "  O subconjunto de vértices não pode ser vazio." << endl;
+                sleep_for_seconds(2, false);
+                break;
+            }
             size_t *sub_vertices = new size_t[size];
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
