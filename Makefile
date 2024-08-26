@@ -28,17 +28,17 @@ LDFLAGS := -lgtest -lgtest_main -lpthread
 ifeq ($(OS),Windows_NT)
     MKDIR_CMD = @if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
     RM_CMD = @if exist $(BUILD_DIR) rmdir /S /Q $(BUILD_DIR) && if exist $(TARGET).exe del $(TARGET).exe && if exist $(TEST_TARGET).exe del $(TEST_TARGET).exe
-    TEST_CMD = $(CXX) $(CXXFLAGS) $(BUILD_DIR)\test_gtest.cpp -o $(BUILD_DIR)\test_gtest $(LDFLAGS)
+    FILE_CHECK_CMD = if not exist 
 else
     MKDIR_CMD = @mkdir -p $(BUILD_DIR)
     RM_CMD = @rm -rf $(BUILD_DIR) $(TARGET) $(TEST_TARGET)
-    TEST_CMD = $(CXX) $(CXXFLAGS) $(BUILD_DIR)/test_gtest.cpp -o $(BUILD_DIR)/test_gtest $(LDFLAGS)
+    FILE_CHECK_CMD = test -e 
 endif
 
 # Output executables
 TARGET := execGrupoX
 
-.PHONY: all clean test check_gtest
+.PHONY: all clean test check_gtest check_files
 
 all: $(TARGET)
 
@@ -53,17 +53,34 @@ $(BUILD_DIR)/main.o: main.cpp $(DEPS)
 	$(MKDIR_CMD)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp $(DEPS) check_gtest
+$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp $(DEPS) check_files check_gtest
 	$(MKDIR_CMD)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(TEST_TARGET): $(TEST_OBJS) $(OBJS) check_gtest
+$(TEST_TARGET): $(TEST_OBJS) $(OBJS) check_files check_gtest
 	$(CXX) $(CXXFLAGS) $(TEST_OBJS) $(OBJS) $(LDFLAGS) -o $(TEST_TARGET)
+
+# Check if necessary files for tests and instances exist
+check_files:
+	@echo Verifying the existence of test files...
+ifeq ($(OS),Windows_NT)
+	@if not exist ".\instances_example\5nD.dat" (echo "File .\instances_example\5nD.dat not found!" && exit 1)
+	@if not exist ".\instances_example\5nU.dat" (echo "File .\instances_example\5nU.dat not found!" && exit 1)
+	@if not exist ".\test\testDirected.cpp" (echo "File .\test\testDirected.cpp not found!" && exit 1)
+	@if not exist ".\test\testGraph.cpp" (echo "File .\test\testGraph.cpp not found!" && exit 1)
+	@if not exist ".\test\testUndirected.cpp" (echo "File .\test\testUndirected.cpp not found!" && exit 1)
+else
+	@$(FILE_CHECK_CMD) ./instances_example/5nD.dat || (echo "File ./instances_example/5nD.dat not found!" && exit 1)
+	@$(FILE_CHECK_CMD) ./instances_example/5nU.dat || (echo "File ./instances_example/5nU.dat not found!" && exit 1)
+	@$(FILE_CHECK_CMD) ./test/testDirected.cpp || (echo "File ./test/testDirected.cpp not found!" && exit 1)
+	@$(FILE_CHECK_CMD) ./test/testGraph.cpp || (echo "File ./test/testGraph.cpp not found!" && exit 1)
+	@$(FILE_CHECK_CMD) ./test/testUndirected.cpp || (echo "File ./test/testUndirected.cpp not found!" && exit 1)
+endif
 
 # Check if gtest library is installed
 check_gtest:
+	@echo Checking if Google Test is installed...
 ifeq ($(OS),Windows_NT)
-	@echo Checking if gtest is installed...
 	@where gtest.lib >nul 2>&1 && \
 		echo Google Test is installed. Compiling and running tests... || \
 		(echo Google Test is not installed. Please install it manually and rerun make test. && exit 1)
