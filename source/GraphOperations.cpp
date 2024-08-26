@@ -2,8 +2,6 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
-using namespace std;
-
 ostringstream output_buffer;
 
 void menu(Graph *g, string file_exit)

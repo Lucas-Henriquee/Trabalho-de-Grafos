@@ -2,8 +2,6 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
-using namespace std;
-
 class GraphOperationsUndirectedTest : public ::testing::Test
 {
 protected:

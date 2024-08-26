@@ -1,8 +1,6 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
-using namespace std;
-
 Graph::Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_nodes)
 {
     // Inicializa as variáveis.
