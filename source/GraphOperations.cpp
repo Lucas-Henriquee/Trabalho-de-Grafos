@@ -388,14 +388,15 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
         }
 
     // Verificando se o subconjunto de vértices é conexo.
-    if (!g->is_connected(vertices, size))
+    int connected = g->is_connected(vertices, size);
+    if (connected == -1)
     {
         output_buffer << "  O subconjunto de vértices não é conexo." << endl;
         return;
     }
 
     // Chamando a função prim.
-    g->prim(vertices, size, parent, key, mst_set);
+    g->prim(vertices, size, parent, key, mst_set, connected);
 
     // Escrevendo no buffer.
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
@@ -409,9 +410,16 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 
     // Calculando o valor da árvore geradora mínima e escrevendo no buffer.
     float vt_agm = 0;
-    for (size_t i = 1; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
-        output_buffer << "\t\t\t" << vertices[parent[i]] << " - " << vertices[i] << endl;
+        if(parent[i] == static_cast<size_t>(-1))
+            continue;
+        output_buffer << "\t\t\t" << vertices[parent[i]];
+        if (g->get_directed())
+            output_buffer << " -> ";
+        else
+            output_buffer << " - ";
+        output_buffer << vertices[i] << "\n";
         vt_agm += key[i];
     }
     output_buffer << "\n  Valor da árvore geradora mínima: " << vt_agm << "\n";
@@ -438,7 +446,7 @@ void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
         }
 
     // Verificando se o subconjunto de vértices é conexo.
-    if (!g->is_connected(vertices, size))
+    if (g->is_connected(vertices, size) == -1)
     {
         output_buffer << "  O subconjunto de vértices não é conexo." << endl;
         return;
@@ -460,7 +468,12 @@ void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
     // Calculando o valor da árvore geradora mínima e escrevendo no buffer.
     for (size_t i = 0; i < tree_edges.size(); i++)
     {
-        output_buffer << "\t\t\t" << tree_edges[i].second.first << " - " << tree_edges[i].second.second << endl;
+        output_buffer << "\t\t\t" << tree_edges[i].second.first;
+        if(g->get_directed())
+            output_buffer << " -> ";
+        else
+            output_buffer << " - ";
+        output_buffer << tree_edges[i].second.second << endl;
         vt_agm += tree_edges[i].first;
     }
 

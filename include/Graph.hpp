@@ -29,7 +29,7 @@ public:
     void dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index);
     void floyd(size_t vertex_1, vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index);
     void floyd(vector<vector<float>> &distance);
-    void prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set);
+    void prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set, size_t start_node);
     void kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *vertices, size_t size, function<size_t(size_t, size_t *)> &find_ds, vector<pair<float, pair<size_t, size_t>>> &tree_edges);
     void compute_graph_properties(float &radius, float &diameter, vector<size_t> &center, vector<size_t> &periphery);
 
@@ -41,7 +41,7 @@ public:
     bool get_weighted_edges();
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
-    bool is_connected(size_t *vertices, size_t size);
+    int is_connected(size_t *vertices, size_t size);
     bool is_connected_graph();
 
 private:

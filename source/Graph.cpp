@@ -899,7 +899,7 @@ void Graph::kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *ve
     }
 }
 
-void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set)
+void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set, size_t start_node)
 {
 
     // Inicializando as informções basicas para o algoritimo.
@@ -911,10 +911,10 @@ void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<f
     }
 
     // Inicializando o vetor de chaves.
-    key[0] = 0;
+    key[start_node] = 0;
 
     // Inicializando o vetor de pais.
-    parent[0] = static_cast<size_t>(-1);
+    parent[start_node] = static_cast<size_t>(-1);
 
     // Loop para encontrar a árvore geradora mínima.
     for (size_t i = 0; i < size - 1; i++)
@@ -1003,8 +1003,9 @@ bool Graph::negative_cycle(size_t vertex)
     return false;
 }
 
-bool Graph::is_connected(size_t *vertices, size_t size)
+int Graph::is_connected(size_t *vertices, size_t size)
 {
+    //TODO: Verificar quando o grafo é direcionado de qual nó iniciar
     // Verificando se o grafo está vazio.
     if (_first == NULL)
         return false;
@@ -1012,14 +1013,21 @@ bool Graph::is_connected(size_t *vertices, size_t size)
     // Inicializando o vetor de visitados.
     vector<bool> visited(size, false);
 
-    // Encontrando o primeiro nó do grafo.
-    Node *start_node = find_node(vertices[0]);
+    for(size_t i = 0; i < size; i++)
+    {
+        Node *start_node = find_node(vertices[i]);
 
-    // Chamando a função de busca em profundidade.
-    dfs(start_node, visited, vertices, size);
+        // Iniciando a DFS a partir do iésimo nó do grafo.
+        dfs(start_node, visited, vertices, size);
 
-    // Verificando se todos os nós foram visitados.
-    return find(visited.begin(), visited.end(), false) == visited.end();
+        // Verificando se todos os nós foram visitados.
+        if(find(visited.begin(), visited.end(), false) == visited.end())
+            return i;
+
+        // Reinicializando o vetor de visitados.
+        visited.assign(size, false);
+    }
+    return -1;
 }
 
 void Graph::dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size)
@@ -1036,8 +1044,8 @@ void Graph::dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size
             continue;
 
         // Verificando se o nó destino ainda não foi visitado.
-        if (!visited[edge->_target_id])
-            dfs(target_node, visited);
+        if (!visited[find(vertices, vertices + size, edge->_target_id) - vertices])
+            dfs(target_node, visited, vertices, size);
     }
 }
 
