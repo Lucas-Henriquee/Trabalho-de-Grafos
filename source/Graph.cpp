@@ -1005,7 +1005,6 @@ bool Graph::negative_cycle(size_t vertex)
 
 int Graph::is_connected(size_t *vertices, size_t size)
 {
-    //TODO: Verificar quando o grafo é direcionado de qual nó iniciar
     // Verificando se o grafo está vazio.
     if (_first == NULL)
         return false;
