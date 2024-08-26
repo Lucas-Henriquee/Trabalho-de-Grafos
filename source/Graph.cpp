@@ -936,43 +936,58 @@ bool Graph::is_connected_graph()
 
 vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node_id_size)
 {
-    if (node_id_size == 0) return;
+    //Saida para erros
+    vector<tuple<size_t, size_t, float>> error_vector=vector<tuple<size_t, size_t, float>>();
+
+    //Verifica se grafo é não direcionado
+    if (this->_directed!=0)
+    {
+        cout <<"Método não disponível para grafo direcionado "<<endl;
+        return error_vector;
+    }
+    
 
     // Inicialização dos vetores
     vector<tuple<size_t, size_t, float>> prim_results(node_id_size,{0,0,0}); // Vetor de resultados
-    vector<size_t> minWeight(node_id_size, INF_F); // Peso mínimo de aresta para cada vértice
-    vector<int> parent(node_id_size, -1); // Vértice pai para a árvore
+    vector<size_t> minWeight(node_id_size, FLT_MAX); // Peso mínimo de aresta para cada vértice
+    vector<size_t> parent(node_id_size, 0); // Vértice pai para a árvore
     vector<bool> inMST(node_id_size, false); // Para marcar vértices incluídos na MST
 
+
     // Começar com o primeiro vértice
-    size_t startVertex = node_id[0];
-    minWeight[startVertex] = 0;
-    parent[startVertex] = -1;
+    size_t startVertexIndex = 0;
+    minWeight[startVertexIndex] = 0;
+    parent[startVertexIndex] = -1;
+
 
     for (size_t i = 0; i < node_id_size - 1; ++i) 
     {
         // Encontrar o vértice com o menor peso de aresta que ainda não está na MST
-        size_t min_node = -1;
-        size_t minWeightValue = INF_F;
+        int min_node_index = -1;
+        size_t minWeightValue = FLT_MAX;
+        int min_node_id= -1;
         for (size_t j = 0; j < node_id_size; ++j)
         {
-            if (!inMST[node_id[j]] && minWeight[node_id[j]] < minWeightValue) 
+            if (!inMST[j] && minWeight[j] < minWeightValue) 
             {
-                min_node = node_id[j];
-                minWeightValue = minWeight[node_id[j]];
+                min_node_index = j;
+                min_node_id=node_id[j];
+                minWeightValue = minWeight[j];
             }
         }
 
         // Adicionar o vértice encontrado à MST
-        inMST[min_node] = true;
+        inMST[min_node_index] = true;
 
         // Atualizar os pesos e pais dos vértices adjacentes
-        Node* aux_node=this->find_node(min_node);
+        Node* aux_node=this->find_node(min_node_id);
         Edge* aux_edge=aux_node->_first_edge;
+
             while (aux_edge!=NULL)
             {
                 size_t aux_edge_target_index=-1;
                 size_t aux_edge_target = aux_edge->_target_id;
+
                 for (size_t i = 0; i < node_id_size; ++i)
                 {
                     if(node_id[i]==aux_edge_target)
@@ -984,7 +999,7 @@ vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node
                 if (aux_edge_target_index!=-1 && !inMST[aux_edge_target_index] && aux_edge->_weight < minWeight[aux_edge_target])
                 {
                     minWeight[aux_edge_target_index] = aux_edge->_weight;
-                    parent[aux_edge_target_index] = min_node;
+                    parent[aux_edge_target_index] = min_node_id;
                 }
                 aux_edge=aux_edge->_next_edge;
             }
@@ -993,6 +1008,12 @@ vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node
     //Salvar resultados na ordem: {id do vértice, pai, peso da aresta}
     for (size_t i = 0; i < node_id_size; ++i)
     {
+        //Teste se o grafo é desconexo
+        if(i>0 && parent[i]==0)
+        {
+            cout<< "Grafo desconexo" <<endl;
+            return error_vector;
+        }
         prim_results[i]={node_id[i], parent[i], minWeight[i]};
     }
     return prim_results;

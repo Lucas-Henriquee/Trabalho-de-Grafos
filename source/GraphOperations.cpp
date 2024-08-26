@@ -363,6 +363,13 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
     
     vector<tuple<size_t,size_t,float>> data_prim_tree=g->primMST(vertices,size);
 
+    if(data_prim_tree==vector<tuple<size_t, size_t, float>>())
+    {
+        return;
+    }
+
+    
+
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
     {
@@ -375,13 +382,14 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
         output_buffer << "\n";
         output_buffer << "Vértice: " << get<0>(data_prim_tree[i]);
         output_buffer << ", Pai: "<< get<1>(data_prim_tree[i]);
-        output_buffer << ", Peso da aresta: " << get<1>(data_prim_tree[i]);
+        output_buffer << ", Peso da aresta: " << get<2>(data_prim_tree[i]);
     }
 }
 
 void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
     vector<tuple<size_t,size_t,float>> data_kruskal_tree=g->kruskalMST(vertices,size);
+    
 
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
     for (size_t i = 0; i < size; ++i)
