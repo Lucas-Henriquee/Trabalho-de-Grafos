@@ -1010,14 +1010,15 @@ vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node
                     aux_edge_target_index = i;
             }
 
-            cout << "Analisando aresta para o vértice " << aux_edge_target << " com peso " << aux_edge->_weight << endl;
+            cout << " Analisando aresta para o vértice " << aux_edge_target << " com peso " << aux_edge->_weight << endl;
 
             if (aux_edge_target_index != -1 && !inMST[aux_edge_target_index] && aux_edge->_weight < minWeight[aux_edge_target_index]) 
             {
                 minWeight[aux_edge_target_index] = aux_edge->_weight;
                 parent[aux_edge_target_index] = min_node_id;
-                cout << "Atualizando vértice " << aux_edge_target << ": novo peso = " << aux_edge->_weight << ", novo pai = " << min_node_id << endl;
+                cout << " -Atualizando vértice " << aux_edge_target << ": novo peso = " << aux_edge->_weight << ", novo pai = " << min_node_id << endl;
             }
+            cout<<endl;
             aux_edge = aux_edge->_next_edge;
         }
     }
