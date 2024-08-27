@@ -262,7 +262,7 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2, float weight)
             // Adicionando a aresta ao nó.
             Edge *aux_edge = search_node_2->_first_edge;
             for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge)
-
+                ;
                 aux_edge->_next_edge = new_edge_2;
         }
 
