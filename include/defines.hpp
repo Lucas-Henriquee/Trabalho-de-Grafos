@@ -10,7 +10,8 @@
 #include <map>       /* implementação do container map e suas operações */
 #include <cfloat>    /* implementação dos valores maximos para os tipos float e double */
 #include <tuple>     /* implementação de tuplas */
-#include <functional> /* implementação de "function" */
+#include <functional> /* implementação de função lambda */
+#include <unordered_map> /* implementação de mapeamento de variáveis*/
 
 /* implementação do tempo de espera para os ambientes Windows e Unix*/
 #ifdef _WIN32

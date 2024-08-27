@@ -93,7 +93,7 @@ void menu(Graph *g, string file_exit)
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
                 cin >> sub_vertices[j];
-            // kruskal_minimum_generating_tree(g, sub_vertices, size);
+            kruskal_minimum_generating_tree(g, sub_vertices, size);
             delete[] sub_vertices;
             break;
         }
@@ -358,46 +358,61 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
-void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
+void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size_vertices)
 {
-    
-    vector<tuple<size_t,size_t,float>> data_prim_tree=g->primMST(vertices,size);
+    //Chamando o método
+    vector<tuple<size_t,size_t,float>> data_prim_tree=g->primMST(vertices,size_vertices);
 
-    if(data_prim_tree==vector<tuple<size_t, size_t, float>>())
+    cout<<"Esta rodando"<<endl<<endl;
+
+    //Saída para erros(vetor vazio)
+    vector<tuple<size_t, size_t, float>> error_vector=vector<tuple<size_t, size_t, float>>();
+    if(data_prim_tree==error_vector)
     {
         return;
     }
 
-    
-
+    //Saida em texto dos resultados
     output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
-    for (size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size_vertices-1; ++i)
     {
         output_buffer << vertices[i] << ", ";
     }
-    output_buffer << "\n";
+    output_buffer << vertices[size_vertices-1] << endl << endl;
+
     output_buffer << "Vértice inicial: " << get<0>(data_prim_tree[0]);
-    for (size_t i = 1; i < size; ++i)
+    for (size_t i = 1; i < data_prim_tree.size(); ++i)
     {
         output_buffer << "\n";
-        output_buffer << "Vértice: " << get<0>(data_prim_tree[i]);
-        output_buffer << ", Pai: "<< get<1>(data_prim_tree[i]);
+        output_buffer << "Aresta " << get<0>(data_prim_tree[i]);
+        output_buffer << " - "<< get<1>(data_prim_tree[i]);
         output_buffer << ", Peso da aresta: " << get<2>(data_prim_tree[i]);
     }
 }
 
-void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
-{
-    vector<tuple<size_t,size_t,float>> data_kruskal_tree=g->kruskalMST(vertices,size);
+void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size_vertices)
+{   
+    //Chamando o método
+    vector<tuple<size_t,size_t,float>> data_kruskal_tree=g->kruskalMST(vertices,size_vertices);
     
-
-    output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
-    for (size_t i = 0; i < size; ++i)
-        output_buffer << vertices[i] << " ";
-
-    output_buffer << "\n";
-    for (size_t i = 0; i < size; ++i)
+    //Saída para erros(vetor vazio)
+    vector<tuple<size_t, size_t, float>> error_vector=vector<tuple<size_t, size_t, float>>();
+    if(data_kruskal_tree==error_vector)
     {
+        return;
+    }
+
+    //Saida em texto dos resultados
+    output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
+    for (size_t i = 0; i < size_vertices-1; ++i)
+    {
+        output_buffer << vertices[i] << ", ";
+    }
+    output_buffer << vertices[size_vertices-1] << endl;
+
+    for (size_t i = 0; i < data_kruskal_tree.size(); ++i)
+    {
+
         output_buffer << "\n";
         output_buffer << "Aresta " << get<0>(data_kruskal_tree[i]);
         output_buffer << " - "<< get<1>(data_kruskal_tree[i]);

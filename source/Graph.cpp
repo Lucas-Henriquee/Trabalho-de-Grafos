@@ -936,102 +936,139 @@ bool Graph::is_connected_graph()
 
 vector<tuple<size_t, size_t, float>> Graph::primMST(size_t* node_id, size_t node_id_size)
 {
-    //Saida para erros
-    vector<tuple<size_t, size_t, float>> error_vector=vector<tuple<size_t, size_t, float>>();
+    // Saída para erros
+    vector<tuple<size_t, size_t, float>> error_vector = vector<tuple<size_t, size_t, float>>();
 
-    //Verifica se grafo é não direcionado
-    if (this->_directed!=0)
-    {
-        cout <<"Método não disponível para grafo direcionado "<<endl;
+    // Verifica se o grafo é direcionado
+    if (this->_directed != 0) {
+        cout << "Método não disponível para grafo direcionado " << endl;
         return error_vector;
     }
-    
+
+    cout << "Iniciando Prim's MST\n";
 
     // Inicialização dos vetores
-    vector<tuple<size_t, size_t, float>> prim_results(node_id_size,{0,0,0}); // Vetor de resultados
-    vector<size_t> minWeight(node_id_size, FLT_MAX); // Peso mínimo de aresta para cada vértice
-    vector<size_t> parent(node_id_size, 0); // Vértice pai para a árvore
+    vector<tuple<size_t, size_t, float>> prim_results(node_id_size, {0, 0, 0}); // Vetor de resultados
+    vector<float> minWeight(node_id_size, FLT_MAX); // Peso mínimo de aresta para cada vértice
+    vector<int> parent(node_id_size, 0); // Vértice pai para a árvore
     vector<bool> inMST(node_id_size, false); // Para marcar vértices incluídos na MST
-
 
     // Começar com o primeiro vértice
     size_t startVertexIndex = 0;
     minWeight[startVertexIndex] = 0;
     parent[startVertexIndex] = -1;
 
+    cout << "Vetor de pesos iniciais e pais:\n";
+    for (size_t i = 0; i < node_id_size; ++i) {
+        cout << "Vértice " << node_id[i] << ": minWeight = " << minWeight[i] << ", parent = " << parent[i] << endl;
+    }
 
-    for (size_t i = 0; i < node_id_size - 1; ++i) 
-    {
+    for (size_t i = 0; i < node_id_size - 1; ++i) {
         // Encontrar o vértice com o menor peso de aresta que ainda não está na MST
         int min_node_index = -1;
-        size_t minWeightValue = FLT_MAX;
-        int min_node_id= -1;
-        for (size_t j = 0; j < node_id_size; ++j)
+        float minWeightValue = FLT_MAX;
+        int min_node_id = -1;
+
+        for (size_t j = 0; j < node_id_size; ++j) 
         {
             if (!inMST[j] && minWeight[j] < minWeightValue) 
             {
                 min_node_index = j;
-                min_node_id=node_id[j];
+                min_node_id = node_id[j];
                 minWeightValue = minWeight[j];
             }
+        }
+
+        cout << "Vértice selecionado: " << min_node_id << " com peso mínimo " << minWeightValue << endl;
+
+        // Verificação se encontramos um vértice válido
+        if (min_node_index == -1) 
+        {
+            cout << "Erro: Nenhum vértice foi selecionado. Grafo pode ser desconexo." << endl;
+            return error_vector;
         }
 
         // Adicionar o vértice encontrado à MST
         inMST[min_node_index] = true;
 
         // Atualizar os pesos e pais dos vértices adjacentes
-        Node* aux_node=this->find_node(min_node_id);
-        Edge* aux_edge=aux_node->_first_edge;
-
-            while (aux_edge!=NULL)
-            {
-                size_t aux_edge_target_index=-1;
-                size_t aux_edge_target = aux_edge->_target_id;
-
-                for (size_t i = 0; i < node_id_size; ++i)
-                {
-                    if(node_id[i]==aux_edge_target)
-                    aux_edge_target_index=i;
-                }
-                
-
-
-                if (aux_edge_target_index!=-1 && !inMST[aux_edge_target_index] && aux_edge->_weight < minWeight[aux_edge_target])
-                {
-                    minWeight[aux_edge_target_index] = aux_edge->_weight;
-                    parent[aux_edge_target_index] = min_node_id;
-                }
-                aux_edge=aux_edge->_next_edge;
-            }
-    }
-
-    //Salvar resultados na ordem: {id do vértice, pai, peso da aresta}
-    for (size_t i = 0; i < node_id_size; ++i)
-    {
-        //Teste se o grafo é desconexo
-        if(i>0 && parent[i]==0)
+        Node* aux_node = this->find_node(min_node_id);
+        if (!aux_node) 
         {
-            cout<< "Grafo desconexo" <<endl;
+            cout << "Erro: Nó " << min_node_id << " não encontrado no grafo." << endl;
             return error_vector;
         }
-        prim_results[i]={node_id[i], parent[i], minWeight[i]};
+        Edge* aux_edge = aux_node->_first_edge;
+        while (aux_edge != nullptr) 
+        {
+            int aux_edge_target_index = -1;
+            size_t aux_edge_target = aux_edge->_target_id;
+
+            for (size_t i = 0; i < node_id_size; ++i) 
+            {
+                if (node_id[i] == aux_edge_target)
+                    aux_edge_target_index = i;
+            }
+
+            cout << "Analisando aresta para o vértice " << aux_edge_target << " com peso " << aux_edge->_weight << endl;
+
+            if (aux_edge_target_index != -1 && !inMST[aux_edge_target_index] && aux_edge->_weight < minWeight[aux_edge_target_index]) 
+            {
+                minWeight[aux_edge_target_index] = aux_edge->_weight;
+                parent[aux_edge_target_index] = min_node_id;
+                cout << "Atualizando vértice " << aux_edge_target << ": novo peso = " << aux_edge->_weight << ", novo pai = " << min_node_id << endl;
+            }
+            aux_edge = aux_edge->_next_edge;
+        }
     }
+
+    // Salvar resultados na ordem: {id do vértice, pai, peso da aresta}
+    for (size_t i = 0; i < node_id_size; ++i) {
+        // Teste se o grafo é desconexo
+        if (i > 0 && parent[i] == 0) {
+            cout << "Grafo desconexo" << endl;
+            return error_vector;
+        }
+
+        prim_results[i] = {node_id[i], parent[i], minWeight[i]};
+    }
+
+    cout << "Prim's MST completo. Resultados:\n";
+    for (const auto& result : prim_results) {
+        cout << "Vértice " << get<0>(result) << ": pai = " << get<1>(result) << ", peso = " << get<2>(result) << endl;
+    }
+
     return prim_results;
 }
 
-vector<tuple<size_t, size_t, float>> Graph:: kruskalMST(size_t* node_id, size_t node_id_size) 
+vector<tuple<size_t, size_t, float>> Graph::kruskalMST(size_t* node_id, size_t node_id_size) 
 {
-    // Vetor que armazena todas as arestas do grafo com os nós de origem e destino
-    vector<tuple<size_t, size_t, float>> edges;  // (origem, destino, peso)
+    //Saida para erros
+    vector<tuple<size_t, size_t, float>> error_vector=vector<tuple<size_t, size_t, float>>();
+
+    if(this->_directed)
+    {
+        cout<<endl<<"Método não disponível para grafo direcionado"<<endl;
+        return error_vector;
+    }
+
+    vector<tuple<size_t, size_t, float>> edges;  // Vetor que armazena as arestas (origem, destino, peso)
+    
+    // Mapeamento do ID do vértice para o índice no vetor node_id
+    unordered_map<size_t, size_t> vertex_to_index;
+    for (size_t i = 0; i < node_id_size; ++i) {
+        vertex_to_index[node_id[i]] = i;
+    }
 
     // Coleta todas as arestas do grafo
-    for (int i = 0; i < node_id_size; i++) 
+    for (size_t i = 0; i < node_id_size; i++) 
     {
-        int u = node_id[i];  // Nó de origem
+        size_t u = node_id[i];  // Nó de origem
         Node* aux_node = this->_first;
         
         // Encontra o nó correspondente ao identificador u
-        while (aux_node && aux_node->_id != u) {
+        while (aux_node && aux_node->_id != u) 
+        {
             aux_node = aux_node->_next_node;
         }
 
@@ -1042,23 +1079,30 @@ vector<tuple<size_t, size_t, float>> Graph:: kruskalMST(size_t* node_id, size_t 
             while (aux_edge) 
             {
                 edges.push_back(make_tuple(u, aux_edge->_target_id, aux_edge->_weight));
+                //cout << "Aresta coletada: (" << u << ", " << aux_edge->_target_id << ", " << aux_edge->_weight << ")\n";
                 aux_edge = aux_edge->_next_edge;
             }
         }
     }
 
     // Ordena as arestas pelo peso
-    sort(edges.begin(), edges.end(), [](const tuple<int, int, int>& a, const tuple<int, int, int>& b) 
+    sort(edges.begin(), edges.end(), [](const tuple<size_t, size_t, float>& a, const tuple<size_t, size_t, float>& b) 
     {
         return get<2>(a) < get<2>(b);
     });
 
+    //cout << "\nArestas ordenadas:\n";
+    for (const auto& edge : edges) 
+    {
+        //cout << "(" << get<0>(edge) << ", " << get<1>(edge) << ", " << get<2>(edge) << ")\n";
+    }
+
     // Estruturas para representar conjuntos disjuntos
-    vector<int> parent(node_id_size);
-    vector<int> rank(node_id_size, 0);
+    vector<size_t> parent(node_id_size);
+    vector<size_t> rank(node_id_size, 0);
 
     // Inicializa os subconjuntos
-    for (int v = 0; v < node_id_size; ++v) 
+    for (size_t v = 0; v < node_id_size; ++v) 
     {
         parent[v] = v;
     }
@@ -1077,6 +1121,8 @@ vector<tuple<size_t, size_t, float>> Graph:: kruskalMST(size_t* node_id, size_t 
         size_t xroot = find(x);
         size_t yroot = find(y);
 
+        //cout << "\nAntes da união: " << x << " no conjunto " << xroot << ", " << y << " no conjunto " << yroot << "\n";
+
         if (rank[xroot] < rank[yroot])
             parent[xroot] = yroot;
         else if (rank[xroot] > rank[yroot])
@@ -1085,27 +1131,41 @@ vector<tuple<size_t, size_t, float>> Graph:: kruskalMST(size_t* node_id, size_t 
             parent[yroot] = xroot;
             rank[xroot]++;
         }
+
+        //cout << "Depois da união: " << xroot << " e " << yroot << " agora têm o mesmo conjunto.\n";
     };
 
     // Vetor para armazenar o resultado (arestas incluídas na MST)
     vector<tuple<size_t, size_t, float>> result;
 
     // Itera sobre as arestas, adicionando-as à MST se não formarem um ciclo
-    for (const auto& edge : edges) {
+    for (const auto& edge : edges) 
+    {
         size_t u = get<0>(edge);  // Nó de origem
         size_t v = get<1>(edge);  // Nó de destino
         float weight = get<2>(edge); // Peso da aresta
 
-        size_t set_u = find(u);
-        size_t set_v = find(v);
+        // Mapeia os IDs dos vértices para seus respectivos índices no vetor parent/rank
+        size_t index_u = vertex_to_index[u];
+        size_t index_v = vertex_to_index[v];
+
+        size_t set_u = find(index_u);
+        size_t set_v = find(index_v);
 
         // Se incluir essa aresta não formar um ciclo, adicione à MST
         if (set_u != set_v) 
         {
             result.push_back(make_tuple(u, v, weight));
+            //cout << "Aresta adicionada à MST: (" << u << ", " << v << ", " << weight << ")\n";
             Union(set_u, set_v);
         }
     }
+
+    //cout << "\nArestas na MST final:\n";
+    //for (const auto& edge : result) 
+    //{
+        //cout << "(" << get<0>(edge) << ", " << get<1>(edge) << ", " << get<2>(edge) << ")\n";
+    //}
 
     return result;
 }
