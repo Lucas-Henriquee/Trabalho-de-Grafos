@@ -363,8 +363,6 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size_vertic
     //Chamando o método
     vector<tuple<size_t,size_t,float>> data_prim_tree=g->primMST(vertices,size_vertices);
 
-    cout<<"Esta rodando"<<endl<<endl;
-
     //Saída para erros(vetor vazio)
     vector<tuple<size_t, size_t, float>> error_vector=vector<tuple<size_t, size_t, float>>();
     if(data_prim_tree==error_vector)
@@ -373,14 +371,13 @@ void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size_vertic
     }
 
     //Saida em texto dos resultados
-    output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
+    output_buffer << endl <<"  Árvore Geradora Mínima (Prim) para os vértices: ";
     for (size_t i = 0; i < size_vertices-1; ++i)
     {
         output_buffer << vertices[i] << ", ";
     }
-    output_buffer << vertices[size_vertices-1] << endl << endl;
+    output_buffer << vertices[size_vertices-1] << endl;
 
-    output_buffer << "Vértice inicial: " << get<0>(data_prim_tree[0]);
     for (size_t i = 1; i < data_prim_tree.size(); ++i)
     {
         output_buffer << "\n";
