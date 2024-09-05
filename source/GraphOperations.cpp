@@ -2,8 +2,6 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
-using namespace std;
-
 ostringstream output_buffer;
 
 void menu(Graph *g, string file_exit)
@@ -77,6 +75,12 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
+            if(size == 0)
+            {
+                cout << "  O subconjunto de vértices não pode ser vazio." << endl;
+                sleep_for_seconds(2, false);
+                break;
+            }
             size_t *sub_vertices = new size_t[size];
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
@@ -89,6 +93,12 @@ void menu(Graph *g, string file_exit)
         {
             cout << "\n  Digite o número de vértices no subconjunto: ";
             cin >> size;
+            if(size == 0)
+            {
+                cout << "  O subconjunto de vértices não pode ser vazio." << endl;
+                sleep_for_seconds(2, false);
+                break;
+            }
             size_t *sub_vertices = new size_t[size];
             cout << "\n  Digite os IDs dos vértices: ";
             for (size_t j = 0; j < size; ++j)
@@ -240,13 +250,6 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         return;
     }
 
-    // Verificando se há ciclo negativo.
-    if (g->negative_cycle(vertex_1))
-    {
-        output_buffer << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
-        return;
-    }
-
     // Criando o vetor de distâncias.
     vector<float> distance(g->get_num_nodes());
 
@@ -254,7 +257,7 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     vector<int> parents(g->get_num_nodes(), -1);
 
     // Criando o vetor para mapear a posição do nó.
-    vector<size_t> node_at_index(g->get_num_nodes());
+    vector<size_t> node_at_index(g->get_num_nodes(), 0);
 
     // Criando o vetor para armazenar o caminho.
     vector<size_t> path;
@@ -262,34 +265,43 @@ void dijkstra_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     // Chamando a função dijkstra.
     g->dijkstra(vertex_1, distance, parents, node_at_index);
 
-    // Verificando se há conexão entre os vértices.
-    if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
+    // Caso o grafo nao tenha ciclos negativos.
+    if (find(node_at_index.begin(), node_at_index.end(), vertex_1) != node_at_index.end())
     {
-        output_buffer << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+        // Verificando se há conexão entre os vértices.
+        if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
+        {
+            output_buffer << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+            return;
+        }
+
+        // Construíndo o caminho mínimo de vertex_1 para vertex_2.
+        for (int v = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin(); v != 0; v = parents[v])
+            path.push_back(v);
+
+        // Adicionando o vértice de origem.
+        path.push_back(0);
+
+        // Invertendo o vetor de caminho.
+        reverse(path.begin(), path.end());
+
+        // Escrevendo no buffer o caminho mínimo.
+        output_buffer << "  Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ";
+
+        for (size_t i = 0; i < path.size(); i++)
+        {
+            output_buffer << node_at_index[path[i]];
+            if (i != path.size() - 1)
+                output_buffer << " -> ";
+        }
+
+        // Escrevendo a distância no buffer.
+        output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
+    }
+
+    // Caso contrário, o grafo possui ciclos negativos.
+    else
         return;
-    }
-
-    // Construíndo o caminho mínimo de vertex_1 para vertex_2.
-    for (int v = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin(); v != 0; v = parents[v])
-        path.push_back(v);
-
-    // Adicionando o vértice de origem.
-    path.push_back(0);
-
-    // Invertendo o vetor de caminho.
-    reverse(path.begin(), path.end());
-
-    // Escrevendo no buffer o caminho mínimo.
-    output_buffer << "  Caminho Mínimo (Dijkstra) entre " << vertex_1 << " e " << vertex_2 << ": ";
-
-    for (size_t i = 0; i < path.size(); i++)
-    {
-        output_buffer << node_at_index[path[i]];
-        if (i != path.size() - 1)
-            output_buffer << " -> ";
-    }
-
-    output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
 void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
@@ -300,12 +312,7 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
         cout << "  Um ou mais vértices não fazem parte do grafo." << endl;
         return;
     }
-    // Verificando se há ciclo negativo.
-    if (g->negative_cycle(vertex_1))
-    {
-        output_buffer << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
-        return;
-    }
+
     // Armazenando o número de nós.
     size_t n = g->get_num_nodes();
 
@@ -316,109 +323,160 @@ void floyd_shortest_path(Graph *g, size_t vertex_1, size_t vertex_2)
     vector<vector<int>> parents(n, vector<int>(n));
 
     // Criando o vetor para mapear a posição do nó.
-    vector<size_t> node_at_index(n);
+    vector<size_t> node_at_index(n, 0);
 
     // Criando o vetor para armazenar o caminho.
     vector<size_t> path;
 
     // Chamando a função floyd.
-    g->floyd(distance, parents, node_at_index);
+    g->floyd(vertex_1, distance, parents, node_at_index);
 
-    // Verificando se há conexão entre os vértices.
-    if (distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == FLT_MAX)
+    // Caso o grafo nao tenha ciclos negativos.
+    if (find(node_at_index.begin(), node_at_index.end(), vertex_1) != node_at_index.end())
     {
-        cout << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+        // Verificando se há conexão entre os vértices.
+        if (distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] == FLT_MAX)
+        {
+            cout << "  Não há conexão entre os vértices " << vertex_1 << " e " << vertex_2 << "." << endl;
+            return;
+        }
+
+        // Construíndo o caminho mínimo de vertex_1 para vertex_2.
+        size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
+        size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
+
+        // Adicionando os vértices ao caminho.
+        for (; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
+            path.insert(path.begin(), node_at_index[p_v2]);
+
+        // Adicionando o vértice de origem.
+        path.insert(path.begin(), vertex_1);
+
+        // Escrevendo no buffer o caminho mínimo.
+        output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ";
+
+        // Escrevendo o caminho no buffer.
+        for (size_t i = 0; i < path.size(); i++)
+        {
+            output_buffer << path[i];
+            if (i != path.size() - 1)
+                output_buffer << " -> ";
+        }
+
+          output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
+    }
+
+    // Caso contrário, o grafo possui ciclos negativos.
+    else
         return;
-    }
-
-    // Construíndo o caminho mínimo de vertex_1 para vertex_2.
-    size_t p_v1 = find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin();
-    size_t p_v2 = find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin();
-
-    // Adicionando os vértices ao caminho.
-    for (; p_v2 != p_v1; p_v2 = parents[p_v1][p_v2])
-    {
-        path.insert(path.begin(), node_at_index[p_v2]);
-    }
-
-    // Adicionando o vértice de origem.
-    path.insert(path.begin(), vertex_1);
-
-    // Escrevendo no buffer o caminho mínimo.
-    output_buffer << "  Caminho Mínimo (Floyd) entre " << vertex_1 << " e " << vertex_2 << ": ";
-
-    // Escrevendo o caminho no buffer.
-    for (size_t i = 0; i < path.size(); i++)
-    {
-        output_buffer << path[i];
-        if (i != path.size() - 1)
-            output_buffer << " -> ";
-    }
-
-    output_buffer << "\n  Distância: " << distance[find(node_at_index.begin(), node_at_index.end(), vertex_1) - node_at_index.begin()][find(node_at_index.begin(), node_at_index.end(), vertex_2) - node_at_index.begin()] << endl;
 }
 
-void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size_vertices)
+void prim_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
 {
-    //Chamando o método
-    vector<tuple<size_t,size_t,float>> data_prim_tree=g->primMST(vertices,size_vertices);
+    // Vetores para armazenar o pai, chave e se o nó está na árvore.
+    vector<size_t> parent(size);
+    vector<float> key(size);
+    vector<bool> mst_set(size);
 
-    cout<<"Esta rodando"<<endl<<endl;
+    // Verificando se os vértices fazem parte do grafo.
+    for (size_t i = 0; i < size; i++)
+        if (g->find_node(vertices[i]) == NULL)
+        {
+            output_buffer << "  Um ou mais vértices não fazem parte do grafo." << endl;
+            return;
+        }
 
-    //Saída para erros(vetor vazio)
-    vector<tuple<size_t, size_t, float>> error_vector=vector<tuple<size_t, size_t, float>>();
-    if(data_prim_tree==error_vector)
+    // Verificando se o subconjunto de vértices é conexo.
+    int connected = g->is_connected(vertices, size);
+    if (connected == -1)
     {
+        output_buffer << "  O subconjunto de vértices não é conexo." << endl;
         return;
     }
 
-    //Saida em texto dos resultados
-    output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
-    for (size_t i = 0; i < size_vertices-1; ++i)
-    {
-        output_buffer << vertices[i] << ", ";
-    }
-    output_buffer << vertices[size_vertices-1] << endl << endl;
+    // Chamando a função prim.
+    g->prim(vertices, size, parent, key, mst_set, connected);
 
-    output_buffer << "Vértice inicial: " << get<0>(data_prim_tree[0]);
-    for (size_t i = 1; i < data_prim_tree.size(); ++i)
+    // Escrevendo no buffer.
+    output_buffer << "  Árvore Geradora Mínima (Prim) para os vértices: ";
+    for (size_t i = 0; i < size; ++i)
     {
-        output_buffer << "\n";
-        output_buffer << "Aresta " << get<0>(data_prim_tree[i]);
-        output_buffer << " - "<< get<1>(data_prim_tree[i]);
-        output_buffer << ", Peso da aresta: " << get<2>(data_prim_tree[i]);
+        if (i != (size - 1))
+            output_buffer << vertices[i] << " ";
+        else
+            output_buffer << vertices[i] << ":\n\n";
     }
+
+    // Calculando o valor da árvore geradora mínima e escrevendo no buffer.
+    float vt_agm = 0;
+    for (size_t i = 0; i < size; i++)
+    {
+        if(parent[i] == static_cast<size_t>(-1))
+            continue;
+        output_buffer << "\t\t\t" << vertices[parent[i]];
+        if (g->get_directed())
+            output_buffer << " -> ";
+        else
+            output_buffer << " - ";
+        output_buffer << vertices[i] << "\n";
+        vt_agm += key[i];
+    }
+    output_buffer << "\n  Valor da árvore geradora mínima: " << vt_agm << "\n";
 }
 
-void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size_vertices)
-{   
-    //Chamando o método
-    vector<tuple<size_t,size_t,float>> data_kruskal_tree=g->kruskalMST(vertices,size_vertices);
-    
-    //Saída para erros(vetor vazio)
-    vector<tuple<size_t, size_t, float>> error_vector=vector<tuple<size_t, size_t, float>>();
-    if(data_kruskal_tree==error_vector)
+void kruskal_minimum_generating_tree(Graph *g, size_t *vertices, size_t size)
+{
+    // Vetores para armazenar as arestas da árvore e as arestas.
+    vector<pair<float, pair<size_t, size_t>>> tree_edges;
+    vector<pair<float, pair<size_t, size_t>>> edges;
+
+    // Variável para armazenar o valor da árvore geradora mínima.
+    float vt_agm = 0;
+
+    // Função para encontrar o conjunto disjunto.
+    function<size_t(size_t, size_t *)> find_ds;
+
+    // Verificando se os vértices fazem parte do grafo.
+    for (size_t i = 0; i < size; i++)
+        if (g->find_node(vertices[i]) == NULL)
+        {
+            output_buffer << "  Um ou mais vértices não fazem parte do grafo." << endl;
+            return;
+        }
+
+    // Verificando se o subconjunto de vértices é conexo.
+    if (g->is_connected(vertices, size) == -1)
     {
+        output_buffer << "  O subconjunto de vértices não é conexo." << endl;
         return;
     }
 
-    //Saida em texto dos resultados
+    // Chamando a função kruskal.
+    g->kruskal(edges, vertices, size, find_ds, tree_edges);
+
+    // Escrevendo no buffer.
     output_buffer << "  Árvore Geradora Mínima (Kruskal) para os vértices: ";
-    for (size_t i = 0; i < size_vertices-1; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
-        output_buffer << vertices[i] << ", ";
-    }
-    output_buffer << vertices[size_vertices-1] << endl;
-
-    for (size_t i = 0; i < data_kruskal_tree.size(); ++i)
-    {
-
-        output_buffer << "\n";
-        output_buffer << "Aresta " << get<0>(data_kruskal_tree[i]);
-        output_buffer << " - "<< get<1>(data_kruskal_tree[i]);
-        output_buffer << ", Peso da aresta: " << get<2>(data_kruskal_tree[i]);
+        if (i != (size - 1))
+            output_buffer << vertices[i] << " ";
+        else
+            output_buffer << vertices[i] << ":\n\n";
     }
 
+    // Calculando o valor da árvore geradora mínima e escrevendo no buffer.
+    for (size_t i = 0; i < tree_edges.size(); i++)
+    {
+        output_buffer << "\t\t\t" << tree_edges[i].second.first;
+        if(g->get_directed())
+            output_buffer << " -> ";
+        else
+            output_buffer << " - ";
+        output_buffer << tree_edges[i].second.second << endl;
+        vt_agm += tree_edges[i].first;
+    }
+
+    output_buffer << "\n  Valor da árvore geradora minima: " << vt_agm << "\n";
 }
 
 void deep_walking(Graph *g, size_t vertex)
@@ -439,7 +497,7 @@ void deep_walking(Graph *g, size_t vertex)
         for (auto &entry : adj_list)
         {
             // Escrevendo a lista de adjacência no buffer.
-            output_buffer << "  " << entry.first << " -> ";
+            output_buffer << "\t\t\t" << entry.first << " -> ";
 
             for (size_t i = 0; i < entry.second.size(); ++i)
             {
@@ -454,7 +512,7 @@ void deep_walking(Graph *g, size_t vertex)
         // Escrevendo as arestas de retorno no buffer.
         output_buffer << "\n  Arestas de retorno:" << endl;
         for (auto &edge : return_edges)
-            output_buffer << "  (" << edge.first << ", " << edge.second << ")" << endl;
+            output_buffer << "  (" << edge.first << ", " << edge.second << ") ";
         output_buffer << endl;
     }
     // Caso o nó não seja encontrado no grafo.

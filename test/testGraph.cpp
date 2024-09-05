@@ -2,8 +2,6 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
-using namespace std;
-
 class GraphTest : public ::testing::Test
 {
 protected:
@@ -42,7 +40,7 @@ TEST_F(GraphTest, TestAddNode)
 {
     graph->add_node(6, 1.0);
     Node *node = graph->find_node(6);
-    
+
     ASSERT_NE(node, nullptr) << "O nó 6 não foi encontrado após ser adicionado.";
 
     EXPECT_EQ(node->_id, 6) << "ID do nó esperado: 6, obtido: " << node->_id;

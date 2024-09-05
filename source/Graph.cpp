@@ -2,8 +2,6 @@
 #include "../include/defines.hpp" 
 
 
-using namespace std;
-
 Graph::Graph(ifstream &instance, bool directed, bool weight_edges, bool weight_nodes)
 {
     // Inicializa as variáveis.
@@ -619,6 +617,13 @@ void Graph::dfs_articulation(size_t i, vector<bool> &visited, vector<int> &disc_
 
 void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parents, vector<size_t> &node_at_index)
 {
+    // Verificando se há ciclo negativo.
+    if (negative_cycle(source))
+    {
+        cout << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
+        return;
+    }
+
     // Inicializando as variáveis.
     int n = _number_of_nodes;
     int p = 0;
@@ -690,8 +695,15 @@ void Graph::dijkstra(size_t source, vector<float> &distance, vector<int> &parent
     }
 }
 
-void Graph::floyd(vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index)
+void Graph::floyd(size_t vertex_1, vector<vector<float>> &distance, vector<vector<int>> &parents, vector<size_t> &node_at_index)
 {
+    // Verificando se há ciclo negativo.
+    if (negative_cycle(vertex_1))
+    {
+        cout << "  O grafo possui um ciclo negativo, portanto, não é possível calcular o caminho mínimo." << endl;
+        return;
+    }
+
     // Inicializando as variáveis.
     size_t n = _number_of_nodes;
     size_t v = 0;
@@ -811,6 +823,136 @@ void Graph::compute_graph_properties(float &radius, float &diameter, vector<size
     }
 }
 
+void Graph::kruskal(vector<pair<float, pair<size_t, size_t>>> &edges, size_t *vertices, size_t size, function<size_t(size_t, size_t *)> &find_ds, vector<pair<float, pair<size_t, size_t>>> &tree_edges)
+{
+
+    // Inicializando a função de busca.
+    find_ds = [&](size_t i, size_t *parent) -> size_t
+    {
+        // Verificando se o nó é o pai dele mesmo.
+        if (parent[i] == i)
+            return i;
+
+        // Chamando a função recursivamente.
+        return parent[i] = find_ds(parent[i], parent);
+    };
+
+    // Inicializando o vetor de arestas.
+    for (size_t i = 0; i < size; ++i)
+    {
+        // Encontrando o nó atual.
+        Node *aux_node = find_node(vertices[i]);
+
+        // Iterando sobre todas as arestas do nó atual.
+        for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        {
+            // Verificando se o nó destino da aresta está no vetor de vértices e se a aresta já foi adicionada.
+            if ((find(vertices, vertices + size, aux_edge->_target_id) != vertices + size) && (find(edges.begin(), edges.end(), make_pair(aux_edge->_weight, make_pair(aux_edge->_target_id, aux_node->_id))) == edges.end()))
+                edges.push_back({aux_edge->_weight, {aux_node->_id, aux_edge->_target_id}});
+        }
+    }
+
+    // Ordenando as arestas.
+    sort(edges.begin(), edges.end());
+
+    // Criando as subárvores.
+    size_t *parent = new size_t[size];
+    size_t *rank = new size_t[size];
+    for (size_t i = 0; i < size; i++)
+    {
+        // Inicializando o rank e o pai.
+        rank[i] = 0;
+        parent[i] = i;
+    }
+
+    // Iterando sobre todas as arestas.
+    vector<pair<float, pair<size_t, size_t>>>::iterator it;
+    for (it = edges.begin(); it != edges.end(); it++)
+    {
+        // Encontrando os nós da aresta.
+        size_t u = it->second.first;
+        size_t v = it->second.second;
+
+        // Encontrando os conjuntos dos nós.
+        size_t set_u = find_ds(find(vertices, vertices + size, u) - vertices, parent);
+        size_t set_v = find_ds(find(vertices, vertices + size, v) - vertices, parent);
+
+        // Verificando se a aresta forma um ciclo.
+        if (set_u != set_v)
+        {
+            // Adicionando a aresta na árvore geradora mínima.
+            tree_edges.push_back({it->first, {u, v}});
+
+            // Verificando se o rank do conjunto u é menor que o rank do conjunto v.
+            if (rank[set_u] < rank[set_v])
+                parent[set_u] = set_v;
+            // Verificando se o rank do conjunto v é menor que o rank do conjunto u.
+            else if (rank[set_u] > rank[set_v])
+                parent[set_v] = set_u;
+            // Caso os ranks sejam iguais.
+            else
+            {
+                // Atualizando o rank e o pai do conjunto.
+                parent[set_v] = set_u;
+                rank[set_u]++;
+            }
+        }
+    }
+}
+
+void Graph::prim(size_t *vertices, size_t size, vector<size_t> &parent, vector<float> &key, vector<bool> &mst_set, size_t start_node)
+{
+
+    // Inicializando as informções basicas para o algoritimo.
+    for (size_t i = 0; i < size; i++)
+    {
+        // Inicializando o vetor de chaves e o vetor de visitados.
+        key[i] = FLT_MAX;
+        mst_set[i] = false;
+    }
+
+    // Inicializando o vetor de chaves.
+    key[start_node] = 0;
+
+    // Inicializando o vetor de pais.
+    parent[start_node] = static_cast<size_t>(-1);
+
+    // Loop para encontrar a árvore geradora mínima.
+    for (size_t i = 0; i < size - 1; i++)
+    {
+        // Encontrando a chave mínima.
+        size_t u;
+        float min = FLT_MAX;
+        for (size_t j = 0; j < mst_set.size(); j++)
+            if (!mst_set[j] && key[j] < min)
+                min = key[j], u = j;
+
+        // Marcando o nó como visitado.
+        mst_set[u] = true;
+
+        // Encontrando o nó atual.
+        Node *aux_node = find_node(vertices[u]);
+
+        // Iterando sobre todas as arestas do nó atual.
+        for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+        {
+            // Encontrando o nó destino e o peso da aresta.
+            if (find(vertices, vertices + size, aux_edge->_target_id) == vertices + size)
+                continue;
+            size_t v = find(vertices, vertices + size, aux_edge->_target_id) - vertices;
+            float weight = aux_edge->_weight;
+
+            // Atualizando a chave e o pai do nó se a nova chave for menor.
+            if (!mst_set[v] && weight < key[v])
+            {
+                // Atualizando a chave e o pai do nó.
+                parent[v] = u;
+                key[v] = weight;
+            }
+        }
+    }
+}
+
 bool Graph::negative_cycle(size_t vertex)
 {
     // Inicializando o vetor de arestas.
@@ -862,7 +1004,7 @@ bool Graph::negative_cycle(size_t vertex)
     return false;
 }
 
-bool Graph::is_connected(size_t *vertices, size_t size)
+int Graph::is_connected(size_t *vertices, size_t size)
 {
     // Verificando se o grafo está vazio.
     if (_first == NULL)
@@ -871,14 +1013,21 @@ bool Graph::is_connected(size_t *vertices, size_t size)
     // Inicializando o vetor de visitados.
     vector<bool> visited(size, false);
 
-    // Encontrando o primeiro nó do grafo.
-    Node *start_node = find_node(vertices[0]);
+    for(size_t i = 0; i < size; i++)
+    {
+        Node *start_node = find_node(vertices[i]);
 
-    // Chamando a função de busca em profundidade.
-    dfs(start_node, visited, vertices, size);
+        // Iniciando a DFS a partir do iésimo nó do grafo.
+        dfs(start_node, visited, vertices, size);
 
-    // Verificando se todos os nós foram visitados.
-    return find(visited.begin(), visited.end(), false) == visited.end();
+        // Verificando se todos os nós foram visitados.
+        if(find(visited.begin(), visited.end(), false) == visited.end())
+            return i;
+
+        // Reinicializando o vetor de visitados.
+        visited.assign(size, false);
+    }
+    return -1;
 }
 
 void Graph::dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size)
@@ -895,8 +1044,8 @@ void Graph::dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size
             continue;
 
         // Verificando se o nó destino ainda não foi visitado.
-        if (!visited[edge->_target_id])
-            dfs(target_node, visited);
+        if (!visited[find(vertices, vertices + size, edge->_target_id) - vertices])
+            dfs(target_node, visited, vertices, size);
     }
 }
 

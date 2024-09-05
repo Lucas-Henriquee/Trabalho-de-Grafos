@@ -2,8 +2,6 @@
 #include "include/GraphOperations.hpp"
 #include "include/defines.hpp"
 
-using namespace std;
-
 int main(int argc, char *argv[])
 {
 
@@ -18,6 +16,7 @@ int main(int argc, char *argv[])
     if (argc != 0)
     {
         string filename = argv[1];
+        
         ifstream file(filename);
 
         Graph *g = NULL;
@@ -32,6 +31,7 @@ int main(int argc, char *argv[])
             
             print_start();
         }
+
         else
             cout << "Erro ao abri o arquivo" << endl;
 

@@ -2,8 +2,6 @@
 #include "../include/Graph.hpp"
 #include "../include/defines.hpp"
 
-using namespace std;
-
 class GraphOperationsUndirectedTest : public ::testing::Test
 {
 protected:
@@ -30,7 +28,7 @@ protected:
             graph = nullptr;
         }
     }
-};  
+};
 
 TEST_F(GraphOperationsUndirectedTest, DijkstraShortestPath)
 {
@@ -77,7 +75,7 @@ TEST_F(GraphOperationsUndirectedTest, FloydShortestPath)
     vector<size_t> node_at_index(n);
     vector<size_t> path;
 
-    graph->floyd(distance, parents, node_at_index);
+    graph->floyd(vertex_1, distance, parents, node_at_index);
 
     if (find(node_at_index.begin(), node_at_index.end(), vertex_2) == node_at_index.end())
     {
@@ -100,14 +98,51 @@ TEST_F(GraphOperationsUndirectedTest, FloydShortestPath)
 
 TEST_F(GraphOperationsUndirectedTest, PrimMinimumGeneratingTree)
 {
-    // TODO: Implementar o teste
-    FAIL() << "Implementar o teste PrimMinimumGeneratingTree";
+    size_t size = 5;
+    size_t sub_vertices[] = {1, 2, 3, 4, 5};
+
+    vector<size_t> parent(size);
+    vector<float> key(size);
+    vector<bool> mst_set(size);
+
+    graph->prim(sub_vertices, size, parent, key, mst_set);
+
+    float vt_agm = 0;
+    float expected_vt_agm = 16.0;
+
+    for (size_t i = 1; i < size; i++)
+        vt_agm += key[i];
+
+    EXPECT_FLOAT_EQ(vt_agm, expected_vt_agm) << "O valor total da árvore geradora mínima não é o esperado.";
 }
 
 TEST_F(GraphOperationsUndirectedTest, KruskalMinimumGeneratingTree)
 {
-    // TODO: Implementar o teste
-    FAIL() << "Implementar o teste KruskalMinimumGeneratingTree";
+    vector<pair<float, pair<size_t, size_t>>> tree_edges;
+    vector<pair<float, pair<size_t, size_t>>> edges;
+
+    size_t size = 5;
+    size_t sub_vertices[] = {1, 2, 3, 4, 5};
+
+    float vt_agm = 0;
+    float expected_vt_agm = 16.0;
+
+    function<size_t(size_t, size_t *)> find_ds;
+
+    find_ds = [&](size_t i, size_t *parent) -> size_t
+    {
+        if (parent[i] == i)
+            return i;
+
+        return parent[i] = find_ds(parent[i], parent);
+    };
+
+    graph->kruskal(edges, sub_vertices, size, find_ds, tree_edges);
+
+    for (size_t i = 0; i < tree_edges.size(); i++)
+        vt_agm += tree_edges[i].first;
+
+    EXPECT_FLOAT_EQ(vt_agm, expected_vt_agm) << "O valor total da árvore geradora mínima não é o esperado.";
 }
 
 TEST_F(GraphOperationsUndirectedTest, DeepWalking)
