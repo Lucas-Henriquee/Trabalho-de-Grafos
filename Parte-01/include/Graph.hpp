@@ -43,8 +43,6 @@ public:
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
     int is_connected(size_t *vertices, size_t size);
     bool is_connected_graph();
-    vector<tuple<size_t,size_t,float>>primMST(size_t* node_id, size_t node_id_size);
-    vector<tuple<size_t,size_t,float>>kruskalMST(size_t* node_id, size_t node_id_size);
 
 private:
     // atributos do grafo

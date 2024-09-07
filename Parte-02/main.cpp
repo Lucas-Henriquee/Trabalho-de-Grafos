@@ -7,10 +7,8 @@ int main(int argc, char *argv[])
 
     /*
     argv[1] arquivo de entrada
-    argv[2] arquivo de saida
-    argv[3] Se é direcionado ou não
-    argv[4] Se tem peso na aresta
-    argv[5] Se tem peso nos nós
+    argv[2] arquivo de saída
+    argv[3] Guloso (0), Guloso Randomizado (1), Guloso Randomizado Reativo (2)
     */
 
     if (argc != 0)
@@ -23,17 +21,16 @@ int main(int argc, char *argv[])
 
         if (file.is_open())
         {
-            bool directed = (string(argv[3]) == "1");
-            bool weight_edges = (string(argv[4]) == "1");
+            bool directed = 0;
             bool weight_nodes = (string(argv[5]) == "1");
 
-            g = new Graph(file, directed, weight_edges, weight_nodes);
+            g = new Graph(file);
             
             print_start();
         }
 
         else
-            cout << "Erro ao abri o arquivo" << endl;
+            cout << "Erro ao abrir o arquivo" << endl;
 
         file.close();
 
