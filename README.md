@@ -76,7 +76,7 @@ Na segunda parte do trabalho, a biblioteca foi estendida para incorporar algorit
 
 ### ⚙️ Acesse as Orientações
 
-ara acessar as orientações detalhadas sobre a implementação dos algoritmos e o relatório com os resultados, entre na pasta [Parte-02](./Parte-02/).
+Para acessar as orientações detalhadas sobre compilação, execução e o relatório com os resultados obtidos, entre na pasta [Parte-02](./Parte-02/).
 
 🔗 **Referências**
 - Artigo de referência: [Link para o artigo](https://www.sciencedirect.com/science/article/abs/pii/S0305054821000939)
