@@ -2,9 +2,9 @@
 
 ## 🎯 Resumo
 
-Este projeto implementa uma biblioteca em C++ para manipulação de grafos simples, tanto direcionados quanto não direcionados, e ponderados ou não ponderados. Utilizando listas de adjacência, a biblioteca oferece uma série de funcionalidades úteis para a análise e manipulação de grafos.
+Este projeto implementa uma biblioteca em C++ para manipulação de grafos simples, tanto direcionados quanto não direcionados, e ponderados ou não ponderados. Utilizando listas de adjacência, a biblioteca oferece uma série de funcionalidades úteis para a análise e manipulação de grafos. Na segunda parte, a biblioteca foi estendida para incluir algoritmos avançados de particionamento de grafos, focando na resolução do Minimum Gap Graph Partitioning Problem (MGGPP). Esses algoritmos visam minimizar a diferença de pesos dentro de subgrafos conectados.
 
-## 🚀 Funcionalidades Implementadas - Parte 1
+## 🚀 Parte 1 - Algoritmos Clássicos de Grafos
 
 1. **Fecho Transitivo Direto**
    - **Descrição:** Calcula o fecho transitivo direto de um vértice em um grafo direcionado.
@@ -51,64 +51,42 @@ Este projeto implementa uma biblioteca em C++ para manipulação de grafos simpl
    - **Parâmetro:** O grafo não direcionado.
    - **Saída:** Conjunto de vértices de articulação.
 
-## ⚙️ Orientações
+### ⚙️ Acesse as Orientações
 
-### Compatibilidade
-O programa é compatível com os ambientes Linux, Windows e iOS.
-### Compilação
-O padrão para compilação a ser utilizado o  será `g++ *.c* -o execGrupoX`.
+Para acessar as orientações detalhadas sobre compilação, execução, testes e exemplos de instâncias, entre na pasta [Parte-01](./Parte-01/).
 
-Para compilar o programa, utilize o Makefile incluído no repositório. Execute o seguinte comando:
-```sh
-make
-```
-### Execução
-Para executar o programa, basta executar o seguinte comando:
+## ✈️ Parte 2 - Algoritmos de Particionamento de Grafos
 
-#### No Linux e iOS:
-```sh
-./execGrupoX ./<arquivo_entrada> ./<arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
-```
+Na segunda parte do trabalho, a biblioteca foi estendida para incorporar algoritmos para o problema de particionamento de grafos ponderados por vértices, conhecido como *Minimum Gap Graph Partitioning Problem* (MGGPP). Este problema consiste em particionar um grafo não direcionado em subgrafos conectados, minimizando a diferença de pesos (gap) dentro de cada subgrafo.
 
-#### No Windows:
-```sh
-.\execGrupoX.exe .\<arquivo_entrada> .\<arquivo_saida> <Op_Direc> <Op_PesoAresta> <Op_PesoNos>
-```
+1. **Algoritmo Guloso**
+   - **Descrição:** Algoritmo que realiza o particionamento do grafo em subgrafos conectados de forma determinística, minimizando o gap de pesos.
+   - **Parâmetro:** Número predefinido de subgrafos (p).
+   - **Saída:** Partição do grafo e gaps minimizados.
 
-#### Parâmetros de Execução
-- `<arquivo_entrada>` : Nome do arquivo contendo as informações do grafo a ser processado.
+2. **Algoritmo Guloso Randomizado Adaptativo**
+   - **Descrição:** Variante do algoritmo guloso, que introduz aleatoriedade na construção da solução para explorar diferentes partições.
+   - **Parâmetro:** Número predefinido de subgrafos (p).
+   - **Saída:** Partição do grafo e gaps minimizados.
 
-- `<arquivo_saida>` : Nome do arquivo onde será salvo o grafo e as funcionalidades solicitadas após a execução do programa.
+3. **Algoritmo Guloso Randomizado Adaptativo Reativo**
+   - **Descrição:** Extensão do algoritmo guloso randomizado adaptativo, onde a aleatoriedade é ajustada dinamicamente com base nos resultados obtidos durante a execução.
+   - **Parâmetro:** Número predefinido de subgrafos (p).
+   - **Saída:** Partição do grafo e gaps minimizados.
 
-- `<Op_Direc>`  : Define se o grafo é direcionado ou não. Use 1 para grafos direcionados e 0 para grafos não direcionados.
+### ⚙️ Acesse as Orientações
 
-- `<Op_PesoAresta>`  : Especifica se as arestas do grafo possuem peso. Use 1 se as arestas são ponderadas e 0 se não são ponderadas.
+ara acessar as orientações detalhadas sobre a implementação dos algoritmos e o relatório com os resultados, entre na pasta [Parte-02](./Parte-02/).
 
-- `<Op_PesoNos>`  : Indica se os vértices possuem peso associado. Use 1 se os vértices são ponderados e 0 se não são ponderados.
-
-### Testes
-
-Para garantir a funcionalidade correta da biblioteca, foi incluido testes automatizados usando a biblioteca GTest. Para executá-los:
-
-- Certifique-se de que a biblioteca Gtest está instalada no seu sistema.
-
-- Compile e execute os testes com o comando:
-    ```sh
-    make test
-    ```
-
-Os testes validarão as funcionalidades implementadas e garantirão que o código está funcionando conforme esperado.
-
-### Exemplo de Arquivo para Compilar ou Fazer os Testes
-Os arquivos de exemplo estão localizados na pasta [**instances_example**](instances_example) do repositório. Esses arquivos contêm grafos diferentes que podem ser usados para compilar o programa ou executar os testes. Utilize esses arquivos para garantir que todas as funcionalidades da biblioteca estejam funcionando corretamente.
-
+🔗 **Referências**
+- Artigo de referência: [Link para o artigo](https://www.sciencedirect.com/science/article/abs/pii/S0305054821000939)
+- Instâncias disponíveis em: [Instâncias do problema](https://homes.di.unimi.it/cordone/research/research.html)
 
 ## 👥 Integrantes do Grupo
 - Breno Montanha Costa
 - Lucas Henrique Nogueira
 - Pedro Henrique de Souza Rodrigues 
 
-
 ## 📚 Teoria dos Grafos
 **Disciplina:** Teoria dos Grafos (DCC059) - UFJF  
-**Período:** 2024/1 
+**Período:** 2024/1
