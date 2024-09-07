@@ -17,8 +17,6 @@ public:
     void remove_edge(size_t node_id_1, size_t node_id_2);
     void add_node(size_t node_id, float weight);
     void add_edge(size_t node_id_1, size_t node_id_2);
-    void print_graph(ofstream &output_file);
-    void print_graph();
     int conected(size_t node_id_1, size_t node_id_2);
 
     // métodos de acesso público
@@ -26,7 +24,6 @@ public:
     size_t get_num_edges();
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
-    int is_connected(size_t *vertices, size_t size);
     bool is_connected_graph();
 
 private:
@@ -38,8 +35,6 @@ private:
 
     // métodos de acesso privado
     void read_graph(ifstream &instance);
-    bool negative_cycle(size_t vertex);
-    void dfs(Node *node, vector<bool> &visited, size_t *vertices, size_t size);
     void dfs(Node *node, vector<bool> &visited);
 };
 

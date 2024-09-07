@@ -251,83 +251,6 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2)
     _number_of_edges = _number_of_edges + 1;
 }
 
-void Graph::print_graph()
-{
-    // Implementação da função de impressão do grafo no menu.
-
-    int i = 0;
-
-    while (i != -1)
-    {
-        system("clear||cls");
-        cout << "\n\t\t\t Grafo\n\n\n";
-
-        cout << "  Dados do Grafo:" << endl;
-        cout << "  Número de Nós: " << _number_of_nodes << endl;
-        cout << "  Número de Arestas: " << _number_of_edges << endl;
-        cout << "  Tipo do Grafo: Direcionado\n\n\n";
-
-        cout << "\n\n";
-
-        // Imprimindo o grafo.
-        for (Node *node = _first; node != NULL; node = node->_next_node)
-        {
-            cout << "\t\t\t" << node->_id;
-            for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
-                cout << " -> " << edge->_target_id;
-            cout << endl;
-        }
-
-        cout << "\n\n  Digite -1 para voltar ao menu: ";
-        cin >> i;
-    }
-}
-
-void Graph::print_graph(ofstream &output_file)
-{
-    // Armazena dados do grafo no buffer.
-    output_file << "\n\t\t\t\tImprimindo Grafo\n\n\n";
-
-    output_file << "  Dados do Grafo:" << endl;
-    output_file << "  Número de Nós: " << _number_of_nodes << endl;
-    output_file << "  Número de Arestas: " << _number_of_edges << endl;
-    output_file << "  Tipo do Grafo: Direcionado\n\n\n";
-
-    // Verifica se o grafo está vazio.
-    if (_first == NULL)
-    {
-        output_file << "  O grafo está vazio." << endl;
-        return;
-    }
-
-    // Itera sobre todos os nós do grafo
-    for (Node *node = _first; node != NULL; node = node->_next_node)
-    {
-        // Imprime o nó atual
-        output_file << "\t\t  " << node->_id;
-
-        // Verifica se há arestas saindo do nó
-        bool first_edge = true;
-        for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
-        {
-            // Se não for a primeira aresta, adiciona a conexão
-            if (first_edge)
-            {
-                output_file << " -> " << edge->_target_id;
-                first_edge = false;
-            }
-            else
-            {
-                output_file << " -> " << edge->_target_id;
-            }
-        }
-        // Quebra de linha após processar todas as arestas do nó atual
-        output_file << endl;
-    }
-
-    output_file << "\n\n";
-}
-
 int Graph::conected(size_t node_id_1, size_t node_id_2)
 {
     // Encontrando os nós da aresta a ser encontrada.
@@ -387,4 +310,38 @@ size_t Graph::get_num_edges()
 {
     // Retornando o número de arestas.
     return _number_of_edges;
+}
+
+void Graph::dfs(Node *node, vector<bool> &visited)
+{
+    // Marcando o nó como visitado.
+    visited[node->_id - 1] = true;
+
+    // Loop para percorrer todas as arestas do nó.
+    for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
+    {
+        // Encontrando o nó destino da aresta.
+        Node *target_node = find_node(edge->_target_id);
+
+        // Verificando se o nó destino ainda não foi visitado.
+        if (!visited[target_node->_id - 1])
+            dfs(target_node, visited);
+    }
+}
+
+bool Graph::is_connected_graph()
+{
+    // Verificando se o grafo está vazio.
+    if (_first == NULL)
+        return false;
+
+    // Inicializando o vetor de nós visitados.
+    vector<bool> visited(_number_of_nodes, false);
+
+    // Iniciando a DFS a partir do primeiro nó do grafo.
+    Node *start_node = _first;
+    dfs(start_node, visited);
+
+    // Verificando se todos os nós foram visitados (grafo conexo).
+    return find(visited.begin(), visited.end(), false) == visited.end();
 }

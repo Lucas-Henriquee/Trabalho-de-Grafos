@@ -1,5 +1,4 @@
 #include "include/Graph.hpp"
-#include "include/GraphOperations.hpp"
 #include "include/defines.hpp"
 
 int main(int argc, char *argv[])
@@ -20,14 +19,7 @@ int main(int argc, char *argv[])
         Graph *g = NULL;
 
         if (file.is_open())
-        {
-            bool directed = 0;
-            bool weight_nodes = (string(argv[5]) == "1");
-
             g = new Graph(file);
-            
-            print_start();
-        }
 
         else
             cout << "Erro ao abrir o arquivo" << endl;
@@ -38,7 +30,6 @@ int main(int argc, char *argv[])
 
         if (g != NULL)
         {
-            menu(g, file_exit);
             delete g;
         }
     }
