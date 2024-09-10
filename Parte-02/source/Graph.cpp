@@ -1,12 +1,12 @@
 #include "../include/Graph.hpp"
-#include "../include/defines.hpp" 
-
+#include "../include/defines.hpp"
 
 Graph::Graph(ifstream &instance)
 {
-    // Inicializa o número de arestas e nós.
+    // Inicializa o número de arestas, nós e subgrafos.
     _number_of_edges = 0;
     _number_of_nodes = 0;
+    _number_of_subgraphs = 0;
 
     // Inicializa os ponteiros do primeiro e do último nó.
     _first = NULL;
@@ -18,9 +18,10 @@ Graph::Graph(ifstream &instance)
 
 Graph::Graph()
 {
-    // Inicializa o número de arestas e nós.
+    // Inicializa o número de arestas, nós e subgrafos.
     _number_of_edges = 0;
     _number_of_nodes = 0;
+    _number_of_subgraphs = 0;
 
     // Inicializa os ponteiros do primeiro e do último nó.
     _first = NULL;
@@ -51,35 +52,83 @@ Graph::~Graph()
 
 void Graph::read_graph(ifstream &instance)
 {
-    // String para armazenar a linha do arquivo.
+    // Inicializando a string para leitura do arquivo.
     string line;
 
-    // Lendo primeira linha.
-    getline(instance, line);
-    istringstream iss(line);
-    iss >> _number_of_nodes;
-    for (size_t i = 1; i <= _number_of_nodes; i++)
-        add_node(i, 0);
-
-    // Inicializando leitura do arquivo.
+    // Lendo o número de subgrafos.
     while (getline(instance, line))
     {
-        // Se houver linha vazia durante a leitura.
-        if (line.empty())
-            continue;
+        // Procurando a linha que contém o número de subgrafos.
+        if (line.find("param p") != string::npos)
+        {
+            // Lendo o número de subgrafos.
+            istringstream iss(line);
+            string discard;
+            iss >> discard >> discard >> _number_of_subgraphs;
+            break;
+        }
+    }
 
-        // Inicializa a leitura da linha.
-        istringstream iss(line);
+    // Lendo o número de nós.
+    while (getline(instance, line))
+    {
+        // Procurando a linha que contém o número de nós.
+        if (line.find("#") != string::npos)
+        {
+            // Lendo o número de nós.
+            istringstream iss(line);
+            char discard;
+            iss >> discard >> _number_of_nodes;
+            break;
+        }
+    }
 
-        // Variáveis para armazenar os valores da linha.
-        size_t node_1, node_2;
-        float node_1_weight = 1.0, node_2_weight = 1.0, edge_weight = 1.0;
+    // Adicionando os nós ao grafo. 
+    for(size_t i = 1; i <= _number_of_nodes; i++)
+        add_node(i, 0);
 
-        // Realizando a leitura dos valores.
+    // Lendo os pesos dos vértices
+    while(getline(instance, line))
+    {
+        // Procurando a linha que contém os pesos dos vértices.
+        if (line.find("param w") != string::npos)
+        {
+            // Lendo os pesos dos vértices.
+            while (getline(instance, line) && !line.empty())
+            {
+                // Inicializando o fluxo de leitura da linha.
+                istringstream iss(line);
+                size_t node;
+                float weight;
 
+                // Lendo o vértice e seu peso e atualizando o peso do vértice.
+                while (iss >> node >> weight)
+                    update_node_weight(node, weight);
+            }
+            break;
+        }
+    }
 
-        // Adicionando os nós e as arestas ao grafo.
-        add_edge(node_1, node_2);
+    // Lendo as arestas do grafo.
+    while (getline(instance, line))
+    {
+        // Procurando a linha que contém as arestas do grafo.
+        if (line.find("set E") != string::npos)
+        {
+            // Lendo as arestas do grafo.
+            while (getline(instance, line) && !line.empty())
+            {
+                // Inicializando o fluxo de leitura da linha.
+                istringstream iss(line);
+                char discard;
+                size_t node_1, node_2;
+
+                // Lendo pares de vértices que formam uma aresta
+                while (iss >> discard >> node_1 >> discard >> node_2 >> discard)
+                    add_edge(node_1, node_2);
+            }
+            break;
+        }
     }
 }
 
@@ -240,12 +289,11 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2)
         Edge *aux_edge = search_node_2->_first_edge;
         for (; aux_edge->_next_edge != NULL; aux_edge = aux_edge->_next_edge)
             ;
-            aux_edge->_next_edge = new_edge_2;
+        aux_edge->_next_edge = new_edge_2;
     }
     // Caso o nó não possua arestas.
     else
         search_node_2->_first_edge = new_edge_2;
-    
 
     // Atualizando o número de arestas.
     _number_of_edges = _number_of_edges + 1;
@@ -310,6 +358,38 @@ size_t Graph::get_num_edges()
 {
     // Retornando o número de arestas.
     return _number_of_edges;
+}
+
+void Graph::update_node_weight(size_t node_id, float weight)
+{
+    // Encontrando o nó a ser atualizado.
+    Node *aux_node = find_node(node_id);
+
+    // Verificando se o nó foi encontrado.
+    if (!aux_node)
+    {
+        cerr << "Node << " << node_id << " >> not found." << endl;
+        return;
+    }
+
+    // Atualizando o peso do nó.
+    aux_node->_weight = weight;
+}
+
+float Graph::get_node_weight(size_t node_id)
+{
+    // Encontrando o nó.
+    Node *aux_node = find_node(node_id);
+
+    // Verificando se o nó foi encontrado.
+    if (!aux_node)
+    {
+        cerr << "Node << " << node_id << " >> not found." << endl;
+        return -1;
+    }
+
+    // Retornando o peso do nó.
+    return aux_node->_weight;
 }
 
 void Graph::dfs(Node *node, vector<bool> &visited)

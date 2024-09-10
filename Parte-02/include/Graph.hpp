@@ -25,11 +25,14 @@ public:
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
     bool is_connected_graph();
+    void update_node_weight(size_t node_id, float weight);
+    float get_node_weight(size_t node_id);
 
 private:
     // atributos do grafo
     size_t _number_of_nodes;
     size_t _number_of_edges;
+    size_t _number_of_subgraphs;
     Node *_first;
     Node *_last;
 
