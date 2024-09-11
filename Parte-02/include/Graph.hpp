@@ -22,6 +22,7 @@ public:
     // métodos de acesso público
     size_t get_num_nodes();
     size_t get_num_edges();
+    size_t get_num_subgraphs();
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
     bool is_connected_graph();

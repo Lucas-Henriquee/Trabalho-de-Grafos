@@ -367,6 +367,12 @@ size_t Graph::get_num_edges()
     return _number_of_edges;
 }
 
+size_t Graph::get_num_subgraphs()
+{
+    // Retornando o número de subgrafos.
+    return _number_of_subgraphs;
+}
+
 void Graph::update_node_weight(size_t node_id, float weight)
 {
     // Encontrando o nó a ser atualizado.
