@@ -27,6 +27,7 @@ public:
     bool is_connected_graph();
     void update_node_weight(size_t node_id, float weight);
     float get_node_weight(size_t node_id);
+    void print_graph();
 
 private:
     // atributos do grafo

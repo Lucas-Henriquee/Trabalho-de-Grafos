@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     if (argc != 0)
     {
         string filename = argv[1];
-        
+
         ifstream file(filename);
 
         Graph *g = NULL;
@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
         file.close();
 
         string file_exit = argv[2];
+
+        g->print_graph();
 
         if (g != NULL)
         {

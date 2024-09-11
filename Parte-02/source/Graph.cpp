@@ -83,19 +83,23 @@ void Graph::read_graph(ifstream &instance)
         }
     }
 
-    // Adicionando os nós ao grafo. 
-    for(size_t i = 1; i <= _number_of_nodes; i++)
+    // Adicionando os nós ao grafo.
+    for (size_t i = 1; i <= _number_of_nodes; i++)
         add_node(i, 0);
 
     // Lendo os pesos dos vértices
-    while(getline(instance, line))
+    while (getline(instance, line))
     {
         // Procurando a linha que contém os pesos dos vértices.
         if (line.find("param w") != string::npos)
         {
             // Lendo os pesos dos vértices.
-            while (getline(instance, line) && !line.empty())
+            while (getline(instance, line))
             {
+                // Se encontrar a próxima seção, terminar a leitura dos pesos
+                if (line.find(";") != string::npos)
+                    break;
+
                 // Inicializando o fluxo de leitura da linha.
                 istringstream iss(line);
                 size_t node;
@@ -115,8 +119,7 @@ void Graph::read_graph(ifstream &instance)
         // Procurando a linha que contém as arestas do grafo.
         if (line.find("set E") != string::npos)
         {
-            // Lendo as arestas do grafo.
-            while (getline(instance, line) && !line.empty())
+            while (getline(instance, line))
             {
                 // Inicializando o fluxo de leitura da linha.
                 istringstream iss(line);
@@ -126,6 +129,10 @@ void Graph::read_graph(ifstream &instance)
                 // Lendo pares de vértices que formam uma aresta
                 while (iss >> discard >> node_1 >> discard >> node_2 >> discard)
                     add_edge(node_1, node_2);
+
+                // Se encontrar a próxima seção, terminar a leitura das arestas
+                if (line.find(";") != string::npos)
+                    break;
             }
             break;
         }
@@ -424,4 +431,31 @@ bool Graph::is_connected_graph()
 
     // Verificando se todos os nós foram visitados (grafo conexo).
     return find(visited.begin(), visited.end(), false) == visited.end();
+}
+
+void Graph::print_graph()
+{
+    // Inicializando o nó auxiliar para percorrer o grafo.
+    Node *aux_node_1 = _first;
+
+    // Percorrendo todos os nós do grafo.
+    while (aux_node_1 != NULL)
+    {
+        // Imprimindo o nó.
+        cout << "Node: " << aux_node_1->_id << " Weight: " << aux_node_1->_weight << endl;
+
+        // Percorrendo todas as arestas do nó.
+        Edge *aux_edge_1 = aux_node_1->_first_edge;
+        while (aux_edge_1 != NULL)
+        {
+            // Imprimindo a aresta.
+            cout << "Edge: " << aux_node_1->_id << " -> " << aux_edge_1->_target_id << endl;
+
+            // Atualizando a aresta auxiliar.
+            aux_edge_1 = aux_edge_1->_next_edge;
+        }
+
+        // Atualizando o nó auxiliar.
+        aux_node_1 = aux_node_1->_next_node;
+    }
 }
