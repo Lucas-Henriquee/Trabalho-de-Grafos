@@ -1,4 +1,5 @@
 #include "include/Graph.hpp"
+#include "include/GraphPartitioning.hpp"
 #include "include/defines.hpp"
 
 int main(int argc, char *argv[])
@@ -27,11 +28,13 @@ int main(int argc, char *argv[])
         file.close();
 
         string file_exit = argv[2];
+        char algorithm = string(argv[3])[0];
 
-        g->print_graph();
+        // g->print_graph();
 
         if (g != NULL)
         {
+            select_algorithm(g, algorithm);
             delete g;
         }
     }
