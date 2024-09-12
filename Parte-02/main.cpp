@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         string file_exit = argv[2];
         char algorithm = string(argv[3])[0];
 
-        // g->print_graph();
+        //g->print_graph();
 
         if (g != NULL)
         {

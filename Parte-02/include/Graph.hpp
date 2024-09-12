@@ -26,7 +26,6 @@ public:
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
     bool is_connected_graph();
-    void update_node_weight(size_t node_id, float weight);
     float get_node_weight(size_t node_id);
     void print_graph();
 
