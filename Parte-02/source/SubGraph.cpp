@@ -1,34 +1,19 @@
-#include "../include/Graph.hpp"
+
+#include "../include/SubGraph.hpp"
 #include "../include/defines.hpp"
 
-Graph::Graph(ifstream &instance)
+SubGraph::SubGraph()
 {
     // Inicializa o número de arestas, nós e subgrafos.
     _number_of_edges = 0;
     _number_of_nodes = 0;
-    _number_of_subgraphs = 0;
-
-    // Inicializa os ponteiros do primeiro e do último nó.
-    _first = NULL;
-    _last = NULL;
-
-    // Chamando a função para ler o grafo.
-    read_graph(instance);
-}
-
-Graph::Graph()
-{
-    // Inicializa o número de arestas, nós e subgrafos.
-    _number_of_edges = 0;
-    _number_of_nodes = 0;
-    _number_of_subgraphs = 0;
 
     // Inicializa os ponteiros do primeiro e do último nó.
     _first = NULL;
     _last = NULL;
 }
 
-Graph::~Graph()
+SubGraph::~SubGraph()
 {
     // Criando o nó auxiliar para percorrer o grafo.
     Node *aux_node_1 = _first;
@@ -50,78 +35,7 @@ Graph::~Graph()
     }
 }
 
-void Graph::read_graph(ifstream &instance)
-{
-    // Inicializando a string para leitura do arquivo.
-    string line;
-
-    // Lendo o número de subgrafos.
-    while (getline(instance, line))
-    {
-        // Procurando a linha que contém o número de subgrafos.
-        if (line.find("param p") != string::npos)
-        {
-            // Lendo o número de subgrafos.
-            istringstream iss(line);
-            string discard;
-            iss >> discard >> discard >> _number_of_subgraphs;
-            break;
-        }
-    }
-
-    // Lendo os pesos dos vértices
-    while (getline(instance, line))
-    {
-        // Procurando a linha que contém os pesos dos vértices.
-        if (line.find("param w") != string::npos)
-        {
-            // Lendo os pesos dos vértices.
-            while (getline(instance, line))
-            {
-                // Se encontrar a próxima seção, terminar a leitura dos pesos
-                if (line.find(";") != string::npos)
-                    break;
-
-                // Inicializando o fluxo de leitura da linha.
-                istringstream iss(line);
-                size_t node;
-                float weight;
-
-                // Lendo o vértice e seu peso e atualizando o peso do vértice.
-                while (iss >> node >> weight)
-                    add_node(node, weight);
-            }
-            break;
-        }
-    }
-
-    // Lendo as arestas do grafo.
-    while (getline(instance, line))
-    {
-        // Procurando a linha que contém as arestas do grafo.
-        if (line.find("set E") != string::npos)
-        {
-            while (getline(instance, line))
-            {
-                // Inicializando o fluxo de leitura da linha.
-                istringstream iss(line);
-                char discard;
-                size_t node_1, node_2;
-
-                // Lendo pares de vértices que formam uma aresta
-                while (iss >> discard >> node_1 >> discard >> node_2 >> discard)
-                    add_edge(node_1, node_2);
-
-                // Se encontrar a próxima seção, terminar a leitura das arestas
-                if (line.find(";") != string::npos)
-                    break;
-            }
-            break;
-        }
-    }
-}
-
-void Graph::remove_node(size_t node_id)
+void SubGraph::remove_node(size_t node_id)
 {
     // Encontrando o nó a ser removido.
     Node *aux_node = find_node(node_id);
@@ -136,19 +50,19 @@ void Graph::remove_node(size_t node_id)
             return;
 
     // Inicializando o vetor de nós conectados.
-    Node **conected_nodes = new Node*[aux_node->_number_of_edges];
+    size_t *conected_nodes = new size_t[aux_node->_number_of_edges];
 
     // Armazenando os nós conectados ao nó a ser removido.
     int i = 0;
     for (Edge *aux_edge = aux_node->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
     {
-        conected_nodes[i] = aux_edge->_target;
+        conected_nodes[i] = aux_edge->_target->_id;
         i++;
     }
 
     // Removendo as arestas do nó a ser removido.
     for (size_t i = 0; i < aux_node->_number_of_edges; i++)
-        remove_edge(node_id, conected_nodes[i]->_id);
+        remove_edge(node_id, conected_nodes[i]);
 
     // Atualizando a lista de nós.
     aux_node->_next_node = aux_node->_previous_node;
@@ -162,7 +76,7 @@ void Graph::remove_node(size_t node_id)
     delete[] conected_nodes;
 }
 
-void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
+void SubGraph::remove_edge(size_t node_id_1, size_t node_id_2)
 {
     // Encontrando os nós da aresta a ser removida.
     Node *aux_node_1 = find_node(node_id_1);
@@ -203,7 +117,7 @@ void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
     }
 }
 
-void Graph::add_node(size_t node_id, float weight)
+void SubGraph::add_node(size_t node_id, float weight)
 {
     // Verificando se o nó já existe.
     if (find_node(node_id) != NULL)
@@ -233,7 +147,7 @@ void Graph::add_node(size_t node_id, float weight)
     }
 }
 
-void Graph::add_edge(size_t node_id_1, size_t node_id_2)
+void SubGraph::add_edge(size_t node_id_1, size_t node_id_2)
 {
     // Procurando se os nós já existem.
     Node *search_node_1 = find_node(node_id_1);
@@ -288,7 +202,7 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2)
     _number_of_edges = _number_of_edges + 1;
 }
 
-int Graph::conected(size_t node_id_1, size_t node_id_2)
+int SubGraph::conected(size_t node_id_1, size_t node_id_2)
 {
     // Encontrando os nós da aresta a ser encontrada.
     Node *aux_node_1 = find_node(node_id_1);
@@ -307,7 +221,7 @@ int Graph::conected(size_t node_id_1, size_t node_id_2)
     return 0;
 }
 
-Node *Graph::find_node(size_t node_id)
+Node *SubGraph::find_node(size_t node_id)
 {
     // Procurando o nó.
     for (Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
@@ -318,13 +232,31 @@ Node *Graph::find_node(size_t node_id)
     return NULL;
 }
 
-size_t Graph::get_num_nodes()
+size_t SubGraph::get_num_nodes()
 {
     // Retornando o número de nós.
     return _number_of_nodes;
 }
 
-Edge *Graph::find_edge(size_t node_id_1, size_t node_id_2)
+float SubGraph::get_min_weight()
+{
+    // Retornando o peso mínimo.
+    return min_weight;
+}
+
+float SubGraph::get_max_weight()
+{
+    // Retornando o peso máximo.
+    return max_weight;
+}
+
+float SubGraph::get_gap()
+{
+    // Retornando a diferença entre o peso máximo e o peso mínimo.
+    return get_max_weight() - get_min_weight();
+}
+
+Edge *SubGraph::find_edge(size_t node_id_1, size_t node_id_2)
 {
     // Encontrando os nós da aresta a ser encontrada.
     Node *aux_node_1 = find_node(node_id_1);
@@ -343,25 +275,18 @@ Edge *Graph::find_edge(size_t node_id_1, size_t node_id_2)
     return NULL;
 }
 
-size_t Graph::get_num_edges()
+size_t SubGraph::get_num_edges()
 {
     // Retornando o número de arestas.
     return _number_of_edges;
 }
-
-size_t Graph::get_num_subgraphs()
-{
-    // Retornando o número de subgrafos.
-    return _number_of_subgraphs;
-}
-
-Node *Graph::get_first_node()
+Node *SubGraph::get_first_node()
 {
     // Retornando o primeiro nó do grafo.
     return _first;
 }
 
-float Graph::get_node_weight(size_t node_id)
+float SubGraph::get_node_weight(size_t node_id)
 {
     // Encontrando o nó.
     Node *aux_node = find_node(node_id);
@@ -377,7 +302,7 @@ float Graph::get_node_weight(size_t node_id)
     return aux_node->_weight;
 }
 
-void Graph::dfs(Node *node, vector<bool> &visited)
+void SubGraph::dfs(Node *node, vector<bool> &visited)
 {
     // Marcando o nó como visitado.
     visited[node->_id - 1] = true;
@@ -394,7 +319,7 @@ void Graph::dfs(Node *node, vector<bool> &visited)
     }
 }
 
-bool Graph::is_connected_graph()
+bool SubGraph::is_connected_subgraph()
 {
     // Verificando se o grafo está vazio.
     if (_first == NULL)
@@ -409,31 +334,4 @@ bool Graph::is_connected_graph()
 
     // Verificando se todos os nós foram visitados (grafo conexo).
     return find(visited.begin(), visited.end(), false) == visited.end();
-}
-
-void Graph::print_graph()
-{
-    // Inicializando o nó auxiliar para percorrer o grafo.
-    Node *aux_node_1 = _first;
-
-    // Percorrendo todos os nós do grafo.
-    while (aux_node_1 != NULL)
-    {
-        // Imprimindo o nó.
-        cout << "Node: " << aux_node_1->_id << " Weight: " << aux_node_1->_weight << endl;
-
-        // Percorrendo todas as arestas do nó.
-        Edge *aux_edge_1 = aux_node_1->_first_edge;
-        while (aux_edge_1 != NULL)
-        {
-            // Imprimindo a aresta.
-            cout << "Edge: " << aux_node_1->_id << " -> " << aux_edge_1->_target->_id << endl;
-
-            // Atualizando a aresta auxiliar.
-            aux_edge_1 = aux_edge_1->_next_edge;
-        }
-
-        // Atualizando o nó auxiliar.
-        aux_node_1 = aux_node_1->_next_node;
-    }
 }

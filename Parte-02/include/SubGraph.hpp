@@ -1,16 +1,15 @@
-#ifndef GRAPH_HPP
-#define GRAPH_HPP
+#ifndef SUBGRAPH_HPP
+#define SUBGRAPH_HPP
 
 #include "Node.hpp"
 #include "defines.hpp"
 
-class Graph
+class SubGraph
 {
 public:
     // construtor e destrutor
-    Graph(ifstream &instance);
-    Graph();
-    ~Graph();
+    SubGraph();
+    ~SubGraph();
 
     // métodos básicos
     void remove_node(size_t node_id);
@@ -22,11 +21,13 @@ public:
     // métodos de acesso público
     size_t get_num_nodes();
     size_t get_num_edges();
-    size_t get_num_subgraphs();
+    float get_min_weight();
+    float get_max_weight();
+    float get_gap();
     Node *get_first_node();
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
-    bool is_connected_graph();
+    bool is_connected_subgraph();
     float get_node_weight(size_t node_id);
     void print_graph();
 
@@ -34,13 +35,14 @@ private:
     // atributos do grafo
     size_t _number_of_nodes;
     size_t _number_of_edges;
-    size_t _number_of_subgraphs;
+    float min_weight;
+    float max_weight;
+    float gap;
     Node *_first;
     Node *_last;
 
-    // métodos de acesso privado
-    void read_graph(ifstream &instance);
+    // métodos de acesso privadox
     void dfs(Node *node, vector<bool> &visited);
 };
 
-#endif // GRAPH_HPP
+#endif // SUBGRAPH_HPP

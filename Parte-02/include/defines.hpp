@@ -10,6 +10,7 @@
 #include <map>        /* implementação do container map e suas operações */
 #include <cfloat>     /* implementação dos valores maximos para os tipos float e double */
 #include <functional> /* implementação de funções lambda */
+#include <queue>      /* implementação do container queue e suas operações */
 
 using namespace std;  /* definição do namespace padrão */
 
