@@ -64,7 +64,7 @@ void Graph::read_graph(ifstream &instance)
             // Lendo o número de subgrafos.
             istringstream iss(line);
             string discard;
-            iss >> discard >> discard >> _number_of_subgraphs;
+            iss >> discard >> discard >> discard >> _number_of_subgraphs;
             break;
         }
     }
@@ -205,6 +205,7 @@ void Graph::remove_edge(size_t node_id_1, size_t node_id_2)
 
 void Graph::add_node(size_t node_id, float weight)
 {
+    _number_of_nodes++;
     // Verificando se o nó já existe.
     if (find_node(node_id) != NULL)
         return;
@@ -245,7 +246,7 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2)
 
     // Criando uma nova aresta.
     Edge *new_edge_1 = new Edge;
-    new_edge_1->_target->_id = node_id_2;
+    new_edge_1->_target = search_node_2;
     new_edge_1->_next_edge = NULL;
 
     // Atualizando o número de arestas.
@@ -267,7 +268,7 @@ void Graph::add_edge(size_t node_id_1, size_t node_id_2)
 
     // Criando uma nova aresta.
     Edge *new_edge_2 = new Edge;
-    new_edge_2->_target->_id = node_id_1;
+    new_edge_2->_target = search_node_1;
     new_edge_2->_next_edge = NULL;
     // Atualizando o número de arestas.
     search_node_2->_number_of_edges = search_node_2->_number_of_edges + 1;

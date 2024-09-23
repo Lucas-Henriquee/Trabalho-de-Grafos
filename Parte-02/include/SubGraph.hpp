@@ -37,12 +37,11 @@ private:
     size_t _number_of_edges;
     float min_weight;
     float max_weight;
-    float gap;
     Node *_first;
     Node *_last;
 
     // métodos de acesso privadox
-    void dfs(Node *node, vector<bool> &visited);
+    void dfs(Node *node, vector<bool> &visited, vector<size_t> &node_at_index);
 };
 
 #endif // SUBGRAPH_HPP

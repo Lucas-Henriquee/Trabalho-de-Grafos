@@ -44,17 +44,17 @@ void greedy_partitioning(Graph *g)
     }
     float max_gap_for_subgraph = (max_weight - min_weight)/(g->get_num_subgraphs() - 1);
 
-    SubGraph* *subgraphs = new SubGraph*[g->get_num_subgraphs()];
+    vector<SubGraph*> subgraphs;
     int subgraph = 0;
     for (Node* aux_node = g->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
     {
-        // Starting a n subgraphs with one node
+        // Starting n subgraphs with one node
         if(aux_node->_weight >= min_weight + subgraph * max_gap_for_subgraph)
         {
             SubGraph* sub_g = new SubGraph();
             subgraph++;
             sub_g->add_node(aux_node->_id, aux_node->_weight);
-            subgraphs[subgraph] = sub_g;
+            subgraphs.push_back(sub_g);
         }
     }
 
@@ -62,16 +62,15 @@ void greedy_partitioning(Graph *g)
     for(size_t i = 0; i < g->get_num_subgraphs(); i++)
     {
         Node* aux_node_s = subgraphs[i]->get_first_node();
-        float min_gap = abs(aux_node_s->_first_edge->_target->_weight - aux_node_s->_weight);
-        Edge* edge_min_gap = aux_node_s->_first_edge;
-        for(Edge* aux_edge = g->find_node(aux_node_s->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
-        {
+        Edge* aux_edge = g->find_node(aux_node_s->_id)->_first_edge;
+        float min_gap = abs(aux_node_s->_weight - aux_edge->_target->_weight);
+        Edge* edge_min_gap = aux_edge;
+        for(; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
             if(min_gap > abs(aux_edge->_target->_weight - aux_node_s->_weight))
             {
                 min_gap = abs(aux_edge->_target->_weight - aux_node_s->_weight);
                 edge_min_gap = aux_edge;
             }
-        }
         subgraphs[i]->add_node(edge_min_gap->_target->_id, edge_min_gap->_target->_weight);
         subgraphs[i]->add_edge(aux_node_s->_id, edge_min_gap->_target->_id);
     }
@@ -117,10 +116,17 @@ void greedy_partitioning(Graph *g)
         for(Edge* aux_edge = g->find_node(gap_alterations[0].node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
             if(subgraphs[gap_alterations[0].subgraph]->find_node(aux_edge->_target->_id) != NULL)
                 subgraphs[gap_alterations[0].subgraph]->add_edge(gap_alterations[0].node->_id, aux_edge->_target->_id);
-    }while(n < g->get_num_nodes());
+    }while(n < g->get_num_nodes() - 1);
     float gap_total = 0;
     for (size_t i = 0; i < g->get_num_subgraphs(); i++)
+    {
+        if (!subgraphs[i]->is_connected_subgraph())
+        {
+            cout << "Subgrafo desconexo" << endl;
+            return;
+        }
         gap_total += subgraphs[i]->get_gap();
+    }
     cout << "Gap total: " << gap_total << endl;
 }
 

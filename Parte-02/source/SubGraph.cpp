@@ -136,6 +136,8 @@ void SubGraph::add_node(size_t node_id, float weight)
     {
         _first = aux;
         _last = aux;
+        min_weight = weight;
+        max_weight = weight;
     }
 
     // Caso contrário.
@@ -144,7 +146,12 @@ void SubGraph::add_node(size_t node_id, float weight)
         _last->_next_node = aux;
         aux->_previous_node = _last;
         _last = aux;
+        if(min_weight > weight)
+            min_weight = weight;
+        else if(max_weight < weight)
+            max_weight = weight;
     }
+    _number_of_nodes++;
 }
 
 void SubGraph::add_edge(size_t node_id_1, size_t node_id_2)
@@ -159,7 +166,7 @@ void SubGraph::add_edge(size_t node_id_1, size_t node_id_2)
 
     // Criando uma nova aresta.
     Edge *new_edge_1 = new Edge;
-    new_edge_1->_target->_id = node_id_2;
+    new_edge_1->_target = find_node(node_id_2);
     new_edge_1->_next_edge = NULL;
 
     // Atualizando o número de arestas.
@@ -181,7 +188,7 @@ void SubGraph::add_edge(size_t node_id_1, size_t node_id_2)
 
     // Criando uma nova aresta.
     Edge *new_edge_2 = new Edge;
-    new_edge_2->_target->_id = node_id_1;
+    new_edge_2->_target = find_node(node_id_1);
     new_edge_2->_next_edge = NULL;
     // Atualizando o número de arestas.
     search_node_2->_number_of_edges = search_node_2->_number_of_edges + 1;
@@ -302,20 +309,20 @@ float SubGraph::get_node_weight(size_t node_id)
     return aux_node->_weight;
 }
 
-void SubGraph::dfs(Node *node, vector<bool> &visited)
+void SubGraph::dfs(Node *node, vector<bool> &visited, vector<size_t> &node_at_index)
 {
     // Marcando o nó como visitado.
-    visited[node->_id - 1] = true;
+    visited[find(node_at_index.begin(), node_at_index.end(), node->_id) - node_at_index.begin()] = true;
 
     // Loop para percorrer todas as arestas do nó.
     for (Edge *edge = node->_first_edge; edge != NULL; edge = edge->_next_edge)
     {
         // Encontrando o nó destino da aresta.
-        Node *target_node = find_node(edge->_target->_id);
+        Node *target_node = edge->_target;
 
         // Verificando se o nó destino ainda não foi visitado.
-        if (!visited[target_node->_id - 1])
-            dfs(target_node, visited);
+        if (!visited[find(node_at_index.begin(), node_at_index.end(), target_node->_id) - node_at_index.begin()])
+            dfs(target_node, visited, node_at_index);
     }
 }
 
@@ -324,13 +331,16 @@ bool SubGraph::is_connected_subgraph()
     // Verificando se o grafo está vazio.
     if (_first == NULL)
         return false;
+    vector<size_t> node_at_index;
+    for(Node *aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
+        node_at_index.push_back(aux_node->_id);
 
     // Inicializando o vetor de nós visitados.
     vector<bool> visited(_number_of_nodes, false);
 
     // Iniciando a DFS a partir do primeiro nó do grafo.
     Node *start_node = _first;
-    dfs(start_node, visited);
+    dfs(start_node, visited, node_at_index);
 
     // Verificando se todos os nós foram visitados (grafo conexo).
     return find(visited.begin(), visited.end(), false) == visited.end();
