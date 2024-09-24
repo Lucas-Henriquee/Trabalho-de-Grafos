@@ -6,31 +6,11 @@
 typedef struct
 {
     int subgraph;
-    float gap_alteration;
-    Node* node;
+    float gap_alteration = 0;
+    Node *node;
 } GapAlteration;
 
-
-void select_algorithm(Graph *g, char algorithm)
-{
-    switch (algorithm)
-    {
-    case '0':
-        greedy_partitioning(g);
-        break;
-    case '1':
-        randomized_greedy_partitioning(g);
-        break;
-    case '2':
-        reactive_randomized_greedy_partitioning(g);
-        break;
-    default:
-        cout << "Algoritmo inválido" << endl;
-        break;
-    }
-}
-
-void greedy_partitioning(Graph *g)
+float greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
 {
     float min_weight = g->get_first_node()->_weight;
     float max_weight = g->get_first_node()->_weight;
@@ -43,8 +23,6 @@ void greedy_partitioning(Graph *g)
             max_weight = aux_node->_weight;
     }
     float max_gap_for_subgraph = (max_weight - min_weight)/(g->get_num_subgraphs() - 1);
-
-    vector<SubGraph*> subgraphs;
     int subgraph = 0;
     for (Node* aux_node = g->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
     {
@@ -112,28 +90,127 @@ void greedy_partitioning(Graph *g)
                 }
         }
         sort(gap_alterations.begin(), gap_alterations.end(), cmp);
-        subgraphs[gap_alterations[0].subgraph]->add_node(gap_alterations[0].node->_id, gap_alterations[0].node->_weight);
-        for(Edge* aux_edge = g->find_node(gap_alterations[0].node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
-            if(subgraphs[gap_alterations[0].subgraph]->find_node(aux_edge->_target->_id) != NULL)
-                subgraphs[gap_alterations[0].subgraph]->add_edge(gap_alterations[0].node->_id, aux_edge->_target->_id);
+        sleep(0.1);
+        srand(time(0));
+        size_t position = 0;
+        if(alpha != 0)
+            position = rand() % (int)(alpha * gap_alterations.size());
+        subgraphs[gap_alterations[position].subgraph]->add_node(gap_alterations[position].node->_id, gap_alterations[position].node->_weight);
+        for(Edge* aux_edge = g->find_node(gap_alterations[position].node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+            if(subgraphs[gap_alterations[position].subgraph]->find_node(aux_edge->_target->_id) != NULL)
+                subgraphs[gap_alterations[position].subgraph]->add_edge(gap_alterations[position].node->_id, aux_edge->_target->_id);
     }while(n < g->get_num_nodes() - 1);
     float gap_total = 0;
     for (size_t i = 0; i < g->get_num_subgraphs(); i++)
     {
         if (!subgraphs[i]->is_connected_subgraph())
-        {
-            cout << "Subgrafo desconexo" << endl;
-            return;
-        }
+            return -1;
         gap_total += subgraphs[i]->get_gap();
     }
-    cout << "Gap total: " << gap_total << endl;
+    return gap_total;
 }
 
-void randomized_greedy_partitioning(Graph *g)
+
+void select_algorithm(Graph *g, char algorithm)
 {
+    vector<float> alphas;
+    switch (algorithm)
+    {
+    case '0':
+        greedy_partitioning(g);
+        break;
+    case '1':
+        cout << "Digite o alpha: ";
+        float alpha;
+        do
+            cin >> alpha;
+        while (alpha < 0 || alpha > 1);
+        randomized_greedy_partitioning(g, alpha);
+        break;
+    case '2':
+        cout << "Digite o número de alphas: ";
+        size_t n;
+        cin >> n;
+        for (size_t i = 0; i < n; i++)
+        {
+            cout << "Digite o alpha " << i + 1 << ": ";
+            float alpha;
+            do
+                cin >> alpha;
+            while (alpha < 0 || alpha > 1);
+            alphas.push_back(alpha);
+        }
+        reactive_randomized_greedy_partitioning(g, alphas);
+        break;
+    default:
+        cout << "Algoritmo inválido" << endl;
+        break;
+    }
 }
 
-void reactive_randomized_greedy_partitioning(Graph *g)
+void greedy_partitioning(Graph *g)
 {
+    float alpha = 0;
+    vector<SubGraph *> subgraphs;
+    float gap = greedy(g, subgraphs, alpha);
+    if (gap == -1)
+    {
+        cout << "Partição inválida" << endl;
+        return;
+    }
+    cout << "GAP total: " << gap << endl;
+}
+
+void randomized_greedy_partitioning(Graph *g, float alpha)
+{
+    vector<float> gaps;
+    for(int i = 0; i < 10; i++)
+    {
+        vector<SubGraph *> subgraphs;
+        float gap = greedy(g, subgraphs, alpha);
+        if (gap == -1)
+        {
+            cout << "Partição inválida" << endl;
+            return;
+        }
+        cout << "GAP total: " << gap << endl;
+        gaps.push_back(gap);
+    }
+    float mean_gap = 0;
+    for (size_t i = 0; i < gaps.size(); i++)
+        mean_gap += gaps[i];
+    mean_gap /= gaps.size();
+    cout << "Média dos GAPs: " << mean_gap << endl;
+}
+
+void reactive_randomized_greedy_partitioning(Graph *g, vector<float> alphas)
+{
+    vector<float> mean_gaps;
+    for (size_t i = 0; i < alphas.size(); i++)
+    {
+        vector<float> gaps;
+        for (int j = 0; j < 10; j++)
+        {
+            vector<SubGraph *> subgraphs;
+            float gap = greedy(g, subgraphs, alphas[i]);
+            if (gap == -1)
+            {
+                cout << "Partição inválida" << endl;
+                return;
+            }
+            cout << "GAP total: " << gap << endl;
+            gaps.push_back(gap);
+        }
+        float mean_gap = 0;
+        for (size_t i = 0; i < gaps.size(); i++)
+            mean_gap += gaps[i];
+        mean_gap /= gaps.size();
+        cout << "Média dos GAPs com alpha " << alphas[i] << ": " << mean_gap << endl;
+        mean_gaps.push_back(mean_gap);
+    }
+    float best_alpha = alphas[0];
+    for (size_t i = 0; i < mean_gaps.size(); i++)
+        if (mean_gaps[i] < mean_gaps[i - 1])
+            best_alpha = alphas[i]; 
+    cout << "Melhor alpha: " << best_alpha << endl;
 }

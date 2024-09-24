@@ -11,6 +11,8 @@
 #include <cfloat>     /* implementação dos valores maximos para os tipos float e double */
 #include <functional> /* implementação de funções lambda */
 #include <queue>      /* implementação do container queue e suas operações */
+#include <cstdlib>    /* implementação do rand() */
+#include <ctime>      /* implementação do time() */
 
 using namespace std;  /* definição do namespace padrão */
 
