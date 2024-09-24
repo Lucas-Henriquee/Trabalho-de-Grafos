@@ -13,6 +13,7 @@
 #include <queue>      /* implementação do container queue e suas operações */
 #include <cstdlib>    /* implementação do rand() */
 #include <ctime>      /* implementação do time() */
+#include <cmath>      /* implementação do ceil() */
 
 using namespace std;  /* definição do namespace padrão */
 
