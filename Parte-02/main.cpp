@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
         if (g != NULL)
         {
-            select_algorithm(g, algorithm);
+            select_algorithm(g, algorithm, filename, file_exit);
             delete g;
         }
     }

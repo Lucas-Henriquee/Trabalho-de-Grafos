@@ -14,6 +14,7 @@
 #include <cstdlib>    /* implementação do rand() */
 #include <ctime>      /* implementação do time() */
 #include <cmath>      /* implementação do ceil() */
+#include <iomanip>    /* manipulação de entrada e saída */
 
 using namespace std;  /* definição do namespace padrão */
 

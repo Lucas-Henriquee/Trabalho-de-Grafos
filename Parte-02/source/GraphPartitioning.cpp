@@ -3,6 +3,8 @@
 #include "../include/SubGraph.hpp"
 #include "../include/defines.hpp"
 
+ostringstream output_buffer;
+
 typedef struct
 {
     int subgraph;
@@ -10,11 +12,16 @@ typedef struct
     Node *node;
 } GapAlteration;
 
+void print_execution_time(clock_t start, clock_t end)
+{
+    double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+    output_buffer << "Tempo de execução: " << fixed << time_taken << setprecision(5) << "s" << endl;
+}
+
 float greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
 {
     float min_weight = g->get_first_node()->_weight;
     float max_weight = g->get_first_node()->_weight;
-    srand(time(NULL));
 
     for (Node* aux_node = g->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
     {
@@ -110,45 +117,69 @@ float greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
 }
 
 
-void select_algorithm(Graph *g, char algorithm)
+void select_algorithm(Graph *g, char algorithm, string filename, string file_exit)
 {
-    vector<float> alphas;
+    output_buffer << "-------------------------------------------------------------\n\n";
+    output_buffer << "Instância: " << filename << endl;
+    output_buffer << "Número de subgrafos: " << g->get_num_subgraphs() << endl;
+
     switch (algorithm)
     {
     case '0':
+        output_buffer << "Tipo de algoritmo: Greedy Partitioning\n\n";
         greedy_partitioning(g);
         break;
+
     case '1':
-        cout << "Digite o alpha: ";
-        float alpha;
-        do
-            cin >> alpha;
-        while (alpha < 0 || alpha > 1);
-        randomized_greedy_partitioning(g, alpha);
-        break;
-    case '2':
-        cout << "Digite o número de alphas: ";
-        size_t n;
-        cin >> n;
-        for (size_t i = 0; i < n; i++)
+        output_buffer << "Tipo de algoritmo: Randomized Greedy Partitioning\n\n";
         {
-            cout << "Digite o alpha " << i + 1 << ": ";
+            cout << "Digite o alpha: ";
             float alpha;
             do
+            {
                 cin >> alpha;
-            while (alpha < 0 || alpha > 1);
-            alphas.push_back(alpha);
+                if (alpha <= 0 || alpha > 1)
+                    cout << "Valor inválido. Digite um alpha entre 0 e 1: ";
+            } while (alpha <= 0 || alpha > 1);
+            randomized_greedy_partitioning(g, alpha);
         }
-        reactive_randomized_greedy_partitioning(g, alphas);
         break;
+
+    case '2':
+        output_buffer << "Tipo de algoritmo: Reactive Randomized Greedy Partitioning\n\n";
+        {
+            cout << "Digite o número de alphas: ";
+            size_t n;
+            cin >> n;
+            vector<float> alphas;
+            for (size_t i = 0; i < n; i++)
+            {
+                cout << "Digite o alpha " << i + 1 << ": ";
+                float alpha;
+                do
+                {
+                    cin >> alpha;
+                    if (alpha <= 0 || alpha > 1)
+                        cout << "Valor inválido. Digite um alpha entre 0 e 1: ";
+                } while (alpha <= 0 || alpha > 1);
+                alphas.push_back(alpha);
+            }
+            reactive_randomized_greedy_partitioning(g, alphas);
+        }
+        break;
+
     default:
         cout << "Algoritmo inválido" << endl;
         break;
     }
+
+    cout << output_buffer.str();
+    print_greedy(file_exit);
 }
 
 void greedy_partitioning(Graph *g)
 {
+    clock_t start = clock();
     float alpha = 0;
     vector<SubGraph *> subgraphs;
     float gap = greedy(g, subgraphs, alpha);
@@ -157,34 +188,43 @@ void greedy_partitioning(Graph *g)
         cout << "Partição inválida" << endl;
         return;
     }
-    cout << "GAP total: " << gap << endl;
+    output_buffer << "GAP total: " << gap << endl;
+    cout << "Número de subgrafos: " << subgraphs.size() << endl;
+    clock_t end = clock();
+    print_execution_time(start, end);
 }
 
 void randomized_greedy_partitioning(Graph *g, float alpha)
 {
+    clock_t start = clock();
     vector<float> gaps;
+    srand(time(NULL));
     for(int i = 0; i < 10; i++)
     {
         vector<SubGraph *> subgraphs;
-        sleep(1);
         float gap = greedy(g, subgraphs, alpha);
         if (gap == -1)
         {
             cout << "Partição inválida" << endl;
             return;
         }
-        cout << "GAP total: " << gap << endl;
+        output_buffer << "GAP total: " << gap << endl;
         gaps.push_back(gap);
     }
     float mean_gap = 0;
     for (size_t i = 0; i < gaps.size(); i++)
         mean_gap += gaps[i];
     mean_gap /= gaps.size();
-    cout << "Média dos GAPs: " << mean_gap << endl;
+    output_buffer << "Média dos GAPs: " << mean_gap << endl;
+
+    clock_t end = clock();
+    print_execution_time(start, end);
 }
 
 void reactive_randomized_greedy_partitioning(Graph *g, vector<float> alphas)
 {
+    clock_t start = clock();
+    srand(time(NULL));
     vector<float> mean_gaps;
     for (size_t i = 0; i < alphas.size(); i++)
     {
@@ -192,26 +232,59 @@ void reactive_randomized_greedy_partitioning(Graph *g, vector<float> alphas)
         for (int j = 0; j < 10; j++)
         {
             vector<SubGraph *> subgraphs;
-            sleep(1);
             float gap = greedy(g, subgraphs, alphas[i]);
             if (gap == -1)
             {
                 cout << "Partição inválida" << endl;
                 return;
             }
-            cout << "GAP total com alpha " << alphas[1] <<": " << gap << endl;
+            output_buffer << "GAP total com alpha " << alphas[i] <<": " << gap << endl;
             gaps.push_back(gap);
         }
         float mean_gap = 0;
         for (size_t i = 0; i < gaps.size(); i++)
             mean_gap += gaps[i];
         mean_gap /= gaps.size();
-        cout << "Média dos GAPs com alpha " << alphas[i] << ": " << mean_gap << endl;
+        output_buffer << "Média dos GAPs com alpha " << alphas[i] << ": " << mean_gap << endl;
         mean_gaps.push_back(mean_gap);
     }
-    float best_alpha = alphas[0];
-    for (size_t i = 0; i < mean_gaps.size(); i++)
-        if (mean_gaps[i] < mean_gaps[i - 1])
-            best_alpha = alphas[i]; 
-    cout << "Melhor alpha: " << best_alpha << endl;
+    output_buffer << "Melhor alpha: " << alphas[min_element(mean_gaps.begin(), mean_gaps.end()) - mean_gaps.begin()] << endl;
+    output_buffer << "Pior alpha: " << alphas[max_element(mean_gaps.begin(), mean_gaps.end()) - mean_gaps.begin()] << endl;
+
+    clock_t end = clock();
+    print_execution_time(start, end);
+}
+
+void print_greedy(string file_exit)
+{
+    ifstream check_file(file_exit);
+    bool file_exists = check_file.good();
+
+    // Abrindo o arquivo de saída.
+    ofstream output_file(file_exit, ios::out | ios::app);
+
+    // Verificando se o arquivo foi aberto.
+    if (output_file.is_open())
+    {
+
+        // Caso o arquivo não exista, escrevendo o grafo no arquivo.
+        if (!file_exists)
+        {
+            output_file << "O Minimum Gap Graph Partitioning Problem (MGGPP):\n\n" << endl;
+        }
+
+        // Escrevendo a saída no arquivo.
+        output_buffer << "\n";
+        output_file << output_buffer.str();
+        output_buffer.str("");
+        output_buffer.clear();
+        cout << "Saída salva no arquivo: " << file_exit << endl;
+
+        // Fechando o arquivo.
+        output_file.close();
+    }
+
+    // Caso contrário.
+    else
+        cout << "Erro ao abrir o arquivo para salvar a saída." << endl;
 }
