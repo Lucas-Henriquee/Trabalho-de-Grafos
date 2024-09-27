@@ -80,7 +80,7 @@ void SubGraph::remove_node(size_t node_id)
 void SubGraph::update_weight(){
     min_weight = _first->_weight;
     max_weight = _first->_weight;
-    for(Node* aux_node;aux_node != NULL; aux_node = aux_node->_next_node){
+    for(Node* aux_node = _first;aux_node != NULL; aux_node = aux_node->_next_node){
         if(aux_node->_weight < min_weight)
             min_weight = aux_node->_weight;
         if(aux_node->_weight > max_weight)
