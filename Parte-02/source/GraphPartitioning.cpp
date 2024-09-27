@@ -201,28 +201,50 @@ float reactive_randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, vector
 {
     float best_gap = FLT_MAX;
     vector<float> probs;
+    vector<float> total_gap_alpha;
+    vector<size_t> n(alphas.size(), 0);
     for(size_t i = 0; i <= alphas.size(); i++)
     {
         probs.push_back(1/alphas.size());
+        total_gap_alpha.push_back(0);
     }
-    for(size_t i = 0; i < 10; i++)
+    for(size_t i = 0; i < 100; i++)
     {
         float chance = (rand() % 100)/100;
         float accumuled_chance = 0;
         float alpha;
         for (size_t j = 0; j < probs.size(); i++)
         {
-            accumuled_chance += probs[j];
             if(accumuled_chance >= chance)
+            {
                 alpha = alphas[j];
+                break;
+            }
+            accumuled_chance += probs[j];
         }
         subgraphs = constructive_phase(g, alpha);
         local_search(g, subgraphs);
         float gap_total = 0;
         for (size_t i = 0; i < subgraphs.size(); i++)
             gap_total += subgraphs[i]->get_gap();
+        total_gap_alpha[find(alphas.begin(), alphas.end(), alpha) - alphas.begin()] += gap_total;
+        n[find(alphas.begin(), alphas.end(), alpha) - alphas.begin()] += 1;
         if(gap_total < best_gap)
             best_gap = gap_total; 
+        if(i % 10 == 0)
+        {
+            vector<float> mean_gap;
+            vector<float> q;
+            float sum_q = 0;
+            for(size_t j = 0; j < alphas.size(); j++)
+            {
+                mean_gap.push_back(total_gap_alpha[j]/n[j]);
+                q.push_back(best_gap/mean_gap[j]);
+                sum_q += q[j];
+            }
+            for(size_t j = 0; j < alphas.size(); j++)
+                probs[j] = q[j]/sum_q;
+        }
     }
     return best_gap;
 }
