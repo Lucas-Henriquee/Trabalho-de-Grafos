@@ -37,6 +37,11 @@ SubGraph::~SubGraph()
 
 void SubGraph::remove_node(size_t node_id)
 {
+    vector<size_t> node_at_index;
+    for (Node* aux_node = _first; aux_node != NULL; aux_node = aux_node->_next_node)
+        node_at_index.push_back(aux_node->_id);
+    
+
     // Encontrando o nó a ser removido.
     Node *aux_node = find_node(node_id);
 
@@ -46,7 +51,7 @@ void SubGraph::remove_node(size_t node_id)
 
     // Verificando se a remoção do nó deixará o grafo desconexo.
     for (size_t i = 0; i < _number_of_nodes; ++i)
-        if (i != node_id && !(conected(node_id, i) || conected(i, node_id)))
+        if (node_at_index[i] != node_id && !(conected(node_id, node_at_index[i]) || conected(node_at_index[i], node_id)))
             return;
 
     // Inicializando o vetor de nós conectados.
@@ -65,6 +70,10 @@ void SubGraph::remove_node(size_t node_id)
         remove_edge(node_id, conected_nodes[i]);
 
     // Atualizando a lista de nós.
+    if(aux_node == _first)
+        _first = aux_node->_next_node;
+    if(aux_node == _last)
+        _last = aux_node->_previous_node;
     aux_node->_next_node = aux_node->_previous_node;
     aux_node->_previous_node = aux_node->_next_node;
 
@@ -303,6 +312,12 @@ Node *SubGraph::get_first_node()
 {
     // Retornando o primeiro nó do grafo.
     return _first;
+}
+
+Node *SubGraph::get_last_node()
+{
+    // Retornando o último nó do grafo.
+    return _last;
 }
 
 float SubGraph::get_node_weight(size_t node_id)

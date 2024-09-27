@@ -25,6 +25,7 @@ public:
     float get_max_weight();
     float get_gap();
     Node *get_first_node();
+    Node *get_last_node();
     Node *find_node(size_t node_id);
     Edge *find_edge(size_t node_id_1, size_t node_id_2);
     bool is_connected_subgraph();

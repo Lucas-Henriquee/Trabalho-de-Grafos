@@ -119,6 +119,12 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
         auto cmp = [](GapAlteration a, GapAlteration b) { return a.gap_alteration < b.gap_alteration; };
         for(size_t i = 0; i < subgraphs.size(); i++)
         {
+            SubGraph* aux_subgraph = new SubGraph();
+            for(Node* aux_node = subgraphs[i]->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
+                aux_subgraph->add_node(aux_node->_id, aux_node->_weight);
+            for(Edge* aux_edge = g->find_node(aux_subgraph->get_first_node()->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+                if(subgraphs[i]->find_node(aux_edge->_target->_id) != NULL)
+                    aux_subgraph->add_edge(aux_subgraph->get_first_node()->_id, aux_edge->_target->_id);
             for(Node* aux_node = subgraphs[i]->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
             {
                 for(Edge* aux_edge = g->find_node(aux_node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
@@ -128,17 +134,17 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
                         if(i == j)
                             continue;
                         if(subgraphs[j]->get_num_nodes() <=2)
-                            continue;
+                            break;
                         if(subgraphs[j]->find_node(aux_edge->_target->_id) != NULL)
                         {
                             GapAlteration gap_alteration;
                             gap_alteration.subgraph = j;
                             gap_alteration.node = aux_edge->_target;
-                            float actualsubgraph_gap = subgraphs[i]->get_gap();
+                            float actualsubgraph_gap = aux_subgraph->get_gap();
                             float othersubgraph_gap = subgraphs[j]->get_gap();
-                            subgraphs[i]->remove_node(aux_node->_id);
+                            aux_subgraph->remove_node(aux_node->_id);
                             subgraphs[j]->add_node(aux_node->_id, aux_node->_weight);
-                            float actualsubgraph_gap_after = subgraphs[i]->get_gap();
+                            float actualsubgraph_gap_after = aux_subgraph->get_gap();
                             float othersubgraph_gap_after = subgraphs[j]->get_gap();
                             float gap_alteration_value = actualsubgraph_gap_after - actualsubgraph_gap + othersubgraph_gap_after - othersubgraph_gap;
                             if(gap_alteration_value < 0)
@@ -147,10 +153,10 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
                                 gap_alterations.push_back(gap_alteration);
                             }
                             subgraphs[j]->remove_node(aux_node->_id);
-                            subgraphs[i]->add_node(aux_node->_id, aux_node->_weight);
+                            aux_subgraph->add_node(aux_node->_id, aux_node->_weight);
                             for(Edge* aux_edge_2 = g->find_node(aux_node->_id)->_first_edge; aux_edge_2 != NULL; aux_edge_2 = aux_edge_2->_next_edge)
-                                if(subgraphs[j]->find_node(aux_edge_2->_target->_id) != NULL)
-                                    subgraphs[j]->add_edge(aux_node->_id, aux_edge_2->_target->_id);
+                                if(aux_subgraph->find_node(aux_edge_2->_target->_id) != NULL)
+                                    aux_subgraph->add_edge(aux_node->_id, aux_edge_2->_target->_id);
                         }
                     }
                 }
@@ -186,7 +192,7 @@ float randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
     float best_gap = FLT_MAX;
     for(size_t n = 0; n < 10; n++)
     {
-        subgraphs = constructive_phase(g, alpha);
+        subgraphs = constructive_phase(g, alpha);     
         local_search(g, subgraphs);
         float gap_total = 0;
         for (size_t i = 0; i < subgraphs.size(); i++)
