@@ -275,24 +275,13 @@ void select_algorithm(Graph *g, char algorithm, string filename, string file_exi
 
     case '2':
         output_buffer << "Tipo de algoritmo: Reactive Randomized Greedy Partitioning\n\n";
+        output_buffer << "Alphas: 0.05, 0.2, 0.3, 0.45, 0.5\n\n";
         {
-            cout << "Digite o número de alphas: ";
-            size_t n;
-            cin >> n;
-            vector<float> alphas;
-            for (size_t i = 0; i < n; i++)
-            {
-                cout << "Digite o alpha " << i + 1 << ": ";
-                float alpha;
-                do
-                {
-                    cin >> alpha;
-                    if (alpha <= 0 || alpha > 1)
-                        cout << "Valor inválido. Digite um alpha entre 0 e 1: ";
-                } while (alpha <= 0 || alpha > 1);
-                alphas.push_back(alpha);
-            }
-            reactive_randomized_greedy_partitioning(g, alphas);
+            float alphas[] = {0.05, 0.2, 0.3, 0.45, 0.5};
+            vector<float> alphas_vector;
+            for (size_t i = 0; i < 5; i++)
+                alphas_vector.push_back(alphas[i]);
+            reactive_randomized_greedy_partitioning(g, alphas_vector);
         }
         break;
 
