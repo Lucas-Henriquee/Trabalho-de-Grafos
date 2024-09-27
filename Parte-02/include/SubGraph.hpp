@@ -42,6 +42,7 @@ private:
 
     // métodos de acesso privadox
     void dfs(Node *node, vector<bool> &visited, vector<size_t> &node_at_index);
+    void update_weight();
 };
 
 #endif // SUBGRAPH_HPP

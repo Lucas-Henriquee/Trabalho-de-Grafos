@@ -18,8 +18,9 @@ void print_execution_time(clock_t start, clock_t end)
     output_buffer << "Tempo de execução: " << fixed << time_taken << setprecision(5) << "s" << endl;
 }
 
-float greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
+vector<SubGraph*> constructive_phase(Graph *g, float alpha)
 {
+    vector<SubGraph *> subgraphs;
     float min_weight = g->get_first_node()->_weight;
     float max_weight = g->get_first_node()->_weight;
 
@@ -62,8 +63,9 @@ float greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
     }
     
     // Adding the remaining nodes to the subgraphs
-    size_t n;
-    do{
+    size_t n = 0;
+    while (n < g->get_num_nodes() - 1)
+    {
         n = 0;
         vector<GapAlteration> gap_alterations;
         auto cmp = [](GapAlteration a, GapAlteration b) { return a.gap_alteration < b.gap_alteration; };
@@ -100,20 +102,129 @@ float greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
         sort(gap_alterations.begin(), gap_alterations.end(), cmp);
         size_t position = 0;
         if(alpha != 0)
-            position = rand() % (int)(ceil(alpha * gap_alterations.size()));
+            position = rand() % int(ceil(alpha * gap_alterations.size()));
         subgraphs[gap_alterations[position].subgraph]->add_node(gap_alterations[position].node->_id, gap_alterations[position].node->_weight);
         for(Edge* aux_edge = g->find_node(gap_alterations[position].node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
             if(subgraphs[gap_alterations[position].subgraph]->find_node(aux_edge->_target->_id) != NULL)
                 subgraphs[gap_alterations[position].subgraph]->add_edge(gap_alterations[position].node->_id, aux_edge->_target->_id);
-    }while(n < g->get_num_nodes() - 1);
-    float gap_total = 0;
-    for (size_t i = 0; i < g->get_num_subgraphs(); i++)
-    {
-        if (!subgraphs[i]->is_connected_subgraph())
-            return -1;
-        gap_total += subgraphs[i]->get_gap();
     }
+    return subgraphs;
+}
+
+void local_search(Graph *g, vector<SubGraph *> &subgraphs)
+{
+    while(true)
+    {
+        vector<GapAlteration> gap_alterations;
+        auto cmp = [](GapAlteration a, GapAlteration b) { return a.gap_alteration < b.gap_alteration; };
+        for(size_t i = 0; i < subgraphs.size(); i++)
+        {
+            for(Node* aux_node = subgraphs[i]->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
+            {
+                for(Edge* aux_edge = g->find_node(aux_node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+                {
+                    for (size_t j = 0; j < subgraphs.size(); j++)
+                    {
+                        if(i == j)
+                            continue;
+                        if(subgraphs[j]->get_num_nodes() <=2)
+                            continue;
+                        if(subgraphs[j]->find_node(aux_edge->_target->_id) != NULL)
+                        {
+                            GapAlteration gap_alteration;
+                            gap_alteration.subgraph = j;
+                            gap_alteration.node = aux_edge->_target;
+                            float actualsubgraph_gap = subgraphs[i]->get_gap();
+                            float othersubgraph_gap = subgraphs[j]->get_gap();
+                            subgraphs[i]->remove_node(aux_node->_id);
+                            subgraphs[j]->add_node(aux_node->_id, aux_node->_weight);
+                            float actualsubgraph_gap_after = subgraphs[i]->get_gap();
+                            float othersubgraph_gap_after = subgraphs[j]->get_gap();
+                            float gap_alteration_value = actualsubgraph_gap_after - actualsubgraph_gap + othersubgraph_gap_after - othersubgraph_gap;
+                            if(gap_alteration_value < 0)
+                            {
+                                gap_alteration.gap_alteration = gap_alteration_value;
+                                gap_alterations.push_back(gap_alteration);
+                            }
+                            subgraphs[j]->remove_node(aux_node->_id);
+                            subgraphs[i]->add_node(aux_node->_id, aux_node->_weight);
+                            for(Edge* aux_edge_2 = g->find_node(aux_node->_id)->_first_edge; aux_edge_2 != NULL; aux_edge_2 = aux_edge_2->_next_edge)
+                                if(subgraphs[j]->find_node(aux_edge_2->_target->_id) != NULL)
+                                    subgraphs[j]->add_edge(aux_node->_id, aux_edge_2->_target->_id);
+                        }
+                    }
+                }
+            }
+        }
+        if(gap_alterations.size() > 0)
+        {
+            sort(gap_alterations.begin(), gap_alterations.end(), cmp);
+            for(size_t i = 0; i < subgraphs.size(); i++)
+                if(subgraphs[i]->find_node(gap_alterations[0].node->_id) != NULL)
+                    subgraphs[i]->remove_node(gap_alterations[0].node->_id);
+            subgraphs[gap_alterations[0].subgraph]->add_node(gap_alterations[0].node->_id, gap_alterations[0].node->_weight);
+            for(Edge* aux_edge = g->find_node(gap_alterations[0].node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
+                if(subgraphs[gap_alterations[0].subgraph]->find_node(aux_edge->_target->_id) != NULL)
+                    subgraphs[gap_alterations[0].subgraph]->add_edge(gap_alterations[0].node->_id, aux_edge->_target->_id);
+        }
+        else
+            break;
+    }
+}
+
+float greedy(Graph *g, vector<SubGraph *> &subgraphs)
+{
+    subgraphs = constructive_phase(g, 0);
+    float gap_total = 0;
+    for (size_t i = 0; i < subgraphs.size(); i++)
+        gap_total += subgraphs[i]->get_gap();
     return gap_total;
+}
+
+float randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
+{
+    float best_gap = FLT_MAX;
+    for(size_t n = 0; n < 10; n++)
+    {
+        subgraphs = constructive_phase(g, alpha);
+        local_search(g, subgraphs);
+        float gap_total = 0;
+        for (size_t i = 0; i < subgraphs.size(); i++)
+            gap_total += subgraphs[i]->get_gap();
+        if(gap_total < best_gap)
+            best_gap = gap_total;
+    }
+    return best_gap;
+}
+
+float reactive_randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, vector<float> alphas)
+{
+    float best_gap = FLT_MAX;
+    vector<float> probs;
+    for(size_t i = 0; i <= alphas.size(); i++)
+    {
+        probs.push_back(1/alphas.size());
+    }
+    for(size_t i = 0; i < 10; i++)
+    {
+        float chance = (rand() % 100)/100;
+        float accumuled_chance = 0;
+        float alpha;
+        for (size_t j = 0; j < probs.size(); i++)
+        {
+            accumuled_chance += probs[j];
+            if(accumuled_chance >= chance)
+                alpha = alphas[j];
+        }
+        subgraphs = constructive_phase(g, alpha);
+        local_search(g, subgraphs);
+        float gap_total = 0;
+        for (size_t i = 0; i < subgraphs.size(); i++)
+            gap_total += subgraphs[i]->get_gap();
+        if(gap_total < best_gap)
+            best_gap = gap_total; 
+    }
+    return best_gap;
 }
 
 
@@ -132,16 +243,11 @@ void select_algorithm(Graph *g, char algorithm, string filename, string file_exi
 
     case '1':
         output_buffer << "Tipo de algoritmo: Randomized Greedy Partitioning\n\n";
+        output_buffer << "Alphas: 0.05, 0.2, 0.3, 0.45, 0.5\n\n";
         {
-            cout << "Digite o alpha: ";
-            float alpha;
-            do
-            {
-                cin >> alpha;
-                if (alpha <= 0 || alpha > 1)
-                    cout << "Valor inválido. Digite um alpha entre 0 e 1: ";
-            } while (alpha <= 0 || alpha > 1);
-            randomized_greedy_partitioning(g, alpha);
+            float alphas[] = {0.05, 0.2, 0.3, 0.45, 0.5};
+            for (size_t i = 0; i < 5; i++)
+                randomized_greedy_partitioning(g, alphas[i]);
         }
         break;
 
@@ -180,9 +286,8 @@ void select_algorithm(Graph *g, char algorithm, string filename, string file_exi
 void greedy_partitioning(Graph *g)
 {
     clock_t start = clock();
-    float alpha = 0;
     vector<SubGraph *> subgraphs;
-    float gap = greedy(g, subgraphs, alpha);
+    float gap = greedy(g, subgraphs);
     if (gap == -1)
     {
         cout << "Partição inválida" << endl;
@@ -197,60 +302,32 @@ void greedy_partitioning(Graph *g)
 void randomized_greedy_partitioning(Graph *g, float alpha)
 {
     clock_t start = clock();
-    vector<float> gaps;
     srand(time(NULL));
-    for(int i = 0; i < 10; i++)
+    vector<SubGraph *> subgraphs;
+    float gap = randomized_greedy(g, subgraphs, alpha);
+    if (gap == -1)
     {
-        vector<SubGraph *> subgraphs;
-        float gap = greedy(g, subgraphs, alpha);
-        if (gap == -1)
-        {
-            cout << "Partição inválida" << endl;
-            return;
-        }
-        output_buffer << "GAP total: " << gap << endl;
-        gaps.push_back(gap);
+        cout << "Partição inválida" << endl;
+        return;
     }
-    float mean_gap = 0;
-    for (size_t i = 0; i < gaps.size(); i++)
-        mean_gap += gaps[i];
-    mean_gap /= gaps.size();
-    output_buffer << "Média dos GAPs: " << mean_gap << endl;
-
+    output_buffer << "GAP total: " << gap << endl;
     clock_t end = clock();
     print_execution_time(start, end);
+    
 }
 
 void reactive_randomized_greedy_partitioning(Graph *g, vector<float> alphas)
 {
     clock_t start = clock();
     srand(time(NULL));
-    vector<float> mean_gaps;
-    for (size_t i = 0; i < alphas.size(); i++)
+    vector<SubGraph *> subgraphs;
+    float gap = reactive_randomized_greedy(g, subgraphs, alphas);
+    if (gap == -1)
     {
-        vector<float> gaps;
-        for (int j = 0; j < 10; j++)
-        {
-            vector<SubGraph *> subgraphs;
-            float gap = greedy(g, subgraphs, alphas[i]);
-            if (gap == -1)
-            {
-                cout << "Partição inválida" << endl;
-                return;
-            }
-            output_buffer << "GAP total com alpha " << alphas[i] <<": " << gap << endl;
-            gaps.push_back(gap);
-        }
-        float mean_gap = 0;
-        for (size_t i = 0; i < gaps.size(); i++)
-            mean_gap += gaps[i];
-        mean_gap /= gaps.size();
-        output_buffer << "Média dos GAPs com alpha " << alphas[i] << ": " << mean_gap << endl;
-        mean_gaps.push_back(mean_gap);
+        cout << "Partição inválida" << endl;
+        return;
     }
-    output_buffer << "Melhor alpha: " << alphas[min_element(mean_gaps.begin(), mean_gaps.end()) - mean_gaps.begin()] << endl;
-    output_buffer << "Pior alpha: " << alphas[max_element(mean_gaps.begin(), mean_gaps.end()) - mean_gaps.begin()] << endl;
-
+    output_buffer << "GAP total: " << gap << endl;
     clock_t end = clock();
     print_execution_time(start, end);
 }
