@@ -49,11 +49,6 @@ void SubGraph::remove_node(size_t node_id)
     if (!aux_node)
         return;
 
-    // Verificando se a remoção do nó deixará o grafo desconexo.
-    for (size_t i = 0; i < _number_of_nodes; ++i)
-        if (node_at_index[i] != node_id && !(conected(node_id, node_at_index[i]) || conected(node_at_index[i], node_id)))
-            return;
-
     // Inicializando o vetor de nós conectados.
     size_t *conected_nodes = new size_t[aux_node->_number_of_edges];
 
@@ -67,23 +62,35 @@ void SubGraph::remove_node(size_t node_id)
 
     // Removendo as arestas do nó a ser removido.
     for (size_t i = 0; i < aux_node->_number_of_edges; i++)
+    {
         remove_edge(node_id, conected_nodes[i]);
+        remove_edge(conected_nodes[i], node_id);
+    }        
 
     // Atualizando a lista de nós.
+    if(aux_node != _first && aux_node != _last)
+    {
+        aux_node->_next_node->_previous_node = aux_node->_previous_node;
+        aux_node->_previous_node->_next_node = aux_node->_next_node;
+    }
     if(aux_node == _first)
+    {
         _first = aux_node->_next_node;
+        aux_node->_next_node->_previous_node = NULL;
+    }
     if(aux_node == _last)
+    {
         _last = aux_node->_previous_node;
-    aux_node->_next_node = aux_node->_previous_node;
-    aux_node->_previous_node = aux_node->_next_node;
+        aux_node->_previous_node->_next_node = NULL;
+    }
 
     // Atualizando o número de nós.
     _number_of_nodes--;
 
     // Deletando o nó.
+    update_weight();
     delete aux_node;
     delete[] conected_nodes;
-    update_weight();
 }
 
 void SubGraph::update_weight(){

@@ -133,13 +133,13 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
                     {
                         if(i == j)
                             continue;
-                        if(subgraphs[j]->get_num_nodes() <=2)
+                        if(subgraphs[i]->get_num_nodes() <=2)
                             break;
                         if(subgraphs[j]->find_node(aux_edge->_target->_id) != NULL)
                         {
                             GapAlteration gap_alteration;
                             gap_alteration.subgraph = j;
-                            gap_alteration.node = aux_edge->_target;
+                            gap_alteration.node = aux_node;
                             float actualsubgraph_gap = aux_subgraph->get_gap();
                             float othersubgraph_gap = subgraphs[j]->get_gap();
                             aux_subgraph->remove_node(aux_node->_id);
@@ -164,14 +164,16 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
         }
         if(gap_alterations.size() > 0)
         {
+            size_t to_remove = 0;
             sort(gap_alterations.begin(), gap_alterations.end(), cmp);
             for(size_t i = 0; i < subgraphs.size(); i++)
                 if(subgraphs[i]->find_node(gap_alterations[0].node->_id) != NULL)
-                    subgraphs[i]->remove_node(gap_alterations[0].node->_id);
+                    to_remove = i;
             subgraphs[gap_alterations[0].subgraph]->add_node(gap_alterations[0].node->_id, gap_alterations[0].node->_weight);
             for(Edge* aux_edge = g->find_node(gap_alterations[0].node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
                 if(subgraphs[gap_alterations[0].subgraph]->find_node(aux_edge->_target->_id) != NULL)
                     subgraphs[gap_alterations[0].subgraph]->add_edge(gap_alterations[0].node->_id, aux_edge->_target->_id);
+            subgraphs[to_remove]->remove_node(gap_alterations[0].node->_id);
         }
         else
             break;
