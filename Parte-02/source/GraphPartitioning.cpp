@@ -125,6 +125,10 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
             for(Edge* aux_edge = g->find_node(aux_subgraph->get_first_node()->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
                 if(subgraphs[i]->find_node(aux_edge->_target->_id) != NULL)
                     aux_subgraph->add_edge(aux_subgraph->get_first_node()->_id, aux_edge->_target->_id);
+            if(aux_subgraph->get_num_nodes() <= 2)
+                continue;
+            if(!aux_subgraph->is_connected_subgraph())
+                continue;
             for(Node* aux_node = subgraphs[i]->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
             {
                 for(Edge* aux_edge = g->find_node(aux_node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
@@ -168,7 +172,10 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
             sort(gap_alterations.begin(), gap_alterations.end(), cmp);
             for(size_t i = 0; i < subgraphs.size(); i++)
                 if(subgraphs[i]->find_node(gap_alterations[0].node->_id) != NULL)
+                {
                     to_remove = i;
+                    break;
+                }
             subgraphs[gap_alterations[0].subgraph]->add_node(gap_alterations[0].node->_id, gap_alterations[0].node->_weight);
             for(Edge* aux_edge = g->find_node(gap_alterations[0].node->_id)->_first_edge; aux_edge != NULL; aux_edge = aux_edge->_next_edge)
                 if(subgraphs[gap_alterations[0].subgraph]->find_node(aux_edge->_target->_id) != NULL)
@@ -184,6 +191,9 @@ float greedy(Graph *g, vector<SubGraph *> &subgraphs)
 {
     subgraphs = constructive_phase(g, 0);
     float gap_total = 0;
+    for(size_t i = 0; i < subgraphs.size(); i++)
+        if(!subgraphs[i]->is_connected_subgraph())
+            return -1;
     for (size_t i = 0; i < subgraphs.size(); i++)
         gap_total += subgraphs[i]->get_gap();
     return gap_total;
@@ -196,9 +206,18 @@ float randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
     {
         subgraphs = constructive_phase(g, alpha);     
         local_search(g, subgraphs);
+        bool connected = true;
+        for(size_t i = 0; i < subgraphs.size(); i++)
+            if(!subgraphs[i]->is_connected_subgraph())
+                connected = false;
         float gap_total = 0;
         for (size_t i = 0; i < subgraphs.size(); i++)
             gap_total += subgraphs[i]->get_gap();
+        if(!connected)
+        {
+            n--;
+            continue;
+        }
         if(gap_total < best_gap)
             best_gap = gap_total;
     }
@@ -230,6 +249,10 @@ float reactive_randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, vector
             }
             accumuled_chance += probs[j];
         }
+        bool connected = true;
+        for(size_t i = 0; i < subgraphs.size(); i++)
+            if(!subgraphs[i]->is_connected_subgraph())
+                connected = false;
         subgraphs = constructive_phase(g, alpha);
         local_search(g, subgraphs);
         float gap_total = 0;
@@ -237,6 +260,11 @@ float reactive_randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, vector
             gap_total += subgraphs[i]->get_gap();
         total_gap_alpha[find(alphas.begin(), alphas.end(), alpha) - alphas.begin()] += gap_total;
         n[find(alphas.begin(), alphas.end(), alpha) - alphas.begin()] += 1;
+        if(!connected)
+        {
+            i--;
+            continue;
+        }
         if(gap_total < best_gap)
             best_gap = gap_total; 
         if(i % 10 == 0)

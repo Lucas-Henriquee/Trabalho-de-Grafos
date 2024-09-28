@@ -73,6 +73,11 @@ void SubGraph::remove_node(size_t node_id)
         aux_node->_next_node->_previous_node = aux_node->_previous_node;
         aux_node->_previous_node->_next_node = aux_node->_next_node;
     }
+    if(aux_node == _first && aux_node == _last)
+    {
+        _first = NULL;
+        _last = NULL;
+    }
     if(aux_node == _first)
     {
         _first = aux_node->_next_node;
@@ -94,6 +99,11 @@ void SubGraph::remove_node(size_t node_id)
 }
 
 void SubGraph::update_weight(){
+    if(_first == NULL){
+        min_weight = 0;
+        max_weight = 0;
+        return;
+    }
     min_weight = _first->_weight;
     max_weight = _first->_weight;
     for(Node* aux_node = _first;aux_node != NULL; aux_node = aux_node->_next_node){
