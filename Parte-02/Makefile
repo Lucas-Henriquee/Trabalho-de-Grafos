@@ -26,6 +26,7 @@ endif
 
 # Output executables
 TARGET := execGrupoX
+EXEC := execAll.sh
 
 .PHONY: all clean
 
@@ -33,6 +34,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS) $(MAIN_OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJS) $(MAIN_OBJ) -o $(TARGET)
+	chmod +x $(EXEC)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPS)
 	$(MKDIR_CMD)
@@ -44,3 +46,4 @@ $(BUILD_DIR)/main.o: main.cpp $(DEPS)
 
 clean:
 	@$(RM_CMD)
+	chmod -x $(EXEC)
