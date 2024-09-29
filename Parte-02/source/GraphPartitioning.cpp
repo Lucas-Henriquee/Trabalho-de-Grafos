@@ -151,7 +151,7 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
                             float actualsubgraph_gap_after = aux_subgraph->get_gap();
                             float othersubgraph_gap_after = subgraphs[j]->get_gap();
                             float gap_alteration_value = actualsubgraph_gap_after - actualsubgraph_gap + othersubgraph_gap_after - othersubgraph_gap;
-                            if(gap_alteration_value < 0)
+                            if(gap_alteration_value < 0 && aux_subgraph->is_connected_subgraph() && aux_subgraph->get_num_nodes() >= 2)
                             {
                                 gap_alteration.gap_alteration = gap_alteration_value;
                                 gap_alterations.push_back(gap_alteration);
