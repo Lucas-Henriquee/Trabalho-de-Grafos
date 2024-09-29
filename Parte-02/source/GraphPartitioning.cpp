@@ -31,11 +31,12 @@ vector<SubGraph*> constructive_phase(Graph *g, float alpha)
         if (max_weight < aux_node->_weight)
             max_weight = aux_node->_weight;
     }
+    //Decide um critério para inicializar os subgrafos
     float max_gap_for_subgraph = (max_weight - min_weight)/(g->get_num_subgraphs() - 1);
     int subgraph = 0;
     for (Node* aux_node = g->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
     {
-        // Starting n subgraphs with one node
+        // Inicializa um subgrafo com um nó seguindo o critério de inicialização
         if(aux_node->_weight >= min_weight + subgraph * max_gap_for_subgraph)
         {
             SubGraph* sub_g = new SubGraph();
@@ -45,7 +46,7 @@ vector<SubGraph*> constructive_phase(Graph *g, float alpha)
         }
     }
 
-    // Adding a new node to each subgraph
+    // Adiciona o segundo nó a cada subgrafo para cumprir o critério de inicialização
     for(size_t i = 0; i < g->get_num_subgraphs(); i++)
     {
         Node* aux_node_s = subgraphs[i]->get_first_node();
@@ -62,13 +63,14 @@ vector<SubGraph*> constructive_phase(Graph *g, float alpha)
         subgraphs[i]->add_edge(aux_node_s->_id, edge_min_gap->_target->_id);
     }
     
-    // Adding the remaining nodes to the subgraphs
+    // Adiciona os nós restantes aos subgrafos
     size_t n = 0;
     while (n < g->get_num_nodes() - 1)
     {
         n = 0;
         vector<GapAlteration> gap_alterations;
         auto cmp = [](GapAlteration a, GapAlteration b) { return a.gap_alteration < b.gap_alteration; };
+        //Verifica as alterções que alteram o gap
         for(size_t i = 0; i < g->get_num_subgraphs(); i++)
         {
             vector<bool> in_gap_alterations(g->get_num_nodes(), false);       
@@ -99,8 +101,10 @@ vector<SubGraph*> constructive_phase(Graph *g, float alpha)
                     }
                 }
         }
+        //Ordena as alterações visando minimizar o gap
         sort(gap_alterations.begin(), gap_alterations.end(), cmp);
         size_t position = 0;
+        //Se alpha for 0, algoritmo guloso, se não, algoritmo randomizado
         if(alpha != 0)
             position = rand() % int(ceil(alpha * gap_alterations.size()));
         subgraphs[gap_alterations[position].subgraph]->add_node(gap_alterations[position].node->_id, gap_alterations[position].node->_weight);
@@ -113,12 +117,15 @@ vector<SubGraph*> constructive_phase(Graph *g, float alpha)
 
 void local_search(Graph *g, vector<SubGraph *> &subgraphs)
 {
+    //Repete até que não haja mais alterações que diminuam o gap
     while(true)
     {
         vector<GapAlteration> gap_alterations;
         auto cmp = [](GapAlteration a, GapAlteration b) { return a.gap_alteration < b.gap_alteration; };
+        //Verica todas as possíveis alterações que diminuam a soma dos gaps
         for(size_t i = 0; i < subgraphs.size(); i++)
         {
+            //Cria um subgrafo auxiliar com os mesmos nós do subgrafo i para testar as alterações
             SubGraph* aux_subgraph = new SubGraph();
             for(Node* aux_node = subgraphs[i]->get_first_node(); aux_node != NULL; aux_node = aux_node->_next_node)
                 aux_subgraph->add_node(aux_node->_id, aux_node->_weight);
@@ -151,6 +158,7 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
                             float actualsubgraph_gap_after = aux_subgraph->get_gap();
                             float othersubgraph_gap_after = subgraphs[j]->get_gap();
                             float gap_alteration_value = actualsubgraph_gap_after - actualsubgraph_gap + othersubgraph_gap_after - othersubgraph_gap;
+                            //Testa se a alteração diminui o gap sem desconectar o subgrafo e deixa mais de 2 nós no subgrafo
                             if(gap_alteration_value < 0 && aux_subgraph->is_connected_subgraph() && aux_subgraph->get_num_nodes() >= 2)
                             {
                                 gap_alteration.gap_alteration = gap_alteration_value;
@@ -166,6 +174,7 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
                 }
             }
         }
+        //Faz a alteração que diminui mais o gap
         if(gap_alterations.size() > 0)
         {
             size_t to_remove = 0;
@@ -189,11 +198,14 @@ void local_search(Graph *g, vector<SubGraph *> &subgraphs)
 
 float greedy(Graph *g, vector<SubGraph *> &subgraphs)
 {
+    //Chama a fase construtiva com alpha 0
     subgraphs = constructive_phase(g, 0);
     float gap_total = 0;
+    //Verifica se a partição é válida
     for(size_t i = 0; i < subgraphs.size(); i++)
-        if(!subgraphs[i]->is_connected_subgraph())
+        if(!subgraphs[i]->is_connected_subgraph() || subgraphs[i]->get_num_nodes() < 2)
             return -1;
+    //Calcula e retorna o gap total
     for (size_t i = 0; i < subgraphs.size(); i++)
         gap_total += subgraphs[i]->get_gap();
     return gap_total;
@@ -201,45 +213,54 @@ float greedy(Graph *g, vector<SubGraph *> &subgraphs)
 
 float randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, float alpha)
 {
-    float best_gap = FLT_MAX;
+    float mean_gap = 0;
+    //Faz 10 iterações para calcular as médias dos gaps
     for(size_t n = 0; n < 10; n++)
     {
-        subgraphs = constructive_phase(g, alpha);     
+        //Chama a fase construtiva com alpha pedido
+        subgraphs = constructive_phase(g, alpha);
+        //Chama a fase de busca local para melhorar a partição
         local_search(g, subgraphs);
-        bool connected = true;
+        //Verifica se a partição é válida
+        bool valid = true;
         for(size_t i = 0; i < subgraphs.size(); i++)
-            if(!subgraphs[i]->is_connected_subgraph())
-                connected = false;
+            if(!subgraphs[i]->is_connected_subgraph() || subgraphs[i]->get_num_nodes() < 2)
+                valid = false;
+        //Calcula o gap total de todos os subgrafos
         float gap_total = 0;
         for (size_t i = 0; i < subgraphs.size(); i++)
             gap_total += subgraphs[i]->get_gap();
-        if(!connected)
+        if(!valid)
         {
             n--;
             continue;
         }
-        if(gap_total < best_gap)
-            best_gap = gap_total;
+        mean_gap += gap_total;
     }
-    return best_gap;
+    //Retorna a média dos gaps
+    return mean_gap/10;
 }
 
 float reactive_randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, vector<float> alphas)
 {
     float best_gap = FLT_MAX;
+    float mean_gap = 0;
     vector<float> probs;
     vector<float> total_gap_alpha;
     vector<size_t> n(alphas.size(), 0);
+    //Inicializa as probabilidades de escolha de alpha
     for(size_t i = 0; i <= alphas.size(); i++)
     {
         probs.push_back(1/alphas.size());
         total_gap_alpha.push_back(0);
     }
+    //Faz 100 iterações para calcular as médias dos gaps
     for(size_t i = 0; i < 100; i++)
     {
         float chance = (rand() % 100)/100;
         float accumuled_chance = 0;
         float alpha;
+        //Escolhe um alpha de acordo com as probabilidades
         for (size_t j = 0; j < probs.size(); i++)
         {
             if(accumuled_chance >= chance)
@@ -249,24 +270,32 @@ float reactive_randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, vector
             }
             accumuled_chance += probs[j];
         }
-        bool connected = true;
-        for(size_t i = 0; i < subgraphs.size(); i++)
-            if(!subgraphs[i]->is_connected_subgraph())
-                connected = false;
+        //Chama a fase construtiva com o alpha escolhido
         subgraphs = constructive_phase(g, alpha);
+        //Chama a fase de busca local para melhorar a partição
         local_search(g, subgraphs);
+        //Verifica se a partição é válida
+        bool valid = true;
+        for(size_t i = 0; i < subgraphs.size(); i++)
+            if(!subgraphs[i]->is_connected_subgraph() || subgraphs[i]->get_num_nodes() < 2)
+                valid = false;
+        //Calcula o gap total de todos os subgrafos
         float gap_total = 0;
         for (size_t i = 0; i < subgraphs.size(); i++)
             gap_total += subgraphs[i]->get_gap();
-        total_gap_alpha[find(alphas.begin(), alphas.end(), alpha) - alphas.begin()] += gap_total;
-        n[find(alphas.begin(), alphas.end(), alpha) - alphas.begin()] += 1;
-        if(!connected)
+        //Se a partição for inválida, repete a iteração
+        if(!valid)
         {
             i--;
             continue;
         }
+        //Atualiza os valores para calcular as probabilidades
+        total_gap_alpha[find(alphas.begin(), alphas.end(), alpha) - alphas.begin()] += gap_total;
+        n[find(alphas.begin(), alphas.end(), alpha) - alphas.begin()] += 1;
         if(gap_total < best_gap)
             best_gap = gap_total; 
+        mean_gap += gap_total;
+        //Atualiza as probabilidades a cada 10 iterações
         if(i % 10 == 0)
         {
             vector<float> mean_gap;
@@ -282,7 +311,8 @@ float reactive_randomized_greedy(Graph *g, vector<SubGraph *> &subgraphs, vector
                 probs[j] = q[j]/sum_q;
         }
     }
-    return best_gap;
+    //Retorna a média dos gaps
+    return mean_gap/100;
 }
 
 
