@@ -47,7 +47,7 @@ Caso o dos2unix não esteja instalado, instale-o manualmente.
 
 ### Relatório de Resultados
 
-O programa gera um arquivo de saída contendo os resultados do particionamento, incluindo os gaps calculados para cada subgrafo. Esses resultados foram utilizados para a análise do *Minimum Gap Graph Partitioning Problem (MGGPP)* e a criação do [Relatório Final]().
+O programa gera um arquivo de saída contendo os resultados do particionamento, incluindo os gaps calculados para cada subgrafo. Esses resultados foram utilizados para a análise do *Minimum Gap Graph Partitioning Problem (MGGPP)* e a criação do [Relatório Final](./Relatorio_Final.pdf).
  
 ### Exemplo de Arquivo para Compilar
 Os arquivos de exemplo estão localizados na pasta [**instances_example**](./instances_example/) do repositório. Esses arquivos contêm grafos que foram selecionados para análise e elaboração do relatório final. Eles podem ser utilizados para referência quanto à estrutura dos dados.
